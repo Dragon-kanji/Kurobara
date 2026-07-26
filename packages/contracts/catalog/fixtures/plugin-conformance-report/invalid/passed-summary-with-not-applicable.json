@@ -1,0 +1,46 @@
+{
+  "report_version": "1.0.0",
+  "report_schema_fingerprint": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "profile": {
+    "id": "dev.kurobara.plugin-conformance/local-v1",
+    "version": "1.0.0",
+    "fingerprint": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "compatibility_matrix_fingerprint": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "subject": {
+    "package_name": "@kurobara/provider-defective",
+    "package_version": "1.0.0",
+    "artifact_fingerprint": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "manifest_fingerprint": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+  },
+  "environment": {
+    "node_version": "24.14.0",
+    "platform": "darwin",
+    "architecture": "arm64"
+  },
+  "toolchain": {
+    "plugin_api_version": "dev.kurobara.plugin/v1",
+    "protocol_api_version": "dev.kurobara.plugin-protocol/v1",
+    "contracts_package_version": "0.1.0",
+    "catalog_version": "0.8.0",
+    "catalog_fingerprint": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "sdk_package_version": "0.1.0",
+    "host_package_version": "0.1.0",
+    "conformance_kit_version": "0.1.0"
+  },
+  "guarantees": [
+    {
+      "id": "compatibility.exact-versions",
+      "status": "not-applicable",
+      "reason_codes": ["profile-not-applicable"],
+      "evidence_refs": ["case:compatibility-exact"]
+    }
+  ],
+  "summary": {
+    "status": "passed",
+    "passed": 0,
+    "failed": 0,
+    "not_applicable": 1,
+    "total": 1
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "value": "example.invalid",
+  "provenance": {
+    "references": [
+      "https://example.invalid/source",
+      "https://example.invalid/source"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "result",
+  "method": "health",
+  "payload": {
+    "status": "degraded",
+    "observedAtMs": 4102444700000,
+    "validUntilMs": 4102444730000,
+    "error": {
+      "class": "provider",
+      "reasonCode": "provider-unavailable",
+      "retryAfterMs": 1000
+    }
+  }
+}

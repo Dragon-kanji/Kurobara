@@ -1,0 +1,22 @@
+{
+  "application_id": "recipe-application-synthetic",
+  "authority_envelope_id": "authority-synthetic",
+  "cell_budget": {
+    "limit": 4,
+    "unit": "cell"
+  },
+  "deadline_ms": 9007199254740991,
+  "max_cells": 10001,
+  "recipe": {
+    "recipe_id": "recipe-synthetic",
+    "recipe_revision": "1",
+    "dataset_id": "dataset-synthetic",
+    "workspace_id": "workspace-synthetic",
+    "name": "Resolve company category",
+    "input_field_ids": ["field-domain"],
+    "target_field_id": "field-category",
+    "workflow_spec_id": "workflow-company-category",
+    "workflow_revision": "1",
+    "workflow_content_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
+}

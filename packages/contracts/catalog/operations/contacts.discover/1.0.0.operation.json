@@ -1,0 +1,48 @@
+{
+  "operation_id": "contacts.discover",
+  "operation_version": "1.0.0",
+  "action_ref": "DiscoverContacts",
+  "kind": "mutation",
+  "auth_profile": "http-bearer",
+  "idempotence": "required",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/contacts/discover-request/1.0.0",
+  "output_schema_id": "https://schemas.kurobara.invalid/schemas/contacts/discover-response/1.0.0",
+  "problem_codes": [
+    "authentication-required",
+    "authority-capability-missing",
+    "authority-permission-missing",
+    "authority-subject-mismatch",
+    "deadline-elapsed",
+    "domain-rejected",
+    "idempotency-key-reused",
+    "internal-error",
+    "invalid-budget",
+    "invalid-credential",
+    "output-contract-violation",
+    "payload-too-large",
+    "quote-unit-mismatch",
+    "request-invalid",
+    "service-unavailable",
+    "unsupported-media-type",
+    "workspace-mismatch"
+  ],
+  "required_capabilities": ["contacts.discover@1.0.0"],
+  "required_permissions": [
+    "datasets:generate",
+    "plans:quote",
+    "contacts:discover"
+  ],
+  "human_gates": [],
+  "accepted_data_classes": ["confidential"],
+  "produced_data_classes": ["confidential"],
+  "status": "experimental",
+  "projections": {
+    "rest": { "method": "POST", "path": "/v1/contact-discoveries" },
+    "sdk_ts": { "method": "contacts.discover" },
+    "cli": { "command": "contact search", "output_mode": "json" },
+    "mcp": {
+      "availability": "deferred",
+      "reason": "Contact discovery remains API, SDK and CLI-only until privacy-scoped MCP authority is implemented."
+    }
+  }
+}

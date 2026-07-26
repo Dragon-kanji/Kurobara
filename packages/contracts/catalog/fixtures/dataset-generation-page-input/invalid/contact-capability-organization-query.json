@@ -1,0 +1,44 @@
+{
+  "capability": {
+    "capabilityId": "contacts.discover",
+    "capabilityVersion": "1.0.0"
+  },
+  "datasetId": "dataset-synthetic",
+  "fields": [
+    {
+      "datasetId": "dataset-synthetic",
+      "fieldId": "field-name",
+      "key": "name",
+      "label": "Name",
+      "valueType": "string",
+      "workspaceId": "workspace-synthetic"
+    }
+  ],
+  "generationId": "generation-synthetic",
+  "generationPlanId": "generation-plan-synthetic",
+  "inputCursor": null,
+  "kind": "dataset-generation-page-input",
+  "limits": {
+    "maxCalls": 2,
+    "maxCompanies": 50,
+    "maxContactsPerCompany": 0,
+    "maxContactsTotal": 0,
+    "maxEnrichments": 0,
+    "maxPages": 2,
+    "maxPhones": 0,
+    "maxResults": 50
+  },
+  "normalizedQuery": {
+    "country_codes": ["FR"],
+    "country_scope": "headquarters",
+    "industry_codes": ["software"],
+    "industry_taxonomy": "kurobara-v1",
+    "result_kind": "company"
+  },
+  "pageSequence": 1,
+  "planHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "queryHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "schemaHash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "version": "1.0.0",
+  "workspaceId": "workspace-synthetic"
+}

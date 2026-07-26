@@ -1,0 +1,20 @@
+{
+  "name": "@kurobara/adapter-orchestration-hatchet",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "typecheck": "tsc --project tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@hatchet-dev/typescript-sdk": "1.26.0",
+    "@kurobara/kernel": "file:../../kernel",
+    "@kurobara/ports": "file:../../ports",
+    "zod": "4.4.3"
+  }
+}

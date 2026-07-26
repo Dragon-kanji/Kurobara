@@ -1,0 +1,9 @@
+{
+  "idempotency_key": "privacy-restrict-synthetic-003",
+  "reason": "operator-subject-request",
+  "subject": {
+    "kind": "email",
+    "provider_key": "synthetic-provider",
+    "value": "privacy-subject@example.invalid"
+  }
+}

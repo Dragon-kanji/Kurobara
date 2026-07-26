@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/recipes/apply-response/1.0.0",
+  "title": "RecipesApplyResponse",
+  "description": "Bounded aggregate result for one exact recipe application, including replay and per-cell binding counts without embedding Runs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "workspace_id",
+    "application_id",
+    "dataset_id",
+    "recipe_id",
+    "recipe_revision",
+    "total_cell_count",
+    "created_run_count",
+    "active_cell_count",
+    "cached_cell_count",
+    "bound_cell_count",
+    "recipe_replayed",
+    "application_replayed"
+  ],
+  "properties": {
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "application_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "recipe_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "recipe_revision": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "total_cell_count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10000
+    },
+    "created_run_count": { "$ref": "#/$defs/cell_count" },
+    "active_cell_count": { "$ref": "#/$defs/cell_count" },
+    "cached_cell_count": { "$ref": "#/$defs/cell_count" },
+    "bound_cell_count": { "$ref": "#/$defs/cell_count" },
+    "recipe_replayed": { "type": "boolean" },
+    "application_replayed": { "type": "boolean" }
+  },
+  "$defs": {
+    "cell_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.recipes",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

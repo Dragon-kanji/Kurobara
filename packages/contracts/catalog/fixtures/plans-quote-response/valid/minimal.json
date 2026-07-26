@@ -1,0 +1,18 @@
+{
+  "run_plan_id": "plan-synthetic",
+  "workspace_id": "workspace-synthetic",
+  "plan_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "catalog_version": "0.1.0",
+  "catalog_fingerprint": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "quote": {
+    "quote_id": "quote-synthetic",
+    "guarantee": "hard",
+    "unit": "credits",
+    "upper_bound": 5,
+    "pricing_version": "1.0.0",
+    "expires_at_ms": 1799999999000
+  },
+  "budget": { "unit": "credits", "limit": 5, "spent": 0, "reserved": 0 },
+  "deadline_ms": 1800000000000,
+  "authority_envelope_id": "authority-synthetic"
+}

@@ -1,0 +1,44 @@
+{
+  "operation_id": "organizations.candidates.list",
+  "operation_version": "1.0.0",
+  "action_ref": "ListOrganizationCandidates",
+  "kind": "read",
+  "auth_profile": "http-bearer",
+  "idempotence": "inherent",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/organizations/candidates-list-request/1.0.0",
+  "output_schema_id": "https://schemas.kurobara.invalid/schemas/organizations/candidates-list-response/1.0.0",
+  "problem_codes": [
+    "authentication-required",
+    "authority-permission-missing",
+    "dataset-generation-not-found",
+    "internal-error",
+    "invalid-credential",
+    "output-contract-violation",
+    "request-invalid",
+    "service-unavailable"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["datasets:read"],
+  "human_gates": [],
+  "accepted_data_classes": ["internal"],
+  "produced_data_classes": ["internal"],
+  "status": "experimental",
+  "projections": {
+    "rest": {
+      "method": "GET",
+      "path": "/v1/dataset-generations/{generation_id}/company-candidates",
+      "path_parameters": ["generation_id"],
+      "query_parameters": ["after_ordinal", "limit"]
+    },
+    "sdk_ts": { "method": "organizations.listCandidates" },
+    "cli": {
+      "command": "company results",
+      "input_mode": "arguments",
+      "output_mode": "json"
+    },
+    "mcp": {
+      "availability": "deferred",
+      "reason": "Company candidate results remain API, SDK and CLI-only until the post-V1 MCP authority surface is implemented."
+    }
+  }
+}

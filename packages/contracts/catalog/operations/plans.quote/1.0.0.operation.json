@@ -1,0 +1,40 @@
+{
+  "operation_id": "plans.quote",
+  "operation_version": "1.0.0",
+  "action_ref": "QuoteRunPlan",
+  "kind": "mutation",
+  "auth_profile": "http-bearer",
+  "idempotence": "not-supported",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/plans/quote-request/1.0.0",
+  "output_schema_id": "https://schemas.kurobara.invalid/schemas/plans/quote-response/1.0.0",
+  "problem_codes": [
+    "authentication-required",
+    "authority-capability-missing",
+    "authority-permission-missing",
+    "authority-subject-mismatch",
+    "deadline-elapsed",
+    "domain-rejected",
+    "internal-error",
+    "invalid-budget",
+    "invalid-credential",
+    "output-contract-violation",
+    "payload-too-large",
+    "quote-unit-mismatch",
+    "request-invalid",
+    "service-unavailable",
+    "unsupported-media-type",
+    "workspace-mismatch"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["plans:quote"],
+  "human_gates": [],
+  "accepted_data_classes": ["internal"],
+  "produced_data_classes": ["internal"],
+  "status": "experimental",
+  "projections": {
+    "rest": { "method": "POST", "path": "/v1/plans" },
+    "sdk_ts": { "method": "plans.quote" },
+    "cli": { "command": "quote" },
+    "mcp": { "tool": "quote_run" }
+  }
+}

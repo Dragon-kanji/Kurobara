@@ -1,0 +1,9 @@
+{
+  "record_id": "record-synthetic",
+  "dataset_id": "dataset-synthetic",
+  "workspace_id": "workspace-synthetic",
+  "values": [
+    { "field_id": "field-domain", "value": "example.invalid" },
+    { "field_id": "field-active", "value": true }
+  ]
+}

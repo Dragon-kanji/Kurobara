@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/contact-privacy/restrict-response/1.0.0",
+  "title": "ContactPrivacyRestrictResponse",
+  "description": "PII-free receipt for an atomic contact restriction and export-delivery revocation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "tombstone_id",
+    "reason",
+    "registered_at_ms",
+    "replayed",
+    "affected_delivery_count",
+    "newly_revoked_delivery_count"
+  ],
+  "properties": {
+    "tombstone_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "provider-opt-out",
+        "provider-deletion",
+        "provider-claimed-email",
+        "operator-subject-request"
+      ]
+    },
+    "registered_at_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "replayed": { "type": "boolean" },
+    "affected_delivery_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "newly_revoked_delivery_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.contact-privacy",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/datasets/import-request/1.0.0",
+  "title": "DatasetsImportRequest",
+  "description": "Bounded metadata for one streaming initial dataset import. The raw source bytes are carried by the REST multipart source part and bound by source_content_hash.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "import_id",
+    "dataset",
+    "fields",
+    "format",
+    "source_content_hash",
+    "max_record_bytes",
+    "batch_limits"
+  ],
+  "properties": {
+    "import_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "dataset": {
+      "$ref": "https://schemas.kurobara.invalid/schemas/product/dataset/1.0.0"
+    },
+    "fields": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "https://schemas.kurobara.invalid/schemas/product/field/1.0.0"
+      }
+    },
+    "format": {
+      "type": "string",
+      "enum": ["csv", "jsonl"]
+    },
+    "source_content_hash": {
+      "type": "string",
+      "minLength": 71,
+      "maxLength": 71,
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "max_record_bytes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 16777216
+    },
+    "batch_limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_bytes", "max_items"],
+      "properties": {
+        "max_bytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 67108864
+        },
+        "max_items": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        }
+      }
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.datasets",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

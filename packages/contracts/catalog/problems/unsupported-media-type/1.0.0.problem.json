@@ -1,0 +1,10 @@
+{
+  "problem_code": "unsupported-media-type",
+  "problem_version": "1.0.0",
+  "type_uri": "https://problems.kurobara.invalid/unsupported-media-type",
+  "title": "Unsupported media type",
+  "default_status": 415,
+  "retryable": false,
+  "safe_extensions": ["correlation_id"],
+  "publication_status": "local-development-only"
+}

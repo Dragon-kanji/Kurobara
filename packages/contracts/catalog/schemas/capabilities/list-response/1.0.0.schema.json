@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/capabilities/list-response/1.0.0",
+  "title": "CapabilitiesListResponse",
+  "description": "Bounded capability references that are both available in the composed runtime and covered by one exact authority envelope.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["workspace_id", "authority_envelope_id", "capabilities"],
+  "properties": {
+    "workspace_id": { "type": "string", "minLength": 1, "maxLength": 255 },
+    "authority_envelope_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "capabilities": {
+      "type": "array",
+      "maxItems": 256,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["capability_id", "capability_version"],
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "capability_version": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+          }
+        }
+      }
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.capabilities",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

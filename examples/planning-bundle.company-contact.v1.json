@@ -1,0 +1,84 @@
+{
+  "formatVersion": "1.0.0",
+  "planning": {
+    "authorities": [
+      {
+        "authorityEnvelopeId": "authority-b2b-dogfood-v1",
+        "budgetLimit": {
+          "limit": 4,
+          "reserved": 0,
+          "spent": 0,
+          "unit": "requests"
+        },
+        "capabilities": [
+          {
+            "capabilityId": "organizations.discover",
+            "capabilityVersion": "1.0.0"
+          },
+          {
+            "capabilityId": "contacts.discover",
+            "capabilityVersion": "1.0.0"
+          },
+          {
+            "capabilityId": "contacts.identity.reveal",
+            "capabilityVersion": "1.0.0"
+          },
+          {
+            "capabilityId": "contacts.work-email.resolve",
+            "capabilityVersion": "1.0.0"
+          },
+          {
+            "capabilityId": "contacts.work-email.verify",
+            "capabilityVersion": "1.0.0"
+          }
+        ],
+        "deadline": 4102444800000,
+        "permissions": [
+          "capabilities:list",
+          "contacts:export",
+          "contacts:discover",
+          "contacts:enrich",
+          "datasets:export",
+          "datasets:generate",
+          "datasets:read",
+          "plans:quote",
+          "steps:execute"
+        ],
+        "subjectActorId": "actor-b2b-dogfood",
+        "version": "1.0.0",
+        "workspaceId": "workspace-b2b-dogfood"
+      }
+    ],
+    "defaults": {
+      "policySnapshotId": "policy-b2b-dogfood-v1",
+      "pricingSnapshotId": "pricing-b2b-dogfood-v1",
+      "workspaceId": "workspace-b2b-dogfood"
+    },
+    "expectedDefaultsRevision": null,
+    "policies": [
+      {
+        "policy": {
+          "factsHash": "sha256:b3bfceb05287608a787b7c1ffce3aeccd3eb6be3bbe5bcb88006256e7910993f",
+          "maxAttemptsPerStep": 1,
+          "requiredPermission": "datasets:generate",
+          "version": "1.0.0"
+        },
+        "snapshotId": "policy-b2b-dogfood-v1",
+        "workspaceId": "workspace-b2b-dogfood"
+      }
+    ],
+    "pricing": [
+      {
+        "guarantee": "hard",
+        "snapshotId": "pricing-b2b-dogfood-v1",
+        "ttlMilliseconds": 900000,
+        "unit": "requests",
+        "upperBound": 1,
+        "version": "1.0.0",
+        "workspaceId": "workspace-b2b-dogfood"
+      }
+    ],
+    "workflows": [],
+    "workspaceId": "workspace-b2b-dogfood"
+  }
+}

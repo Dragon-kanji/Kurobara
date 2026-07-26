@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/contacts/discover-response/1.0.0",
+  "title": "ContactsDiscoverResponse",
+  "description": "Immutable plan identity and optional started generation for a bounded contact shortlist.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "dataset_id",
+    "generation_plan_id",
+    "mode",
+    "organization_generation_id",
+    "plan_hash",
+    "query_hash",
+    "quote",
+    "replayed",
+    "state",
+    "workspace_id"
+  ],
+  "properties": {
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "generation_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "generation_plan_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "mode": { "type": "string", "enum": ["dry-run", "start"] },
+    "organization_generation_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "plan_hash": {
+      "type": "string",
+      "minLength": 71,
+      "maxLength": 71,
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "query_hash": {
+      "type": "string",
+      "minLength": 71,
+      "maxLength": 71,
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "quote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expires_at_ms", "guarantee", "unit"],
+      "properties": {
+        "expires_at_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "guarantee": {
+          "type": "string",
+          "enum": ["estimated", "hard", "unknown"]
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9._-]*$"
+        },
+        "upper_bound": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000000
+        }
+      }
+    },
+    "replayed": { "type": "boolean" },
+    "state": { "type": "string", "enum": ["planned", "building", "ready"] },
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.contacts",
+  "x-kurobara-data-classification": "confidential",
+  "x-kurobara-publication-status": "local-development-only"
+}

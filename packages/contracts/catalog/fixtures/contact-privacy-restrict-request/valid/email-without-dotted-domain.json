@@ -1,0 +1,8 @@
+{
+  "idempotency_key": "privacy-restrict-synthetic-email-local",
+  "reason": "operator-subject-request",
+  "subject": {
+    "kind": "email",
+    "value": "privacy-subject@localhost"
+  }
+}

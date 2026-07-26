@@ -1,0 +1,11 @@
+{
+  "workspace_id": "workspace-synthetic",
+  "dataset_id": "dataset-synthetic",
+  "import_id": "import-synthetic",
+  "state": "failed",
+  "batch_count": 1,
+  "item_count": 2,
+  "record_count": 1,
+  "error_count": 1,
+  "replayed": false
+}

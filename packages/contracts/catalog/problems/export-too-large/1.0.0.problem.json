@@ -1,0 +1,10 @@
+{
+  "problem_code": "export-too-large",
+  "problem_version": "1.0.0",
+  "type_uri": "https://problems.kurobara.invalid/export-too-large",
+  "title": "Export too large",
+  "default_status": 413,
+  "retryable": false,
+  "safe_extensions": ["correlation_id"],
+  "publication_status": "local-development-only"
+}

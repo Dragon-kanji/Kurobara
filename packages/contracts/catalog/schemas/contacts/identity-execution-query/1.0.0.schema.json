@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/contacts/identity-execution-query/1.0.0",
+  "title": "ContactIdentityExecutionQuery",
+  "description": "Internal ordered snapshots for selected contact identity revelation. Restricted provider lineage is admitted only here and never in the public command.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["result_kind", "selected_contacts", "source_dataset_id"],
+  "properties": {
+    "result_kind": { "type": "string", "const": "contact_identity" },
+    "selected_contacts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/selectedContact" }
+    },
+    "source_dataset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    }
+  },
+  "$defs": {
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "department",
+        "display_name",
+        "identity_completeness",
+        "job_title",
+        "observed_at_ms",
+        "organization_domain",
+        "organization_id",
+        "organization_name",
+        "person_country_code",
+        "profile_url",
+        "seniority"
+      ],
+      "properties": {
+        "department": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[a-z][a-z0-9._-]*$"
+            }
+          ]
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "identity_completeness": {
+          "type": "string",
+          "const": "obfuscated"
+        },
+        "job_title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "observed_at_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "organization_domain": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 253,
+          "pattern": "^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$"
+        },
+        "organization_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "organization_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "person_country_code": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 2,
+              "pattern": "^[A-Z]{2}$"
+            }
+          ]
+        },
+        "profile_url": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "string",
+              "format": "uri",
+              "maxLength": 2048,
+              "pattern": "^https://"
+            }
+          ]
+        },
+        "seniority": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "string",
+              "enum": [
+                "owner",
+                "c_suite",
+                "vp",
+                "director",
+                "manager",
+                "senior",
+                "individual_contributor"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "providerIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_key", "provider_subject_id"],
+      "properties": {
+        "provider_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-z][a-z0-9._-]*$"
+        },
+        "provider_subject_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "selectedContact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate", "provider_identity", "source_record_id"],
+      "properties": {
+        "candidate": { "$ref": "#/$defs/candidate" },
+        "provider_identity": { "$ref": "#/$defs/providerIdentity" },
+        "source_record_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        }
+      }
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.contacts",
+  "x-kurobara-data-classification": "restricted",
+  "x-kurobara-publication-status": "local-development-only"
+}

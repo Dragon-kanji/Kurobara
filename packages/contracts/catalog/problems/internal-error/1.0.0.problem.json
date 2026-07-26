@@ -1,0 +1,10 @@
+{
+  "problem_code": "internal-error",
+  "problem_version": "1.0.0",
+  "type_uri": "https://problems.kurobara.invalid/internal-error",
+  "title": "Internal error",
+  "default_status": 500,
+  "retryable": false,
+  "safe_extensions": ["correlation_id"],
+  "publication_status": "local-development-only"
+}

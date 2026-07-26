@@ -1,0 +1,9 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "result",
+  "method": "validateConfig",
+  "payload": {
+    "status": "valid",
+    "configurationFingerprint": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+  }
+}

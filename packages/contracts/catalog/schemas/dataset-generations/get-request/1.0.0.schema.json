@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/dataset-generations/get-request/1.0.0",
+  "title": "DatasetGenerationsGetRequest",
+  "description": "Read one generated dataset by its stable generation identity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["generation_id"],
+  "properties": {
+    "generation_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.datasets",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

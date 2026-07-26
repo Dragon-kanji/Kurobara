@@ -1,0 +1,39 @@
+{
+  "apiVersion": "dev.kurobara.plugin/v1",
+  "id": "dev.kurobara.oneshot",
+  "version": "1.0.0",
+  "capabilities": [
+    {
+      "capabilityId": "organizations.website.resolve",
+      "capabilityVersion": "1.0.0",
+      "inputContract": {
+        "catalogVersion": "0.1.0",
+        "catalogFingerprint": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schemaId": "https://schemas.kurobara.invalid/schemas/product/record/1.0.0",
+        "schemaVersion": "1.0.0",
+        "schemaFingerprint": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "outputContract": {
+        "catalogVersion": "0.1.0",
+        "catalogFingerprint": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schemaId": "https://schemas.kurobara.invalid/schemas/product/record/1.0.0",
+        "schemaVersion": "1.0.0",
+        "schemaFingerprint": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    }
+  ],
+  "auth": { "modes": ["api-key-header"] },
+  "execution": {
+    "idempotency": { "mode": "none", "keyScope": "operation" },
+    "lookup": { "mode": "none", "authoritativeNotFound": false },
+    "timeouts": { "executeMs": 30000, "lookupMs": 1000 }
+  },
+  "economics": {
+    "estimateGuarantee": "estimated",
+    "usageReporting": "exact",
+    "unit": "credits"
+  },
+  "permissions": {
+    "egress": { "tlsRequired": true, "hosts": ["api.example.com"] }
+  }
+}

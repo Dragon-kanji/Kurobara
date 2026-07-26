@@ -1,0 +1,10 @@
+{
+  "workspace_id": "workspace-synthetic",
+  "authority_envelope_id": "authority-synthetic",
+  "capabilities": [
+    {
+      "capability_id": "documents.summarize",
+      "capability_version": "latest"
+    }
+  ]
+}

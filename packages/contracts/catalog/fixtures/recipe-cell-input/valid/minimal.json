@@ -1,0 +1,23 @@
+{
+  "datasetId": "dataset-synthetic",
+  "inputValues": [
+    {
+      "fieldId": "field-domain",
+      "present": true,
+      "value": "example.invalid"
+    },
+    {
+      "fieldId": "field-missing",
+      "present": false
+    }
+  ],
+  "recipeId": "recipe-synthetic",
+  "recipeRevision": "1",
+  "recordContentHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "recordId": "record-synthetic",
+  "targetFieldId": "field-category",
+  "workflowContentHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "workflowRevision": "1",
+  "workflowSpecId": "workflow-company-category",
+  "workspaceId": "workspace-synthetic"
+}

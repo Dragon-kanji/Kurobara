@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "public_packages": [
+    {
+      "bundle": "cli",
+      "kind": "standalone-cli",
+      "name": "@kurobara/cli",
+      "source_manifest": "packages/cli/package.json"
+    }
+  ]
+}

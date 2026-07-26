@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/recipe-applications/get-response/1.0.0",
+  "title": "RecipeApplicationsGetResponse",
+  "description": "Counts-only durable snapshot of one recipe application.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "workspace_id",
+    "application_id",
+    "dataset_id",
+    "recipe_id",
+    "recipe_revision",
+    "state",
+    "terminal",
+    "total_cell_count",
+    "bound_cell_count",
+    "unbound_cell_count",
+    "pending_cell_count",
+    "running_cell_count",
+    "succeeded_cell_count",
+    "failed_cell_count",
+    "skipped_cell_count"
+  ],
+  "properties": {
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "application_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "recipe_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "recipe_revision": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "state": {
+      "type": "string",
+      "enum": ["needs_replay", "running", "succeeded", "completed_with_errors"]
+    },
+    "terminal": { "type": "boolean" },
+    "total_cell_count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10000
+    },
+    "bound_cell_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "unbound_cell_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "pending_cell_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "running_cell_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "succeeded_cell_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "failed_cell_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "skipped_cell_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.recipes",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

@@ -1,0 +1,313 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/plugins/conformance-report/1.0.0",
+  "title": "PluginConformanceReport",
+  "description": "Deterministic local-development report for one exact Kurobara plugin artifact, profile, compatibility matrix, toolchain and runtime.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "report_version",
+    "report_schema_fingerprint",
+    "profile",
+    "subject",
+    "environment",
+    "toolchain",
+    "guarantees",
+    "summary"
+  ],
+  "properties": {
+    "report_version": { "const": "1.0.0" },
+    "report_schema_fingerprint": { "$ref": "#/$defs/content_hash" },
+    "profile": { "$ref": "#/$defs/profile" },
+    "subject": { "$ref": "#/$defs/subject" },
+    "environment": { "$ref": "#/$defs/environment" },
+    "toolchain": { "$ref": "#/$defs/toolchain" },
+    "guarantees": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/guarantee" }
+    },
+    "summary": { "$ref": "#/$defs/summary" }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["summary", "guarantees"],
+      "properties": {
+        "summary": {
+          "$ref": "#/$defs/summary",
+          "type": "object",
+          "required": ["status"],
+          "properties": { "status": { "const": "passed" } }
+        },
+        "guarantees": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/guarantee",
+            "type": "object",
+            "required": ["status"],
+            "properties": { "status": { "const": "passed" } }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": ["summary"],
+      "properties": {
+        "summary": {
+          "$ref": "#/$defs/summary",
+          "type": "object",
+          "required": ["status"],
+          "properties": { "status": { "const": "failed" } }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "fingerprint",
+        "compatibility_matrix_fingerprint"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[a-z][a-z0-9]*(?:[.-][a-z][a-z0-9-]*)+/[a-z][a-z0-9-]*$"
+        },
+        "version": { "$ref": "#/$defs/semver" },
+        "fingerprint": { "$ref": "#/$defs/content_hash" },
+        "compatibility_matrix_fingerprint": {
+          "$ref": "#/$defs/content_hash"
+        }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "package_name",
+        "package_version",
+        "artifact_fingerprint",
+        "manifest_fingerprint"
+      ],
+      "properties": {
+        "package_name": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 214,
+          "pattern": "^(?:@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*$"
+        },
+        "package_version": { "$ref": "#/$defs/semver" },
+        "artifact_fingerprint": { "$ref": "#/$defs/content_hash" },
+        "manifest_fingerprint": { "$ref": "#/$defs/content_hash" },
+        "declared_plugin_id": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z][a-z0-9-]*)+$"
+        },
+        "declared_plugin_version": { "$ref": "#/$defs/semver" }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_version", "platform", "architecture"],
+      "properties": {
+        "node_version": { "$ref": "#/$defs/semver" },
+        "platform": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 32,
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "architecture": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 32,
+          "pattern": "^[a-z][a-z0-9-]*$"
+        }
+      }
+    },
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plugin_api_version",
+        "protocol_api_version",
+        "contracts_package_version",
+        "catalog_version",
+        "catalog_fingerprint",
+        "sdk_package_version",
+        "host_package_version",
+        "conformance_kit_version"
+      ],
+      "properties": {
+        "plugin_api_version": {
+          "type": "string",
+          "pattern": "^dev\\.kurobara\\.plugin/v[1-9][0-9]*$"
+        },
+        "protocol_api_version": {
+          "type": "string",
+          "pattern": "^dev\\.kurobara\\.plugin-protocol/v[1-9][0-9]*$"
+        },
+        "contracts_package_version": { "$ref": "#/$defs/semver" },
+        "catalog_version": { "$ref": "#/$defs/semver" },
+        "catalog_fingerprint": { "$ref": "#/$defs/content_hash" },
+        "sdk_package_version": { "$ref": "#/$defs/semver" },
+        "host_package_version": { "$ref": "#/$defs/semver" },
+        "conformance_kit_version": { "$ref": "#/$defs/semver" }
+      }
+    },
+    "failure_reason_code": {
+      "type": "string",
+      "enum": [
+        "compatibility-unsupported",
+        "contract-rejected",
+        "behavior-mismatch",
+        "forbidden-observation"
+      ]
+    },
+    "guarantee": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "reason_codes", "evidence_refs"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)+$"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["passed", "failed", "not-applicable"]
+        },
+        "reason_codes": {
+          "type": "array",
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "compatibility-unsupported",
+              "contract-rejected",
+              "behavior-mismatch",
+              "forbidden-observation",
+              "profile-not-applicable"
+            ]
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 192,
+            "pattern": "^case:[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+          }
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["status", "reason_codes"],
+          "properties": {
+            "status": { "const": "passed" },
+            "reason_codes": {
+              "type": "array",
+              "maxItems": 0,
+              "items": false
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["status", "reason_codes"],
+          "properties": {
+            "status": { "const": "failed" },
+            "reason_codes": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 4,
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/failure_reason_code" }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["status", "reason_codes"],
+          "properties": {
+            "status": { "const": "not-applicable" },
+            "reason_codes": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 1,
+              "items": { "const": "profile-not-applicable" }
+            }
+          }
+        }
+      ]
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "passed", "failed", "not_applicable", "total"],
+      "properties": {
+        "status": { "type": "string", "enum": ["passed", "failed"] },
+        "passed": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "failed": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "not_applicable": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "total": { "type": "integer", "minimum": 1, "maximum": 64 }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["status", "failed", "not_applicable"],
+          "properties": {
+            "status": { "const": "passed" },
+            "failed": { "const": 0 },
+            "not_applicable": { "const": 0 }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["status", "failed"],
+          "properties": {
+            "status": { "const": "failed" },
+            "failed": { "type": "integer", "minimum": 1, "maximum": 64 }
+          }
+        }
+      ]
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "plugin-conformance",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

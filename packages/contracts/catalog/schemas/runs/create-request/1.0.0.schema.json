@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/runs/create-request/1.0.0",
+  "title": "RunsCreateRequest",
+  "description": "Command to consume one prepared run plan using an idempotency key and the immutable identity hash of that exact RunPlan.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["run_plan_id", "idempotency_key", "intention_hash"],
+  "properties": {
+    "run_plan_id": { "type": "string", "minLength": 1 },
+    "idempotency_key": { "type": "string", "minLength": 1, "maxLength": 255 },
+    "intention_hash": {
+      "description": "Exact immutable plan_hash returned by plans.quote; arbitrary client-computed intent hashes are rejected.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.runs",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

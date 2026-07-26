@@ -1,0 +1,28 @@
+{
+  "name": "@kurobara/worker",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --conditions=kurobara-source --experimental-strip-types src/index.ts",
+    "test": "node --conditions=kurobara-source --experimental-strip-types --test test/*.test.ts",
+    "typecheck": "tsc --project tsconfig.json --noEmit --customConditions kurobara-source"
+  },
+  "dependencies": {
+    "@kurobara/adapter-effect-deterministic": "file:../../packages/adapters/effect-deterministic",
+    "@kurobara/adapter-effect-plugin": "file:../../packages/adapters/effect-plugin",
+    "@kurobara/adapter-orchestration-hatchet": "file:../../packages/adapters/orchestration-hatchet",
+    "@kurobara/adapter-output-json-schema": "file:../../packages/adapters/output-json-schema",
+    "@kurobara/adapter-postgres": "file:../../packages/adapters/postgres",
+    "@kurobara/adapter-provider-registry": "file:../../packages/adapters/provider-registry",
+    "@kurobara/adapter-system": "file:../../packages/adapters/system",
+    "@kurobara/application": "file:../../packages/application",
+    "@kurobara/contracts": "file:../../packages/contracts",
+    "@kurobara/provider-apollo": "0.1.0",
+    "@kurobara/provider-exa": "0.1.0",
+    "@kurobara/provider-hunter": "0.1.0",
+    "@kurobara/provider-prospeo": "0.1.0",
+    "@kurobara/provider-tavily": "0.1.0"
+  }
+}

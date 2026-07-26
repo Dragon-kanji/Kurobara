@@ -1,0 +1,24 @@
+{
+  "cell_result_id": "cell-result-synthetic",
+  "dataset_id": "dataset-synthetic",
+  "workspace_id": "workspace-synthetic",
+  "record_id": "record-synthetic",
+  "field_id": "field-category",
+  "recipe_id": "recipe-synthetic",
+  "recipe_revision": "1",
+  "run_id": "run-synthetic",
+  "status": "succeeded",
+  "value": "software",
+  "provenance": {
+    "references": [
+      "artifact:artifact-synthetic",
+      "https://example.invalid/source"
+    ]
+  },
+  "freshness": {
+    "observed_at_ms": 1700000000000,
+    "expires_at_ms": 1700086400000
+  },
+  "confidence": 0.92,
+  "cost": { "unit": "credits", "amount": 1.25, "basis": "exact" }
+}

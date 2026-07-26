@@ -1,0 +1,9 @@
+{
+  "idempotency_key": "privacy-restrict-synthetic-002",
+  "reason": "provider-opt-out",
+  "subject": {
+    "kind": "provider-subject",
+    "provider_key": "synthetic-provider",
+    "value": "provider-subject-synthetic-001"
+  }
+}

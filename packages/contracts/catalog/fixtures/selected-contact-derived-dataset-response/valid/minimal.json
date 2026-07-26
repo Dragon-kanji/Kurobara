@@ -1,0 +1,11 @@
+{
+  "contact_dataset_id": "dataset-source-contacts",
+  "contact_record_ids": ["contact-1", "contact-2"],
+  "generation_id": "generation-identity-synthetic",
+  "generation_plan_id": "generation-plan-identity-synthetic",
+  "operation_id": "identity-reveal-synthetic",
+  "replayed": false,
+  "result_dataset_id": "dataset-derived-identities",
+  "state": "building",
+  "workspace_id": "workspace-synthetic"
+}

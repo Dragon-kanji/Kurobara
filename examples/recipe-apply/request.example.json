@@ -1,0 +1,22 @@
+{
+  "application_id": "application_demo_org_website_v1",
+  "authority_envelope_id": "authority-demo",
+  "cell_budget": {
+    "limit": 5,
+    "unit": "requests"
+  },
+  "deadline_ms": 4102444800000,
+  "max_cells": 100,
+  "recipe": {
+    "recipe_id": "recipe_org_website",
+    "recipe_revision": "1.0.0",
+    "dataset_id": "dataset_demo_orgs",
+    "workspace_id": "workspace_demo",
+    "name": "Resolve organization website",
+    "input_field_ids": ["field_domain"],
+    "target_field_id": "field_official_website_url",
+    "workflow_spec_id": "workflow_organization_website_lookup",
+    "workflow_revision": "1.0.0",
+    "workflow_content_hash": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+  }
+}

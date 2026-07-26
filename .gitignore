@@ -1,0 +1,14 @@
+node_modules
+.next
+.source
+.vercel
+.wrangler
+dist
+coverage
+.DS_Store
+.claude
+.vscode
+.env
+.env.*
+!.env.example
+*.tsbuildinfo

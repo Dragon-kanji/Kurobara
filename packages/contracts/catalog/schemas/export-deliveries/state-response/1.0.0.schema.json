@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/export-deliveries/state-response/1.0.0",
+  "title": "ExportDeliveryStateResponse",
+  "description": "PII-free owner-scoped lifecycle state for one exact export delivery.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "delivery_id",
+    "dataset_id",
+    "content_hash",
+    "content_length",
+    "format",
+    "state",
+    "prepared_at_ms",
+    "expires_at_ms"
+  ],
+  "properties": {
+    "delivery_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "content_length": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "format": { "type": "string", "enum": ["csv", "jsonl"] },
+    "state": {
+      "type": "string",
+      "enum": ["prepared", "delivered", "expired", "revoked"]
+    },
+    "prepared_at_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "expires_at_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "delivered_at_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "revoked_at_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.exports",
+  "x-kurobara-data-classification": "confidential",
+  "x-kurobara-publication-status": "local-development-only"
+}

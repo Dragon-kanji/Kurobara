@@ -1,0 +1,13 @@
+{
+  "event_type": "dev.kurobara.run.queued.v1",
+  "event_version": "1.0.0",
+  "source_fact": "RunQueued",
+  "data_schema_id": "https://schemas.kurobara.invalid/schemas/events/run-queued/1.0.0",
+  "owner": "application.runs",
+  "aggregate_key": "run_id",
+  "ordering": "sequence-per-run",
+  "classification": "internal",
+  "retention": "same-as-run",
+  "redaction": "public-safe-fields-only",
+  "status": "experimental"
+}

@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/recipes/apply-request/1.0.0",
+  "title": "RecipesApplyRequest",
+  "description": "Bounded command to register or replay one exact recipe and apply it across one already imported dataset under one authority envelope.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "application_id",
+    "authority_envelope_id",
+    "cell_budget",
+    "deadline_ms",
+    "max_cells",
+    "recipe"
+  ],
+  "properties": {
+    "aggregate_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["limit", "unit"],
+      "properties": {
+        "limit": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000000
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9._-]*$"
+        }
+      }
+    },
+    "application_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "authority_envelope_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "cell_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["limit", "unit"],
+      "properties": {
+        "limit": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000000
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9._-]*$"
+        }
+      }
+    },
+    "deadline_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "max_cells": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10000
+    },
+    "recipe": {
+      "$ref": "https://schemas.kurobara.invalid/schemas/product/enrichment-recipe/1.0.0"
+    },
+    "record_ids": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10000,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "pattern": "\\S"
+      }
+    }
+  },
+  "dependentRequired": { "record_ids": ["aggregate_budget"] },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.recipes",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

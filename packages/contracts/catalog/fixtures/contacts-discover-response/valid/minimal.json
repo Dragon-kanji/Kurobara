@@ -1,0 +1,17 @@
+{
+  "dataset_id": "contacts-synthetic",
+  "generation_plan_id": "contact-plan-synthetic",
+  "mode": "dry-run",
+  "organization_generation_id": "organization-generation-synthetic",
+  "plan_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "query_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "quote": {
+    "expires_at_ms": 2000000000000,
+    "guarantee": "hard",
+    "unit": "requests",
+    "upper_bound": 2
+  },
+  "replayed": false,
+  "state": "planned",
+  "workspace_id": "workspace-synthetic"
+}

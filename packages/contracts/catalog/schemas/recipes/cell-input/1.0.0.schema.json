@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/recipes/cell-input/1.0.0",
+  "title": "RecipeCellInput",
+  "description": "Canonical internal camelCase payload used to hash and execute one exact recipe cell without exposing adapter-owned storage details.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "datasetId",
+    "inputValues",
+    "recipeId",
+    "recipeRevision",
+    "recordContentHash",
+    "recordId",
+    "targetFieldId",
+    "workflowContentHash",
+    "workflowRevision",
+    "workflowSpecId",
+    "workspaceId"
+  ],
+  "properties": {
+    "datasetId": { "$ref": "#/$defs/identity" },
+    "inputValues": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["fieldId", "present"],
+        "properties": {
+          "fieldId": { "$ref": "#/$defs/identity" },
+          "present": { "type": "boolean" },
+          "value": { "$ref": "#/$defs/scalar" }
+        },
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "present": { "const": false },
+              "value": false
+            }
+          },
+          {
+            "type": "object",
+            "required": ["value"],
+            "properties": {
+              "present": { "const": true }
+            }
+          }
+        ]
+      }
+    },
+    "recipeId": { "$ref": "#/$defs/identity" },
+    "recipeRevision": { "$ref": "#/$defs/identity" },
+    "recordContentHash": { "$ref": "#/$defs/content_hash" },
+    "recordId": { "$ref": "#/$defs/identity" },
+    "targetFieldId": { "$ref": "#/$defs/identity" },
+    "workflowContentHash": { "$ref": "#/$defs/content_hash" },
+    "workflowRevision": { "$ref": "#/$defs/identity" },
+    "workflowSpecId": { "$ref": "#/$defs/identity" },
+    "workspaceId": { "$ref": "#/$defs/identity" }
+  },
+  "$defs": {
+    "content_hash": {
+      "type": "string",
+      "minLength": 71,
+      "maxLength": 71,
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "identity": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "scalar": {
+      "description": "Bounded scalar value; null is explicit and distinct from an input entry whose present flag is false.",
+      "type": ["string", "number", "boolean", "null"],
+      "maxLength": 16384,
+      "minimum": -1000000000000000,
+      "maximum": 1000000000000000
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.recipes",
+  "x-kurobara-data-classification": "confidential",
+  "x-kurobara-publication-status": "local-development-only"
+}

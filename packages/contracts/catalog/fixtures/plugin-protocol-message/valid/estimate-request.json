@@ -1,0 +1,34 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "request",
+  "method": "estimate",
+  "payload": {
+    "context": {
+      "capability": {
+        "capabilityId": "fixture.echo",
+        "capabilityVersion": "1.0.0"
+      },
+      "configuration": {
+        "contentHash": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "value": {
+          "endpointProfile": "synthetic"
+        }
+      },
+      "deadlineAtMs": 4102444800000
+    },
+    "input": {
+      "contract": {
+        "catalogVersion": "0.6.0",
+        "catalogFingerprint": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schemaId": "https://schemas.kurobara.invalid/schemas/fixtures/plugin-input/1.0.0",
+        "schemaVersion": "1.0.0",
+        "schemaFingerprint": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "contentHash": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "sizeBytes": 24,
+      "value": {
+        "document": "synthetic"
+      }
+    }
+  }
+}

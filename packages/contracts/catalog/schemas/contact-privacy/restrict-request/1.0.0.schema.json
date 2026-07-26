@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/contact-privacy/restrict-request/1.0.0",
+  "title": "ContactPrivacyRestrictRequest",
+  "description": "Registers one workspace-scoped durable contact restriction without persisting its raw subject in the public response.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["idempotency_key", "reason", "subject"],
+  "properties": {
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "provider-opt-out",
+        "provider-deletion",
+        "provider-claimed-email",
+        "operator-subject-request"
+      ]
+    },
+    "subject": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "type": "string", "const": "email" },
+            "value": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 320,
+              "pattern": "^[^\\s@]+@[^\\s@]+$"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "provider_key", "value"],
+          "properties": {
+            "kind": { "type": "string", "const": "provider-subject" },
+            "provider_key": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[a-z0-9][a-z0-9._-]*$"
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024,
+              "pattern": "\\S"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.contact-privacy",
+  "x-kurobara-data-classification": "restricted",
+  "x-kurobara-publication-status": "local-development-only"
+}

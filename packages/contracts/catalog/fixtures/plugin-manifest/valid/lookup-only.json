@@ -1,0 +1,42 @@
+{
+  "apiVersion": "dev.kurobara.plugin/v1",
+  "id": "dev.kurobara.lookup-fixture",
+  "version": "2.1.0",
+  "capabilities": [
+    {
+      "capabilityId": "fixture.lookup",
+      "capabilityVersion": "1.0.0",
+      "inputContract": {
+        "catalogVersion": "0.1.0",
+        "catalogFingerprint": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "schemaId": "https://schemas.kurobara.invalid/schemas/fixtures/lookup-input/1.0.0",
+        "schemaVersion": "1.0.0",
+        "schemaFingerprint": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      },
+      "outputContract": {
+        "catalogVersion": "0.1.0",
+        "catalogFingerprint": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "schemaId": "https://schemas.kurobara.invalid/schemas/fixtures/lookup-output/1.0.0",
+        "schemaVersion": "1.0.0",
+        "schemaFingerprint": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+      }
+    }
+  ],
+  "auth": { "modes": ["api-key-header"] },
+  "execution": {
+    "idempotency": { "mode": "lookup-only", "keyScope": "operation" },
+    "lookup": {
+      "mode": "by-operation-key",
+      "authoritativeNotFound": false
+    },
+    "timeouts": { "executeMs": 60000, "lookupMs": 15000 }
+  },
+  "economics": {
+    "estimateGuarantee": "unknown",
+    "usageReporting": "unavailable",
+    "unit": "requests"
+  },
+  "permissions": {
+    "egress": { "hosts": ["lookup.fixture.invalid"], "tlsRequired": true }
+  }
+}

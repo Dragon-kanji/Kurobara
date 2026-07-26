@@ -1,0 +1,40 @@
+{
+  "operation_id": "runs.cancel",
+  "operation_version": "1.0.0",
+  "action_ref": "RequestStop",
+  "kind": "mutation",
+  "auth_profile": "http-bearer",
+  "idempotence": "required",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/runs/cancel-request/1.0.0",
+  "output_schema_id": "https://schemas.kurobara.invalid/schemas/runs/cancel-response/1.0.0",
+  "problem_codes": [
+    "authentication-required",
+    "authority-permission-missing",
+    "domain-rejected",
+    "idempotency-key-reused",
+    "internal-error",
+    "invalid-credential",
+    "output-contract-violation",
+    "payload-too-large",
+    "request-invalid",
+    "run-not-found",
+    "service-unavailable",
+    "unsupported-media-type"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["runs:cancel"],
+  "human_gates": [],
+  "accepted_data_classes": ["internal"],
+  "produced_data_classes": ["internal"],
+  "status": "experimental",
+  "projections": {
+    "rest": {
+      "method": "POST",
+      "path": "/v1/runs/{run_id}/cancel",
+      "path_parameters": ["run_id"]
+    },
+    "sdk_ts": { "method": "runs.cancel" },
+    "cli": { "command": "run cancel" },
+    "mcp": { "tool": "cancel_run" }
+  }
+}

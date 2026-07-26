@@ -1,0 +1,13 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "result",
+  "method": "execute",
+  "payload": {
+    "status": "outcome-unknown",
+    "externalOperationReference": "provider-operation-synthetic",
+    "error": {
+      "class": "transport",
+      "reasonCode": "transport-failed"
+    }
+  }
+}

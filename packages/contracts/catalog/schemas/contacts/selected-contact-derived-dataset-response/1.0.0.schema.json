@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/contacts/selected-contact-derived-dataset-response/1.0.0",
+  "title": "SelectedContactDerivedDatasetResponse",
+  "description": "Durable receipt for a selected-contact DatasetGeneration; contact details remain in the immutable result dataset.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contact_dataset_id",
+    "contact_record_ids",
+    "generation_id",
+    "generation_plan_id",
+    "operation_id",
+    "replayed",
+    "result_dataset_id",
+    "state",
+    "workspace_id"
+  ],
+  "properties": {
+    "contact_dataset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "contact_record_ids": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "pattern": "\\S"
+      }
+    },
+    "generation_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "generation_plan_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "operation_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "\\S"
+    },
+    "replayed": { "type": "boolean" },
+    "result_dataset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "state": {
+      "type": "string",
+      "enum": ["building", "ready", "failed", "cancelled", "ambiguous"]
+    },
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.contacts",
+  "x-kurobara-data-classification": "confidential",
+  "x-kurobara-publication-status": "local-development-only"
+}

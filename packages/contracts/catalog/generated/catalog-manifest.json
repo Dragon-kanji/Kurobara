@@ -1,0 +1,963 @@
+{
+  "canonical_namespace": "https://schemas.kurobara.invalid/",
+  "canonicalization": "RFC-8785",
+  "catalog_version": "0.12.0",
+  "hash_algorithm": "SHA-256",
+  "json_schema_dialect": "https://json-schema.org/draft/2020-12/schema",
+  "members": [
+    {
+      "fingerprint": "sha256:d490031ff8e45c26391bf9134840cef74a4407c93fc4c7e594cb20745f7e3f4e",
+      "id": "event:dev.kurobara.run.queued.v1:1.0.0",
+      "media_type": "application/json",
+      "role": "event",
+      "source": "catalog/events/dev.kurobara.run.queued.v1/1.0.0.event.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:4b7f00d969ef21638ba3c2feb7f10f148f55d1cabb4e845cc9b4e8a74dcdf3d6",
+      "id": "https://schemas.kurobara.invalid/schemas/capabilities/list-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/capabilities/list-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:e1e6b45ea6cc0af3f275ce369eea5933fe534663a741d790f4d12b85f4dfd7d1",
+      "id": "https://schemas.kurobara.invalid/schemas/capabilities/list-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/capabilities/list-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:21fb8395964353869ecbed4fa4be81fdec7b3a445e7cea3255534adfa06de47b",
+      "id": "https://schemas.kurobara.invalid/schemas/contact-privacy/restrict-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/contact-privacy/restrict-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:7f4d39519160d2533eb6e43f7d676e29cb2afebd16c6019c2d164087811f63fc",
+      "id": "https://schemas.kurobara.invalid/schemas/contact-privacy/restrict-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/contact-privacy/restrict-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:857b3d4f788209bb4f852c07d9551f22d95decd276114d27950bf6dac0572377",
+      "id": "https://schemas.kurobara.invalid/schemas/contacts/candidates-list-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/contacts/candidates-list-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:97e1b244960b811e4b6b005dda675890ab9656e0a1afae47a5c3e5769003279e",
+      "id": "https://schemas.kurobara.invalid/schemas/contacts/candidates-list-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/contacts/candidates-list-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:a605e0f21c728baf150ec5e2671239f1a4f30444f1c2fe81d4d84b2fe28ad282",
+      "id": "https://schemas.kurobara.invalid/schemas/contacts/contact-candidate/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/contacts/contact-candidate/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:78323b1bee2bcc1c1291d85fd7417ccc61370e339267c4cd99704e923fcb3890",
+      "id": "https://schemas.kurobara.invalid/schemas/contacts/discover-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/contacts/discover-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:3fc818e0014d182c4056f55bfe72e4183358a2b096db4e634ed2a0dc37b807c8",
+      "id": "https://schemas.kurobara.invalid/schemas/contacts/discover-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/contacts/discover-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:cb354d3cae3c64fa6d6a447c7e8cb1294e49acdafc3cbb23d0f5f3ed93e2290c",
+      "id": "https://schemas.kurobara.invalid/schemas/contacts/discovery-execution-query/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/contacts/discovery-execution-query/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:39429a5810a9c44051d63c82ebf0999b42a3fbbb82214981abf2c05c8c3ab828",
+      "id": "https://schemas.kurobara.invalid/schemas/contacts/discovery-query/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/contacts/discovery-query/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:0b4882dcaadf1db35718f376da0560d8f86da4a69559db9be00d58dbe60ac675",
+      "id": "https://schemas.kurobara.invalid/schemas/contacts/identity-execution-query/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/contacts/identity-execution-query/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:b82198ee518929ecce082853f27c83758e8168bb55dba3d233323989d9edb8d6",
+      "id": "https://schemas.kurobara.invalid/schemas/contacts/selected-contact-derived-dataset-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/contacts/selected-contact-derived-dataset-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:c5503399a0be0bbf632e4a0d6f8b2939ff883aa44414fb948f2f48330881a681",
+      "id": "https://schemas.kurobara.invalid/schemas/contacts/selected-contact-derived-dataset-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/contacts/selected-contact-derived-dataset-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:5141da3ba76178fc085d7be62173e7ab21d6cdd020fae7bef15e1e04b08d5750",
+      "id": "https://schemas.kurobara.invalid/schemas/contacts/work-email-execution-query/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/contacts/work-email-execution-query/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:59cb2d557996a55e7fc986b1f886ec60e0468a0211d8b60970a3e2bd777da1aa",
+      "id": "https://schemas.kurobara.invalid/schemas/dataset-generations/cancel-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/dataset-generations/cancel-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:03661cd93d9d81a10e237ddc9ff19b40535e3a017e1fec35939b24f2e834f2a7",
+      "id": "https://schemas.kurobara.invalid/schemas/dataset-generations/cancel-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/dataset-generations/cancel-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:b216e4e24c8f4dcc5adc5863edda9cde3e9d984248e6b127ca4d21c94d8031ce",
+      "id": "https://schemas.kurobara.invalid/schemas/dataset-generations/get-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/dataset-generations/get-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:d098ab0c097a68a4899b8b675d971efb0dc921e78c70416cbbbc28870813c07d",
+      "id": "https://schemas.kurobara.invalid/schemas/dataset-generations/get-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/dataset-generations/get-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:40153b13ed33d9bf086dcfde537ce1e17946b0e82b6e0461683c42c24a382a55",
+      "id": "https://schemas.kurobara.invalid/schemas/dataset-generations/page-input/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/dataset-generations/page-input/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:f61bef0f513210cf17c84fd53aad2c1624a6913a732e98597056a442bc589ab3",
+      "id": "https://schemas.kurobara.invalid/schemas/dataset-generations/page-output/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/dataset-generations/page-output/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:c297cd92f01686a2aa8fb4f4ec63682638a10e7f9e507b910428377ea23ccd90",
+      "id": "https://schemas.kurobara.invalid/schemas/datasets/export-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/datasets/export-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:23c48ad67973e38065b834395fdd46ef2fd1183a93ff2056f99988e9e2c770d7",
+      "id": "https://schemas.kurobara.invalid/schemas/datasets/import-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/datasets/import-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:5c7b1c4ace858915573c7bd8472de17b1111d341b22e3861cf0089097177f3bc",
+      "id": "https://schemas.kurobara.invalid/schemas/datasets/import-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/datasets/import-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:2e30bfbc5ba1d3c57396c387353f1555fca6dcec0b6fc0975b477ee74ae4d9a2",
+      "id": "https://schemas.kurobara.invalid/schemas/events/run-queued/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/events/run-queued/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:218113c16abc11aa87f5328a6a61212f989ed84f31762ad65d6eb26f6898d210",
+      "id": "https://schemas.kurobara.invalid/schemas/export-deliveries/get-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/export-deliveries/get-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:647a5e2ee30fcf729603a586a2dab004dc6f4546ef78447fd26d88271538cd4a",
+      "id": "https://schemas.kurobara.invalid/schemas/export-deliveries/revoke-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/export-deliveries/revoke-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:9b0d2053390ef7a1b526f44d7fb1f09bc9883e9e0ae40d753abbcc4711f18dc0",
+      "id": "https://schemas.kurobara.invalid/schemas/export-deliveries/revoke-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/export-deliveries/revoke-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:d3ac13e4cfeb83de671296176ce8314f41006a7a5949a339e292a3a02b69e0ff",
+      "id": "https://schemas.kurobara.invalid/schemas/export-deliveries/state-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/export-deliveries/state-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:02f08ae5cb4775e420fcc1c4ce468943e497ef430da7e03d7be0b6a91e060d8e",
+      "id": "https://schemas.kurobara.invalid/schemas/fixtures/deterministic-output/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/fixtures/deterministic-output/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:278caf57796db93788ffc7f5530d329ea4594edef86286814867627c608d01e8",
+      "id": "https://schemas.kurobara.invalid/schemas/organizations/candidates-list-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/organizations/candidates-list-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:2f26d0cea41f46a1acc91aef09df7e6cbb0baac499a47e5e0288fe65914c3901",
+      "id": "https://schemas.kurobara.invalid/schemas/organizations/candidates-list-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/organizations/candidates-list-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:cee68a0099f7f060fff5ddfa20eba6ffdb649623090aa7d93966ca04f25d9643",
+      "id": "https://schemas.kurobara.invalid/schemas/organizations/company-candidate/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/organizations/company-candidate/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:b7b10c50baadc594be00c3767e89e3bf9f01e43053d2351744563c4a46200809",
+      "id": "https://schemas.kurobara.invalid/schemas/organizations/discover-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/organizations/discover-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:ca87cf238b46fd75c6887c9530f124fe5886b48ccd2e6917f26745bb3e015933",
+      "id": "https://schemas.kurobara.invalid/schemas/organizations/discover-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/organizations/discover-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:c61784cf575474811fe4d5b063d876510f93d9369dbd3958d5375645eafe5be3",
+      "id": "https://schemas.kurobara.invalid/schemas/organizations/discovery-query/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/organizations/discovery-query/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:51b2fc6e22db70b4c8fe3ed6bd3720779af071d91255e6d953e68201cd5a5f4a",
+      "id": "https://schemas.kurobara.invalid/schemas/plans/quote-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/plans/quote-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:8a8469eae85b610c356b356a472a807ae982503ebc464c3a4f831850f9955cb4",
+      "id": "https://schemas.kurobara.invalid/schemas/plans/quote-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/plans/quote-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:16c0d9e715287fd820ce1a3d2a665f292cf3d29bcfb0ce312f010598f2da6a50",
+      "id": "https://schemas.kurobara.invalid/schemas/plugins/conformance-report/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/plugins/conformance-report/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:b5a0ef9ba9ee57cbed75cd5e422f6423eb91182cdc83ac103c398d92e0754f2d",
+      "id": "https://schemas.kurobara.invalid/schemas/plugins/manifest/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/plugins/manifest/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:807354c01970f6e2d8dbdc192112b25a8e1066fa1a998b5078bdcca81420b59a",
+      "id": "https://schemas.kurobara.invalid/schemas/plugins/protocol-message/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/plugins/protocol-message/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:6a80257aaf18e8b971a7d0a28a86f4c4e817d6c8521f26c4b7a59ca311fbf428",
+      "id": "https://schemas.kurobara.invalid/schemas/plugins/sidecar-json-rpc-frame/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/plugins/sidecar-json-rpc-frame/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:a66d93eca0240210e6c6d529279a4a0406999a04f2be2419f2b226850d84dd45",
+      "id": "https://schemas.kurobara.invalid/schemas/problems/problem-details/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/problems/problem-details/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:9eeb2193f77e8d288447223b11dfb9f68e0d16068e8df5a7a17945f3b72e125a",
+      "id": "https://schemas.kurobara.invalid/schemas/product/cell-result/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/product/cell-result/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:d0b95be5da3891725a2f4f619f9269dd38b16e7fa208ac2acd4e64e6254a518c",
+      "id": "https://schemas.kurobara.invalid/schemas/product/dataset/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/product/dataset/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:3d6d72a61020a454c962e3df41784b3ec88d209434a7f7be5092f4d5dc3c2d49",
+      "id": "https://schemas.kurobara.invalid/schemas/product/enrichment-recipe/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/product/enrichment-recipe/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:a1c5a4ee108823fbc3ba76811be9633949ec9d6649936079d5594343ed0e5cfa",
+      "id": "https://schemas.kurobara.invalid/schemas/product/field/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/product/field/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:9c1fed09cc7cc924ac5e824ea07fcefc738fd78265075c7c37e5bd935b2c5d78",
+      "id": "https://schemas.kurobara.invalid/schemas/product/record/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/product/record/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:09c711b519cb746ada0aa149fcad93debd3dc83bf17293567bbbb2e39670356e",
+      "id": "https://schemas.kurobara.invalid/schemas/recipe-applications/export-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/recipe-applications/export-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:9c910070ea8f502e0df45886b65ccbcb82bb3a8660612b6df1a8645c930d4c9b",
+      "id": "https://schemas.kurobara.invalid/schemas/recipe-applications/get-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/recipe-applications/get-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:3fc94ee803fb5d2650018a77f5fd4499f53ffde100a560b93f5331425edac57b",
+      "id": "https://schemas.kurobara.invalid/schemas/recipe-applications/get-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/recipe-applications/get-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:1a6f25b470d2ae92421121754ab98ae1df78cd129daee1032c031553eac9c00c",
+      "id": "https://schemas.kurobara.invalid/schemas/recipes/apply-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/recipes/apply-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:dddc2c023b846bdbcaadfd585cc3b404da455e2875a5a1000d961cad69fb8029",
+      "id": "https://schemas.kurobara.invalid/schemas/recipes/apply-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/recipes/apply-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:c40a6d60340e2fcc29415f4594b5b3f951da7a798d41a245bb63cecd1600eccd",
+      "id": "https://schemas.kurobara.invalid/schemas/recipes/cell-input/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/recipes/cell-input/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:a131ddf91ef2314dbaf7af91f3ba56eec4adf766d557a70185b0bbc320d13e9d",
+      "id": "https://schemas.kurobara.invalid/schemas/recipes/cell-output/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/recipes/cell-output/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:3aab9e9fd8acc225331fab1eaa4984599a4e7a35867ef89985c7f159482956b2",
+      "id": "https://schemas.kurobara.invalid/schemas/runs/cancel-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/runs/cancel-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:5277949d88cdb7f97043eaf2b29e347296de8b535cb119e535b5dfee5a6be166",
+      "id": "https://schemas.kurobara.invalid/schemas/runs/cancel-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/runs/cancel-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:0488d0d61c015852da511a3828e101ecccc5d37d410d8739db97719f49aaec19",
+      "id": "https://schemas.kurobara.invalid/schemas/runs/create-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/runs/create-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:ae107776fd2c2e7dd4e2f6a28c4f702d09dcbf82b0094f845ac9b08594d327fd",
+      "id": "https://schemas.kurobara.invalid/schemas/runs/create-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/runs/create-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:fa939014ff9eb70a7500c4f2b202b57330cd832596b9bff506e6e3998f0d5048",
+      "id": "https://schemas.kurobara.invalid/schemas/runs/get-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/runs/get-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:302609bc8c68b7809d746b0f6cdc6ab232e7b039f396784255da36b53c1d5eb4",
+      "id": "https://schemas.kurobara.invalid/schemas/runs/get-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/runs/get-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:c968f55d2f94d22217b586a652c89550e198434f396768604e148574a94523ac",
+      "id": "operation:capabilities.list:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/capabilities.list/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:f442b4090ba25f410bdbc1b8d99bf9cb0973cb0b6d034a525ceafb39843f30e2",
+      "id": "operation:contact-privacy.restrict:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/contact-privacy.restrict/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:b0b222a30f1e5d90470845005798f1ebccc124e91546198d45ada45021131355",
+      "id": "operation:contacts.candidates.list:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/contacts.candidates.list/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:b7bf0cc27e89103196c3890ccbd2820cd48fa9797228a705da9b6a898b8a33d3",
+      "id": "operation:contacts.discover:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/contacts.discover/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:81eed3386a9f8d19ef6cb88172b2009ec9f7a859b50115704400267dffc15105",
+      "id": "operation:contacts.identity.reveal:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/contacts.identity.reveal/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:a373dde7bce0c05bf6be19033d43181b7904f98b840743c4fcad5dde6aea31fb",
+      "id": "operation:contacts.work-email.resolve:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/contacts.work-email.resolve/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:dce3f46b8608e78fdbe44d89462e83276b85a6b6b5f504ccdafd715022b25af0",
+      "id": "operation:contacts.work-email.verify:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/contacts.work-email.verify/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:e5b522ac75c86720f3b8a0be0131c3222da0f5bd166813961d433c63f1ab9f65",
+      "id": "operation:dataset-generations.cancel:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/dataset-generations.cancel/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:ed4402c5bf02e40145b1f3966f35c1152500abdc05778637facf6273cb3ad4ef",
+      "id": "operation:dataset-generations.get:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/dataset-generations.get/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:fd7254095c1a51640682bc2ba39e727687c758c85c5ef7338906a1c94093bad3",
+      "id": "operation:datasets.export:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/datasets.export/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:570536b3e96b889619a039b21304e4280bf7174701c45707bbccdc3048ea297a",
+      "id": "operation:datasets.import:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/datasets.import/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:77d059b4750f96553b416f566f462d2184f7e24371963a72795da54e7e8fab2f",
+      "id": "operation:export-deliveries.get:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/export-deliveries.get/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:42fc87a07f053c51f98e63771679bda08a5239e4555613324f0095b186b2fe77",
+      "id": "operation:export-deliveries.revoke:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/export-deliveries.revoke/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:6b7a6a26dd258b2f6e11c96dfc6b95ee9ccbb3fb991db01814c5f8166c924407",
+      "id": "operation:organizations.candidates.list:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/organizations.candidates.list/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:3d719ca851a602775e1b8a265c255ded6159a62c19be7faff5ffa47b613efdd8",
+      "id": "operation:organizations.discover:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/organizations.discover/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:96fdd9156a9ecaefd15652f6442affbb2652c1e883770cfdef554abdb64fec1f",
+      "id": "operation:plans.quote:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/plans.quote/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:3ae6888f02d978d4b9beda827cdd2dfd64fc64d04bc0e45f9131960a0975e25b",
+      "id": "operation:recipe-applications.export:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/recipe-applications.export/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:f2d09ff7916d775134c9f7e9b03ad5feff4780b87779c0c0ded394f416e12e23",
+      "id": "operation:recipe-applications.get:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/recipe-applications.get/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:7ace226abe8f4eeb49ef3ec5d484ced9a1d15df4bd5f0ff18c9251d856a6eff6",
+      "id": "operation:recipes.apply:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/recipes.apply/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:81ba78a1a9d1af4a4abd67260ead789c35d12b837b4d5361e47613b66e78726d",
+      "id": "operation:runs.cancel:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/runs.cancel/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:c6c90c3f3ee09130ce30120355ae2b89f970a90cf77d78488201850442347445",
+      "id": "operation:runs.create:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/runs.create/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:4a389e1bec7ac772b2fcf46dfa2d0ac793cdf37eaaa420493a343cac4f4a5d00",
+      "id": "operation:runs.get:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/runs.get/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:c398b0c14bbfac8e8bcc9a603a52a34f8babba2bb329953d9a4e3246c00d61bf",
+      "id": "problem:authentication-required:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/authentication-required/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:689ec9a512bacb95f01826f54c975fa5564d4e09e4c542bddaed9cd0d0be8523",
+      "id": "problem:authority-capability-missing:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/authority-capability-missing/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:8adce2b13069594a88c9f8cdebbbd4323ef48a69b1bbfe3e0c069763f55c342a",
+      "id": "problem:authority-permission-missing:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/authority-permission-missing/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:efd16d62c98370991a24a1fb1e64f9b2e26356f1986aeaf8e3cdb8994eb68027",
+      "id": "problem:authority-subject-mismatch:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/authority-subject-mismatch/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:89080db7d681ae26d0ede2628228ad4d8c9ae0d4bcb653d9c24170f17715cee6",
+      "id": "problem:dataset-generation-not-found:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/dataset-generation-not-found/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:2ff3735b2687a712fde57dd9cf181549a8f0d2b1df1398ef8b789fc4a7866761",
+      "id": "problem:dataset-import-conflict:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/dataset-import-conflict/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:e3f73a39b26f5023b9d7a94f87ab1a327a2eab0f8a91684cff2666d50fd06a26",
+      "id": "problem:dataset-import-failed:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/dataset-import-failed/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:9b8350d13b3e13b4a709201e4ca7156ba90891ebcf36bb36c47fdbd9a5013c1b",
+      "id": "problem:dataset-source-mismatch:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/dataset-source-mismatch/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:60258d8c90149f859b8b17a20c65d285cf1ff78f9ffff87818e7de16e98ed840",
+      "id": "problem:deadline-elapsed:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/deadline-elapsed/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:506bb84f85c0378de9d4c651846ed1c871ef9c050ec4893ff01ccd76b129550c",
+      "id": "problem:domain-rejected:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/domain-rejected/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:1715a56301f3a18f123eecf26eba699362a565d52ff5902291683310dddc7099",
+      "id": "problem:export-delivery-not-found:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/export-delivery-not-found/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:322a5f7c007cefb709ffd5534e9ae2fe2d7bae8029307c65c838953f53553277",
+      "id": "problem:export-too-large:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/export-too-large/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:a9c4c1e8135f0af8534fd1c6aef11dacbf88114651cfc9325a09d9470a19b1b3",
+      "id": "problem:idempotency-key-reused:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/idempotency-key-reused/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:c1cf21b7e22ce97318f5d85f0902ab997fe4259e6697e528716f16f8dbc754e9",
+      "id": "problem:intention-hash-mismatch:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/intention-hash-mismatch/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:dc7af030df94e1ba0f9e01bb43dc5596a97eddce552e19f77fe35170ec1e87ca",
+      "id": "problem:internal-error:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/internal-error/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:1c0550e550cdbf2c79fe90d3225fa435b17118894efd9707a04483633775d43f",
+      "id": "problem:invalid-budget:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/invalid-budget/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:1690ec98317d5305002400871c6111cebdda94f75c5858e7f18881e6cfe3311e",
+      "id": "problem:invalid-credential:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/invalid-credential/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:9b6ed90945f6df01d5d820b2e3c5aa9dfda2a9c66ff8af5f9f89765d1f748c5f",
+      "id": "problem:method-not-allowed:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/method-not-allowed/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:1f701726b8a89c319f3500a83251a7d878a8e7753f97b8e70e8f6d8cd234cff9",
+      "id": "problem:output-contract-violation:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/output-contract-violation/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:7b6e65822552814495c236d380beb60ca5c428842451019d6a8fbfe2a2f8b6b1",
+      "id": "problem:payload-too-large:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/payload-too-large/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:26b91d658e9610165820456d27f69439b41a8d6e1147272ebd3f860cc48ecaa4",
+      "id": "problem:quote-expired:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/quote-expired/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:86fe1cb195c1090171e2937b16e1baf26ba52843752c96cd713fece63e2f8bf5",
+      "id": "problem:quote-unit-mismatch:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/quote-unit-mismatch/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:ba53e052e414ca0236820ebf5a4c5f8b295ea0e924e93525776ef20f8d5d26b2",
+      "id": "problem:recipe-application-export-unavailable:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/recipe-application-export-unavailable/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:e6f4ad5710da7af90120b3e5742874613fcb5d4051c8327e740f400db5be31b7",
+      "id": "problem:recipe-application-not-found:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/recipe-application-not-found/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:3b90140fc74dc47bdc631e81687a8fa826ec9e18df0672803fbc24b46c38efba",
+      "id": "problem:request-invalid:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/request-invalid/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:9bcafabbd27c3ff285125caeef0f40c3b59c9d53471f147e3a12adad41f760b4",
+      "id": "problem:route-not-found:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/route-not-found/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:f98252eeb4b75863010be3efd13dd1a0721fe9fc1a74cdb5cdbd0e552d645b15",
+      "id": "problem:run-not-found:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/run-not-found/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:8edb875e2aea3eeeeb788bdf80bd09c16edd0aff6550c1c0ef99f61e600ccdc7",
+      "id": "problem:run-plan-already-consumed:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/run-plan-already-consumed/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:fddb667f5d972d8c57c62d0545a42ce847c60a256f0755513e322f6cea0a50c9",
+      "id": "problem:run-plan-not-found:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/run-plan-not-found/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:8df1a81525548257fa265400465c1106eb43ee6a3426178d3f9fc9029e1a3b87",
+      "id": "problem:service-unavailable:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/service-unavailable/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:e729f80ae4c61f085cebdc2e271e2dcfd8a5643e5dfde21ee7a8a0959dd20ebf",
+      "id": "problem:unsupported-media-type:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/unsupported-media-type/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:db613b144bf90d37df698f89e991d0bcd36dbc1029b1084dcb5e08595525d974",
+      "id": "problem:workspace-mismatch:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/workspace-mismatch/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:94891f3d7c5e6117072f44f970bec346bd45fd8a700d599a83123d107234402d",
+      "id": "projection:cli:1.1.0",
+      "media_type": "application/json",
+      "role": "projection-rule",
+      "source": "catalog/projection-rules/cli.json",
+      "version": "1.1.0"
+    },
+    {
+      "fingerprint": "sha256:c977eb186e7d9f80da7384828020e36b87dc9a478c94097437ea8e1d9b198276",
+      "id": "projection:mcp:1.0.0",
+      "media_type": "application/json",
+      "role": "projection-rule",
+      "source": "catalog/projection-rules/mcp.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:e641a2d2c1e00259de84ba40a2be007011cc03f77d13823525803c17f2aa3533",
+      "id": "projection:rest:1.1.0",
+      "media_type": "application/json",
+      "role": "projection-rule",
+      "source": "catalog/projection-rules/rest.json",
+      "version": "1.1.0"
+    }
+  ],
+  "publication_status": "local-development-only",
+  "catalog_fingerprint": "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd"
+}

@@ -1,0 +1,35 @@
+{
+  "generator": {
+    "name": "@kurobara/contracts-foundation",
+    "version": "0.1.0"
+  },
+  "network_access": "forbidden",
+  "outputs": [
+    {
+      "file": "catalog/generated/catalog-manifest.json",
+      "fingerprint": "sha256:57526272d8d0dd3a566fe7cd497ca2e0acf33a8ae8d2aae241733871fd00d828"
+    },
+    {
+      "file": "catalog/generated/openapi-3.1.1.json",
+      "fingerprint": "sha256:6c77c7ed72c05c44b75f0abc71ff50b5c1b789de18e678dbbd425ef2e2940233"
+    },
+    {
+      "file": "catalog/generated/mcp-tools.json",
+      "fingerprint": "sha256:b1edba1d29b748db4f4bd35c24e55bc081705ade7775feb243f74e516f3b2618"
+    },
+    {
+      "file": "catalog/generated/problem-registry.json",
+      "fingerprint": "sha256:d2c3b4afd0b480052573a58c810b400459003d0a4ccb38f0a23e46ed7cab086a"
+    },
+    {
+      "file": "catalog/generated/cli-commands.json",
+      "fingerprint": "sha256:46c428f8cee5daecfc0025ebd04f619a133cc258ed52c170e260711c02f54b71"
+    },
+    {
+      "file": "src/generated/v1.ts",
+      "fingerprint": "sha256:0a2814b5e1c57addf630e8c81dcf28cf682acda38f71ae7cc533bd45fd2f6c51"
+    }
+  ],
+  "runtime": "node-24.14.0",
+  "source_catalog_fingerprint": "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd"
+}

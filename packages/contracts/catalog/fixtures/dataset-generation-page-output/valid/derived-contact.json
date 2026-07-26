@@ -1,0 +1,44 @@
+{
+  "hasMore": false,
+  "items": [
+    {
+      "contentHash": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "providerIdentity": {
+        "providerKey": "apollo-people-search",
+        "providerSubjectId": "person-synthetic-1"
+      },
+      "record": {
+        "datasetId": "dataset-derived-work-emails",
+        "recordId": "derived-contact-1",
+        "values": [
+          { "fieldId": "field-display-name", "value": "Synthetic Contact" },
+          { "fieldId": "field-first-name", "value": "Synthetic" },
+          { "fieldId": "field-last-name", "value": "Contact" },
+          { "fieldId": "field-job-title", "value": "Director" },
+          { "fieldId": "field-organization-id", "value": "company-1" },
+          {
+            "fieldId": "field-organization-name",
+            "value": "Synthetic Company"
+          },
+          {
+            "fieldId": "field-organization-domain",
+            "value": "company.example"
+          },
+          {
+            "fieldId": "field-work-email",
+            "value": "synthetic@company.example"
+          },
+          { "fieldId": "field-work-email-verification", "value": "valid" }
+        ],
+        "workspaceId": "workspace-synthetic"
+      },
+      "source": {
+        "datasetId": "dataset-derived-identities",
+        "recordId": "contact-1"
+      }
+    }
+  ],
+  "nextCursor": null,
+  "sourcePartitionCompleted": true,
+  "version": "1.0.0"
+}

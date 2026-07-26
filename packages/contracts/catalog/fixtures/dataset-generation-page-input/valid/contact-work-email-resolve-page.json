@@ -1,0 +1,71 @@
+{
+  "capability": {
+    "capabilityId": "contacts.work-email.resolve",
+    "capabilityVersion": "1.0.0"
+  },
+  "datasetId": "dataset-derived-work-emails",
+  "fields": [
+    {
+      "datasetId": "dataset-derived-work-emails",
+      "fieldId": "field-work-email",
+      "key": "work_email",
+      "label": "Work email",
+      "valueType": "string",
+      "workspaceId": "workspace-synthetic"
+    }
+  ],
+  "generationId": "generation-email-resolve",
+  "generationPlanId": "generation-plan-email-resolve",
+  "inputCursor": null,
+  "kind": "dataset-generation-page-input",
+  "limits": {
+    "maxCalls": 1,
+    "maxCompanies": 0,
+    "maxContactsPerCompany": 0,
+    "maxContactsTotal": 1,
+    "maxEnrichments": 1,
+    "maxPages": 1,
+    "maxPhones": 0,
+    "maxResults": 1
+  },
+  "normalizedQuery": {
+    "operation_kind": "resolve",
+    "result_kind": "contact_work_email",
+    "selected_contacts": [
+      {
+        "candidate": {
+          "department": "sales",
+          "display_name": "Synthetic Contact",
+          "identity_completeness": "full",
+          "job_title": "Director",
+          "observed_at_ms": 1000,
+          "organization_domain": "company.example",
+          "organization_id": "company-1",
+          "organization_name": "Synthetic Company",
+          "person_country_code": "ES",
+          "profile_url": "https://professional.example/synthetic-contact",
+          "seniority": "director"
+        },
+        "identity": {
+          "display_name": "Synthetic Contact",
+          "first_name": "Synthetic",
+          "last_name": "Contact",
+          "observed_at_ms": 1200,
+          "profile_url": "https://professional.example/synthetic-contact"
+        },
+        "provider_identity": {
+          "provider_key": "apollo-people-search",
+          "provider_subject_id": "person-synthetic-1"
+        },
+        "source_record_id": "contact-1"
+      }
+    ],
+    "source_dataset_id": "dataset-derived-identities"
+  },
+  "pageSequence": 1,
+  "planHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "queryHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "schemaHash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "version": "1.0.0",
+  "workspaceId": "workspace-synthetic"
+}

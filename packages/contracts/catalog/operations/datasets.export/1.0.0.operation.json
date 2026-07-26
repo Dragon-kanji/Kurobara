@@ -1,0 +1,57 @@
+{
+  "operation_id": "datasets.export",
+  "operation_version": "1.0.0",
+  "action_ref": "ExportDataset",
+  "kind": "read",
+  "auth_profile": "http-bearer",
+  "idempotence": "inherent",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/datasets/export-request/1.0.0",
+  "output_stream": {
+    "delivery_tracking": "optional-atomic",
+    "format_property": "format",
+    "formats": {
+      "csv": {
+        "media_type": "text/csv",
+        "file_extension": "csv",
+        "filename": "kurobara-dataset.csv"
+      },
+      "jsonl": {
+        "media_type": "application/x-ndjson",
+        "file_extension": "jsonl",
+        "filename": "kurobara-dataset.jsonl"
+      }
+    }
+  },
+  "problem_codes": [
+    "authentication-required",
+    "authority-permission-missing",
+    "export-too-large",
+    "idempotency-key-reused",
+    "internal-error",
+    "invalid-credential",
+    "output-contract-violation",
+    "payload-too-large",
+    "request-invalid",
+    "service-unavailable",
+    "unsupported-media-type"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["datasets:export"],
+  "human_gates": [],
+  "accepted_data_classes": ["confidential"],
+  "produced_data_classes": ["confidential"],
+  "status": "experimental",
+  "projections": {
+    "rest": { "method": "POST", "path": "/v1/dataset-exports" },
+    "sdk_ts": { "method": "datasets.export" },
+    "cli": {
+      "command": "dataset export",
+      "input_mode": "arguments",
+      "output_mode": "file-and-json-receipt"
+    },
+    "mcp": {
+      "availability": "deferred",
+      "reason": "Dataset file export remains API, SDK and CLI-only until a bounded MCP artifact transport is designed."
+    }
+  }
+}

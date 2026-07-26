@@ -1,0 +1,37 @@
+{
+  "operation_id": "capabilities.list",
+  "operation_version": "1.0.0",
+  "action_ref": "ListCapabilities",
+  "kind": "read",
+  "auth_profile": "http-bearer",
+  "idempotence": "inherent",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/capabilities/list-request/1.0.0",
+  "output_schema_id": "https://schemas.kurobara.invalid/schemas/capabilities/list-response/1.0.0",
+  "problem_codes": [
+    "authentication-required",
+    "authority-permission-missing",
+    "authority-subject-mismatch",
+    "deadline-elapsed",
+    "internal-error",
+    "invalid-credential",
+    "output-contract-violation",
+    "request-invalid",
+    "service-unavailable"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["capabilities:list"],
+  "human_gates": [],
+  "accepted_data_classes": ["internal"],
+  "produced_data_classes": ["internal"],
+  "status": "experimental",
+  "projections": {
+    "rest": {
+      "method": "GET",
+      "path": "/v1/capabilities",
+      "query_parameters": ["authority_envelope_id"]
+    },
+    "sdk_ts": { "method": "capabilities.list" },
+    "cli": { "command": "capabilities" },
+    "mcp": { "tool": "list_capabilities" }
+  }
+}

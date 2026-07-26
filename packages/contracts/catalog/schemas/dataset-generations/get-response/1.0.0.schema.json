@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/dataset-generations/get-response/1.0.0",
+  "title": "DatasetGenerationsGetResponse",
+  "description": "Bounded progress and materialization state for one generated dataset.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "cost",
+    "counters",
+    "dataset_id",
+    "generation_id",
+    "generation_plan_id",
+    "materialization_id",
+    "materialization_state",
+    "state",
+    "terminal",
+    "workspace_id"
+  ],
+  "properties": {
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reserved", "spent", "unit"],
+      "properties": {
+        "reserved": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000000
+        },
+        "spent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000000
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9._-]*$"
+        }
+      }
+    },
+    "counters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accepted",
+        "calls",
+        "duplicates",
+        "pages",
+        "rejected",
+        "returned"
+      ],
+      "properties": {
+        "accepted": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "calls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "duplicates": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "pages": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "rejected": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "returned": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "generation_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "generation_plan_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "materialization_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "materialization_state": {
+      "type": "string",
+      "enum": ["ambiguous", "building", "cancelled", "failed", "ready"]
+    },
+    "record_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "ambiguous",
+        "cancelled",
+        "completed",
+        "failed",
+        "planned",
+        "running",
+        "stopping"
+      ]
+    },
+    "stop_reason": { "type": "string", "const": "requested" },
+    "stop_requested_at_ms": { "type": "integer", "minimum": 0 },
+    "terminal": { "type": "boolean" },
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.datasets",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

@@ -1,0 +1,39 @@
+{
+  "operation_id": "recipe-applications.get",
+  "operation_version": "1.0.0",
+  "action_ref": "GetRecipeApplicationStatus",
+  "kind": "read",
+  "auth_profile": "http-bearer",
+  "idempotence": "inherent",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/recipe-applications/get-request/1.0.0",
+  "output_schema_id": "https://schemas.kurobara.invalid/schemas/recipe-applications/get-response/1.0.0",
+  "problem_codes": [
+    "authentication-required",
+    "authority-permission-missing",
+    "internal-error",
+    "invalid-credential",
+    "output-contract-violation",
+    "recipe-application-not-found",
+    "request-invalid",
+    "service-unavailable"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["recipes:read"],
+  "human_gates": [],
+  "accepted_data_classes": ["internal"],
+  "produced_data_classes": ["internal"],
+  "status": "experimental",
+  "projections": {
+    "rest": {
+      "method": "GET",
+      "path": "/v1/recipe-applications/{application_id}",
+      "path_parameters": ["application_id"]
+    },
+    "sdk_ts": { "method": "recipeApplications.get" },
+    "cli": { "command": "recipe watch", "output_mode": "json" },
+    "mcp": {
+      "availability": "deferred",
+      "reason": "Recipe application watch remains API, SDK and CLI-only until a post-V1 MCP surface is designed."
+    }
+  }
+}

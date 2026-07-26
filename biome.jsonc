@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["ultracite/biome/core"],
+  "linter": {
+    "rules": {
+      "performance": {
+        // Durable I/O, stream decoding and provider routes are intentionally sequential.
+        "noAwaitInLoops": "off"
+      },
+      "nursery": {
+        // Explicit indexing and counters are clearer in state-machine and fixture code.
+        "noIncrementDecrement": "off",
+        "useDestructuring": "off",
+        // Public errors intentionally drop raw provider/database causes for redaction.
+        "useErrorCause": "off",
+        // Runtime boundary guards remain useful even when TypeScript narrows a value.
+        "noUnnecessaryConditions": "off",
+        // Test fixtures and transition callbacks deliberately reuse domain vocabulary.
+        "noShadow": "off"
+      }
+    }
+  }
+}

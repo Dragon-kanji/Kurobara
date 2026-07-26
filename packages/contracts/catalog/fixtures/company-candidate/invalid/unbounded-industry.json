@@ -1,0 +1,9 @@
+{
+  "company_id": "company-synthetic",
+  "country_code": "FR",
+  "domain": "example.invalid",
+  "employee_count": 42,
+  "industry_code": "Software & Internet",
+  "name": "Synthetic Company",
+  "observed_at_ms": 1752700000000
+}

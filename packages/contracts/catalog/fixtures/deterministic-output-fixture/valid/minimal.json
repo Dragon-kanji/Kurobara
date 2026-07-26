@@ -1,0 +1,8 @@
+{
+  "adapter": "deterministic-local",
+  "attempt_id": "attempt-fixture",
+  "operation_key": "operation-fixture",
+  "run_id": "run-fixture",
+  "status": "succeeded",
+  "step_run_id": "step-fixture"
+}

@@ -1,0 +1,10 @@
+{
+  "jsonrpc": "2.0",
+  "method": "plugin.describe",
+  "params": {
+    "apiVersion": "dev.kurobara.plugin-protocol/v1",
+    "direction": "request",
+    "method": "describe",
+    "payload": {}
+  }
+}

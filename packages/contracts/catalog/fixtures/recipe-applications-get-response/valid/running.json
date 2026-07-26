@@ -1,0 +1,17 @@
+{
+  "workspace_id": "workspace-synthetic",
+  "application_id": "recipe-application-synthetic",
+  "dataset_id": "dataset-synthetic",
+  "recipe_id": "recipe-synthetic",
+  "recipe_revision": "revision-synthetic",
+  "state": "running",
+  "terminal": false,
+  "total_cell_count": 4,
+  "bound_cell_count": 4,
+  "unbound_cell_count": 0,
+  "pending_cell_count": 1,
+  "running_cell_count": 1,
+  "succeeded_cell_count": 2,
+  "failed_cell_count": 0,
+  "skipped_cell_count": 0
+}

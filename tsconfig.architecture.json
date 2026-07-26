@@ -1,0 +1,50 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@kurobara/application": ["packages/application/src/index.ts"],
+      "@kurobara/adapter-effect-plugin": [
+        "packages/adapters/effect-plugin/src/index.ts"
+      ],
+      "@kurobara/adapter-provider-registry": [
+        "packages/adapters/provider-registry/src/index.ts"
+      ],
+      "@kurobara/contracts": ["packages/contracts/src/generated/v1.ts"],
+      "@kurobara/contracts/plugin-manifest-schema": [
+        "packages/contracts/src/plugin-manifest-schema.ts"
+      ],
+      "@kurobara/sdk": ["packages/sdk-ts/src/index.ts"],
+      "@kurobara/kernel": ["packages/kernel/src/index.ts"],
+      "@kurobara/plugin-host": ["packages/plugin-host/src/index.ts"],
+      "@kurobara/plugin-sdk": ["packages/plugin-sdk/src/index.ts"],
+      "@kurobara/policy-engine": ["packages/policy-engine/src/index.ts"],
+      "@kurobara/ports": ["packages/ports/src/index.ts"],
+      "@kurobara/provider-exa": ["packages/adapters/provider-exa/src/index.ts"],
+      "@kurobara/provider-fixture": [
+        "packages/adapters/provider-fixture/src/index.ts"
+      ],
+      "@kurobara/provider-hunter": [
+        "packages/adapters/provider-hunter/src/index.ts"
+      ],
+      "@kurobara/provider-search-common": [
+        "packages/adapters/provider-search-common/src/index.ts"
+      ],
+      "@kurobara/provider-tavily": [
+        "packages/adapters/provider-tavily/src/index.ts"
+      ],
+      "@kurobara/workflow-engine": ["packages/workflow-engine/src/index.ts"]
+    }
+  },
+  "include": [
+    "apps/**/*.ts",
+    "apps/**/*.tsx",
+    "apps/**/*.mts",
+    "apps/**/*.cts",
+    "packages/**/*.ts",
+    "packages/**/*.tsx",
+    "packages/**/*.mts",
+    "packages/**/*.cts"
+  ],
+  "exclude": ["**/.next/**", "**/coverage/**", "**/dist/**", "node_modules"]
+}

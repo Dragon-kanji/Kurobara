@@ -1,0 +1,9 @@
+{
+  "company_headquarters_country_codes": ["ES"],
+  "departments": ["sales"],
+  "email_required": true,
+  "person_country_codes": [],
+  "result_kind": "contact",
+  "seniorities": ["director"],
+  "titles": []
+}

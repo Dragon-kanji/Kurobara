@@ -1,0 +1,17 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "result",
+  "method": "execute",
+  "payload": {
+    "status": "outcome-unknown",
+    "error": {
+      "class": "transport",
+      "reasonCode": "transport-failed"
+    },
+    "usage": {
+      "basis": "estimated",
+      "amount": 1,
+      "unit": "credits"
+    }
+  }
+}

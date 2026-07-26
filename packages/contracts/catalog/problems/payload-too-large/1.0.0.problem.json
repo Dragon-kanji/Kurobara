@@ -1,0 +1,10 @@
+{
+  "problem_code": "payload-too-large",
+  "problem_version": "1.0.0",
+  "type_uri": "https://problems.kurobara.invalid/payload-too-large",
+  "title": "Payload too large",
+  "default_status": 413,
+  "retryable": false,
+  "safe_extensions": ["correlation_id"],
+  "publication_status": "local-development-only"
+}

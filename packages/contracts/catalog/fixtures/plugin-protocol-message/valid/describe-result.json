@@ -1,0 +1,60 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "result",
+  "method": "describe",
+  "payload": {
+    "manifest": {
+      "apiVersion": "dev.kurobara.plugin/v1",
+      "id": "dev.kurobara.protocol-fixture",
+      "version": "1.0.0",
+      "capabilities": [
+        {
+          "capabilityId": "fixture.echo",
+          "capabilityVersion": "1.0.0",
+          "inputContract": {
+            "catalogVersion": "0.6.0",
+            "catalogFingerprint": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "schemaId": "https://schemas.kurobara.invalid/schemas/fixtures/plugin-input/1.0.0",
+            "schemaVersion": "1.0.0",
+            "schemaFingerprint": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "outputContract": {
+            "catalogVersion": "0.6.0",
+            "catalogFingerprint": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "schemaId": "https://schemas.kurobara.invalid/schemas/fixtures/plugin-output/1.0.0",
+            "schemaVersion": "1.0.0",
+            "schemaFingerprint": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        }
+      ],
+      "auth": {
+        "modes": ["none"]
+      },
+      "execution": {
+        "idempotency": {
+          "mode": "native-key",
+          "keyScope": "operation"
+        },
+        "lookup": {
+          "mode": "by-operation-key",
+          "authoritativeNotFound": true
+        },
+        "timeouts": {
+          "executeMs": 30000,
+          "lookupMs": 10000
+        }
+      },
+      "economics": {
+        "estimateGuarantee": "hard",
+        "usageReporting": "exact",
+        "unit": "credits"
+      },
+      "permissions": {
+        "egress": {
+          "hosts": ["api.fixture.invalid"],
+          "tlsRequired": true
+        }
+      }
+    }
+  }
+}

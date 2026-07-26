@@ -1,0 +1,25 @@
+{
+  "authority_envelope_id": "authority-synthetic",
+  "budget": { "limit": 2, "unit": "requests" },
+  "dataset_id": "contacts-synthetic",
+  "dataset_name": "Synthetic contacts",
+  "deadline_ms": 2000000000000,
+  "discovery_id": "contact-discovery-synthetic",
+  "limits": {
+    "max_calls": 2,
+    "max_companies": 3,
+    "max_contacts_per_company": 2,
+    "max_contacts_total": 6,
+    "max_pages": 2
+  },
+  "mode": "dry-run",
+  "organization_generation_id": "organization-generation-synthetic",
+  "query": {
+    "company_headquarters_country_codes": ["ES"],
+    "departments": ["sales"],
+    "person_country_codes": [],
+    "result_kind": "contact",
+    "seniorities": ["director"],
+    "titles": []
+  }
+}

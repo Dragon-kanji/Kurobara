@@ -1,0 +1,25 @@
+{
+  "name": "@kurobara/api",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "bootstrap:api-key": "node --experimental-strip-types src/bootstrap-api-key.ts",
+    "bootstrap:planning": "node --experimental-strip-types src/bootstrap-planning.ts",
+    "start": "node --experimental-strip-types src/index.ts",
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "typecheck": "tsc --project tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "2.0.11",
+    "@kurobara/adapter-dataset-codec": "file:../../packages/adapters/dataset-codec",
+    "@kurobara/adapter-http": "file:../../packages/adapters/http",
+    "@kurobara/adapter-postgres": "file:../../packages/adapters/postgres",
+    "@kurobara/adapter-provider-registry": "file:../../packages/adapters/provider-registry",
+    "@kurobara/adapter-system": "file:../../packages/adapters/system",
+    "@kurobara/application": "file:../../packages/application",
+    "hono": "4.12.30",
+    "jsonc-parser": "3.3.1"
+  }
+}

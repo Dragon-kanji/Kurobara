@@ -1,0 +1,20 @@
+{
+  "name": "@kurobara/adapter-dataset-codec",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "typecheck": "tsc --project tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@kurobara/ports": "file:../../ports"
+  },
+  "devDependencies": {
+    "@kurobara/kernel": "file:../../kernel"
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/organizations/discover-request/1.0.0",
+  "title": "OrganizationsDiscoverRequest",
+  "description": "Zero-effect dry-run or bounded start command for one provider-neutral company discovery.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "authority_envelope_id",
+    "budget",
+    "dataset_id",
+    "dataset_name",
+    "deadline_ms",
+    "discovery_id",
+    "limits",
+    "mode",
+    "query"
+  ],
+  "properties": {
+    "authority_envelope_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["limit", "unit"],
+      "properties": {
+        "limit": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1000000000000000
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9._-]*$"
+        }
+      }
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "dataset_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "deadline_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "discovery_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "\\S"
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_calls", "max_companies", "max_pages"],
+      "properties": {
+        "max_calls": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "max_companies": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "max_pages": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        }
+      }
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["dry-run", "start"]
+    },
+    "query": {
+      "$ref": "https://schemas.kurobara.invalid/schemas/organizations/discovery-query/1.0.0"
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.organizations",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

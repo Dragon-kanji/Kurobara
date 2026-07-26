@@ -1,0 +1,41 @@
+{
+  "operation_kind": "verify",
+  "result_kind": "contact_work_email",
+  "selected_contacts": [
+    {
+      "candidate": {
+        "department": "sales",
+        "display_name": "Synthetic Contact",
+        "identity_completeness": "full",
+        "job_title": "Director",
+        "observed_at_ms": 1000,
+        "organization_domain": "company.example",
+        "organization_id": "company-1",
+        "organization_name": "Synthetic Company",
+        "person_country_code": "ES",
+        "profile_url": "https://professional.example/synthetic-contact",
+        "seniority": "director"
+      },
+      "identity": {
+        "display_name": "Synthetic Contact",
+        "first_name": "Synthetic",
+        "last_name": "Contact",
+        "observed_at_ms": 1200,
+        "profile_url": "https://professional.example/synthetic-contact"
+      },
+      "provider_identity": {
+        "provider_key": "apollo-people-search",
+        "provider_subject_id": "person-synthetic-1"
+      },
+      "source_record_id": "contact-1",
+      "work_email": {
+        "confidence": 0.9,
+        "email": "synthetic@company.example",
+        "observed_at_ms": 1400,
+        "source": "provider_unspecified",
+        "verification": "unknown"
+      }
+    }
+  ],
+  "source_dataset_id": "dataset-derived-work-emails"
+}

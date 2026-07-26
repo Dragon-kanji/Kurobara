@@ -1,0 +1,60 @@
+{
+  "operation_id": "recipe-applications.export",
+  "operation_version": "1.0.0",
+  "action_ref": "ExportRecipeApplication",
+  "kind": "read",
+  "auth_profile": "http-bearer",
+  "idempotence": "inherent",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/recipe-applications/export-request/1.0.0",
+  "output_stream": {
+    "format_property": "format",
+    "formats": {
+      "csv": {
+        "media_type": "text/csv",
+        "file_extension": "csv",
+        "filename": "kurobara-recipe-application.csv"
+      },
+      "jsonl": {
+        "media_type": "application/x-ndjson",
+        "file_extension": "jsonl",
+        "filename": "kurobara-recipe-application.jsonl"
+      }
+    }
+  },
+  "problem_codes": [
+    "authentication-required",
+    "authority-permission-missing",
+    "export-too-large",
+    "internal-error",
+    "invalid-credential",
+    "output-contract-violation",
+    "payload-too-large",
+    "recipe-application-export-unavailable",
+    "recipe-application-not-found",
+    "request-invalid",
+    "service-unavailable",
+    "unsupported-media-type"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["recipes:export"],
+  "human_gates": [],
+  "accepted_data_classes": ["internal"],
+  "produced_data_classes": ["confidential"],
+  "status": "experimental",
+  "projections": {
+    "rest": {
+      "method": "POST",
+      "path": "/v1/recipe-application-exports"
+    },
+    "sdk_ts": { "method": "recipeApplications.export" },
+    "cli": {
+      "command": "recipe export",
+      "input_mode": "arguments",
+      "output_mode": "file-and-json-receipt"
+    },
+    "mcp": {
+      "availability": "deferred",
+      "reason": "Recipe application file export remains API, SDK and CLI-only until a bounded MCP artifact transport is designed."
+    }
+  }
+}

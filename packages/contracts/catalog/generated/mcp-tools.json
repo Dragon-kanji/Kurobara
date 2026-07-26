@@ -1,0 +1,1111 @@
+{
+  "protocol_version": "2025-11-25",
+  "publication_status": "local-development-only",
+  "source_catalog_fingerprint": "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd",
+  "tools": [
+    {
+      "idempotence": "inherent",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/capabilities/list-request/1.0.0",
+        "title": "CapabilitiesListRequest",
+        "description": "Selects one exact authority envelope for a tenant-safe capability discovery snapshot.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "authority_envelope_id"
+        ],
+        "properties": {
+          "authority_envelope_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.capabilities",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "name": "list_capabilities",
+      "operation_id": "capabilities.list",
+      "operation_version": "1.0.0",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/capabilities/list-response/1.0.0",
+        "title": "CapabilitiesListResponse",
+        "description": "Bounded capability references that are both available in the composed runtime and covered by one exact authority envelope.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspace_id",
+          "authority_envelope_id",
+          "capabilities"
+        ],
+        "properties": {
+          "workspace_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "authority_envelope_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "capabilities": {
+            "type": "array",
+            "maxItems": 256,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "capability_id",
+                "capability_version"
+              ],
+              "properties": {
+                "capability_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "capability_version": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+                }
+              }
+            }
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.capabilities",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "problemCodes": [
+        "authentication-required",
+        "authority-permission-missing",
+        "authority-subject-mismatch",
+        "deadline-elapsed",
+        "internal-error",
+        "invalid-credential",
+        "output-contract-violation",
+        "request-invalid",
+        "service-unavailable"
+      ],
+      "problems": [
+        {
+          "code": "authentication-required",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "authority-subject-mismatch",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-subject-mismatch"
+        },
+        {
+          "code": "deadline-elapsed",
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/deadline-elapsed"
+        },
+        {
+          "code": "internal-error",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "request-invalid",
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "service-unavailable",
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        }
+      ],
+      "required_permissions": [
+        "capabilities:list"
+      ],
+      "structuredContent": true
+    },
+    {
+      "idempotence": "not-supported",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/plans/quote-request/1.0.0",
+        "title": "PlansQuoteRequest",
+        "description": "Local-development contract for preparing a run plan and cost quote without creating a run.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workspace_id",
+          "workflow_spec_id",
+          "workflow_revision",
+          "workflow_content_hash",
+          "normalized_input_hash",
+          "budget",
+          "deadline_ms",
+          "authority_envelope_id"
+        ],
+        "properties": {
+          "workspace_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "workflow_spec_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "workflow_revision": {
+            "type": "string",
+            "minLength": 1
+          },
+          "workflow_content_hash": {
+            "$ref": "#/$defs/content_hash"
+          },
+          "normalized_input_hash": {
+            "$ref": "#/$defs/content_hash"
+          },
+          "budget": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "unit",
+              "limit"
+            ],
+            "properties": {
+              "unit": {
+                "type": "string",
+                "minLength": 1
+              },
+              "limit": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          "deadline_ms": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "authority_envelope_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "$defs": {
+          "content_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.planning",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "name": "quote_run",
+      "operation_id": "plans.quote",
+      "operation_version": "1.0.0",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/plans/quote-response/1.0.0",
+        "title": "PlansQuoteResponse",
+        "description": "Prepared single-use run plan reference and cost quote. Its presence does not create a run or run identifier.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_plan_id",
+          "workspace_id",
+          "plan_hash",
+          "catalog_version",
+          "catalog_fingerprint",
+          "quote",
+          "budget",
+          "deadline_ms",
+          "authority_envelope_id"
+        ],
+        "properties": {
+          "run_plan_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "workspace_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "plan_hash": {
+            "$ref": "#/$defs/content_hash"
+          },
+          "catalog_version": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+          },
+          "catalog_fingerprint": {
+            "$ref": "#/$defs/content_hash"
+          },
+          "quote": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "quote_id",
+              "guarantee",
+              "unit",
+              "pricing_version",
+              "expires_at_ms"
+            ],
+            "properties": {
+              "quote_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "guarantee": {
+                "type": "string",
+                "enum": [
+                  "hard",
+                  "estimated",
+                  "unknown"
+                ]
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1
+              },
+              "upper_bound": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pricing_version": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expires_at_ms": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "budget": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "unit",
+              "limit",
+              "spent",
+              "reserved"
+            ],
+            "properties": {
+              "unit": {
+                "type": "string",
+                "minLength": 1
+              },
+              "limit": {
+                "type": "number",
+                "minimum": 0
+              },
+              "spent": {
+                "type": "number",
+                "minimum": 0
+              },
+              "reserved": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          "deadline_ms": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "authority_envelope_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "$defs": {
+          "content_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.planning",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "problemCodes": [
+        "authentication-required",
+        "authority-capability-missing",
+        "authority-permission-missing",
+        "authority-subject-mismatch",
+        "deadline-elapsed",
+        "domain-rejected",
+        "internal-error",
+        "invalid-budget",
+        "invalid-credential",
+        "output-contract-violation",
+        "payload-too-large",
+        "quote-unit-mismatch",
+        "request-invalid",
+        "service-unavailable",
+        "unsupported-media-type",
+        "workspace-mismatch"
+      ],
+      "problems": [
+        {
+          "code": "authentication-required",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-capability-missing",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-capability-missing"
+        },
+        {
+          "code": "authority-permission-missing",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "authority-subject-mismatch",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-subject-mismatch"
+        },
+        {
+          "code": "deadline-elapsed",
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/deadline-elapsed"
+        },
+        {
+          "code": "domain-rejected",
+          "retryable": false,
+          "status": 422,
+          "type": "https://problems.kurobara.invalid/domain-rejected"
+        },
+        {
+          "code": "internal-error",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-budget",
+          "retryable": false,
+          "status": 422,
+          "type": "https://problems.kurobara.invalid/invalid-budget"
+        },
+        {
+          "code": "invalid-credential",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "payload-too-large",
+          "retryable": false,
+          "status": 413,
+          "type": "https://problems.kurobara.invalid/payload-too-large"
+        },
+        {
+          "code": "quote-unit-mismatch",
+          "retryable": false,
+          "status": 422,
+          "type": "https://problems.kurobara.invalid/quote-unit-mismatch"
+        },
+        {
+          "code": "request-invalid",
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "service-unavailable",
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        },
+        {
+          "code": "unsupported-media-type",
+          "retryable": false,
+          "status": 415,
+          "type": "https://problems.kurobara.invalid/unsupported-media-type"
+        },
+        {
+          "code": "workspace-mismatch",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/workspace-mismatch"
+        }
+      ],
+      "required_permissions": [
+        "plans:quote"
+      ],
+      "structuredContent": true
+    },
+    {
+      "idempotence": "required",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/runs/cancel-request/1.0.0",
+        "title": "RunsCancelRequest",
+        "description": "Tenant-scoped request to stop one run. REST projects run_id to the path and sends only idempotency_key in the closed JSON body.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_id",
+          "idempotency_key"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.runs",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "name": "cancel_run",
+      "operation_id": "runs.cancel",
+      "operation_version": "1.0.0",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/runs/cancel-response/1.0.0",
+        "title": "RunsCancelResponse",
+        "description": "Canonical run snapshot after a stop request, including command replay information.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_id",
+          "run_plan_id",
+          "workspace_id",
+          "state",
+          "aggregate_version",
+          "event_sequence",
+          "result_completeness",
+          "created_at_ms",
+          "replayed"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_plan_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "workspace_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "description": "Fresh cancellations return cancelling, ambiguous, or cancelled. An exact replay returns the current durable snapshot, which may have reconciled to completed or failed.",
+            "type": "string",
+            "enum": [
+              "cancelling",
+              "ambiguous",
+              "cancelled",
+              "completed",
+              "failed"
+            ]
+          },
+          "aggregate_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "event_sequence": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "result_completeness": {
+            "type": "string",
+            "enum": [
+              "none",
+              "partial",
+              "complete"
+            ]
+          },
+          "created_at_ms": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "replayed": {
+            "type": "boolean"
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.runs",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "problemCodes": [
+        "authentication-required",
+        "authority-permission-missing",
+        "domain-rejected",
+        "idempotency-key-reused",
+        "internal-error",
+        "invalid-credential",
+        "output-contract-violation",
+        "payload-too-large",
+        "request-invalid",
+        "run-not-found",
+        "service-unavailable",
+        "unsupported-media-type"
+      ],
+      "problems": [
+        {
+          "code": "authentication-required",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "domain-rejected",
+          "retryable": false,
+          "status": 422,
+          "type": "https://problems.kurobara.invalid/domain-rejected"
+        },
+        {
+          "code": "idempotency-key-reused",
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/idempotency-key-reused"
+        },
+        {
+          "code": "internal-error",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "payload-too-large",
+          "retryable": false,
+          "status": 413,
+          "type": "https://problems.kurobara.invalid/payload-too-large"
+        },
+        {
+          "code": "request-invalid",
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "run-not-found",
+          "retryable": false,
+          "status": 404,
+          "type": "https://problems.kurobara.invalid/run-not-found"
+        },
+        {
+          "code": "service-unavailable",
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        },
+        {
+          "code": "unsupported-media-type",
+          "retryable": false,
+          "status": 415,
+          "type": "https://problems.kurobara.invalid/unsupported-media-type"
+        }
+      ],
+      "required_permissions": [
+        "runs:cancel"
+      ],
+      "structuredContent": true
+    },
+    {
+      "idempotence": "required",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/runs/create-request/1.0.0",
+        "title": "RunsCreateRequest",
+        "description": "Command to consume one prepared run plan using an idempotency key and the immutable identity hash of that exact RunPlan.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_plan_id",
+          "idempotency_key",
+          "intention_hash"
+        ],
+        "properties": {
+          "run_plan_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "intention_hash": {
+            "description": "Exact immutable plan_hash returned by plans.quote; arbitrary client-computed intent hashes are rejected.",
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.runs",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "name": "create_run",
+      "operation_id": "runs.create",
+      "operation_version": "1.0.0",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/runs/create-response/1.0.0",
+        "title": "RunsCreateResponse",
+        "description": "Initial queued run returned after atomic creation, including idempotent replay information.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_id",
+          "run_plan_id",
+          "workspace_id",
+          "state",
+          "aggregate_version",
+          "event_sequence",
+          "result_completeness",
+          "created_at_ms",
+          "replayed"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_plan_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "workspace_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "const": "queued"
+          },
+          "aggregate_version": {
+            "const": 1
+          },
+          "event_sequence": {
+            "const": 1
+          },
+          "result_completeness": {
+            "const": "none"
+          },
+          "created_at_ms": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "replayed": {
+            "type": "boolean"
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.runs",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "problemCodes": [
+        "authentication-required",
+        "authority-capability-missing",
+        "authority-permission-missing",
+        "authority-subject-mismatch",
+        "deadline-elapsed",
+        "domain-rejected",
+        "idempotency-key-reused",
+        "intention-hash-mismatch",
+        "internal-error",
+        "invalid-budget",
+        "invalid-credential",
+        "output-contract-violation",
+        "payload-too-large",
+        "quote-expired",
+        "quote-unit-mismatch",
+        "request-invalid",
+        "run-plan-already-consumed",
+        "run-plan-not-found",
+        "service-unavailable",
+        "unsupported-media-type",
+        "workspace-mismatch"
+      ],
+      "problems": [
+        {
+          "code": "authentication-required",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-capability-missing",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-capability-missing"
+        },
+        {
+          "code": "authority-permission-missing",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "authority-subject-mismatch",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-subject-mismatch"
+        },
+        {
+          "code": "deadline-elapsed",
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/deadline-elapsed"
+        },
+        {
+          "code": "domain-rejected",
+          "retryable": false,
+          "status": 422,
+          "type": "https://problems.kurobara.invalid/domain-rejected"
+        },
+        {
+          "code": "idempotency-key-reused",
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/idempotency-key-reused"
+        },
+        {
+          "code": "intention-hash-mismatch",
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/intention-hash-mismatch"
+        },
+        {
+          "code": "internal-error",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-budget",
+          "retryable": false,
+          "status": 422,
+          "type": "https://problems.kurobara.invalid/invalid-budget"
+        },
+        {
+          "code": "invalid-credential",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "payload-too-large",
+          "retryable": false,
+          "status": 413,
+          "type": "https://problems.kurobara.invalid/payload-too-large"
+        },
+        {
+          "code": "quote-expired",
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/quote-expired"
+        },
+        {
+          "code": "quote-unit-mismatch",
+          "retryable": false,
+          "status": 422,
+          "type": "https://problems.kurobara.invalid/quote-unit-mismatch"
+        },
+        {
+          "code": "request-invalid",
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "run-plan-already-consumed",
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/run-plan-already-consumed"
+        },
+        {
+          "code": "run-plan-not-found",
+          "retryable": false,
+          "status": 404,
+          "type": "https://problems.kurobara.invalid/run-plan-not-found"
+        },
+        {
+          "code": "service-unavailable",
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        },
+        {
+          "code": "unsupported-media-type",
+          "retryable": false,
+          "status": 415,
+          "type": "https://problems.kurobara.invalid/unsupported-media-type"
+        },
+        {
+          "code": "workspace-mismatch",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/workspace-mismatch"
+        }
+      ],
+      "required_permissions": [
+        "runs:create"
+      ],
+      "structuredContent": true
+    },
+    {
+      "idempotence": "inherent",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/runs/get-request/1.0.0",
+        "title": "RunsGetRequest",
+        "description": "Bounded query for one authorized run snapshot.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_id"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.runs",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "name": "get_run",
+      "operation_id": "runs.get",
+      "operation_version": "1.0.0",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/runs/get-response/1.0.0",
+        "title": "RunsGetResponse",
+        "description": "Versioned run snapshot with closed lifecycle states and aggregate cost only.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_id",
+          "run_plan_id",
+          "workspace_id",
+          "state",
+          "aggregate_version",
+          "event_sequence",
+          "result_completeness",
+          "created_at_ms",
+          "cost"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_plan_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "workspace_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "running",
+              "waiting",
+              "cancelling",
+              "ambiguous",
+              "completed",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "aggregate_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "event_sequence": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "result_completeness": {
+            "type": "string",
+            "enum": [
+              "none",
+              "partial",
+              "complete"
+            ]
+          },
+          "created_at_ms": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "cost": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "unit",
+              "spent",
+              "reserved"
+            ],
+            "properties": {
+              "unit": {
+                "type": "string",
+                "minLength": 1
+              },
+              "spent": {
+                "type": "number",
+                "minimum": 0
+              },
+              "reserved": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.runs",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "problemCodes": [
+        "authentication-required",
+        "internal-error",
+        "invalid-credential",
+        "output-contract-violation",
+        "request-invalid",
+        "run-not-found",
+        "service-unavailable"
+      ],
+      "problems": [
+        {
+          "code": "authentication-required",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "internal-error",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "request-invalid",
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "run-not-found",
+          "retryable": false,
+          "status": 404,
+          "type": "https://problems.kurobara.invalid/run-not-found"
+        },
+        {
+          "code": "service-unavailable",
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        }
+      ],
+      "required_permissions": [
+        "runs:read"
+      ],
+      "structuredContent": true
+    }
+  ]
+}

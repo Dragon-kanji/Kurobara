@@ -1,0 +1,37 @@
+name: Feature request
+description: Propose a bounded product or developer outcome
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: What should an operator, developer or agent be able to accomplish?
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints and limits
+      description: Include bounds, privacy, provider, cost and compatibility requirements.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance evidence
+      description: Describe the smallest reproducible proof that would close the request.
+    validations:
+      required: true
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+  - type: checkboxes
+    id: architecture
+    attributes:
+      label: Change classification
+      options:
+        - label: This may change a public contract, security guarantee or module boundary and might require an RFC.

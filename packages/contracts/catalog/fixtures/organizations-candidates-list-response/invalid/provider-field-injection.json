@@ -1,0 +1,44 @@
+{
+  "workspace_id": "workspace-synthetic",
+  "generation_id": "generation-synthetic",
+  "dataset_id": "dataset-synthetic",
+  "record_count": 1,
+  "provenance": {
+    "capability_id": "organizations.discover",
+    "capability_version": "1.0.0",
+    "generation_plan_id": "generation-plan-synthetic",
+    "plan_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "query_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "schema_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "materialization_id": "materialization-synthetic",
+    "materialization_revision": 1,
+    "materialization_content_hash": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "completed_at_ms": 1784671200000,
+    "completion_reason": "source-completed",
+    "coverage": {
+      "basis": "locked_provider_route",
+      "status": "complete_for_declared_source"
+    },
+    "provider_key": "provider-synthetic"
+  },
+  "page": {
+    "after_ordinal": 0,
+    "limit": 50,
+    "has_more": false,
+    "next_after_ordinal": null
+  },
+  "items": [
+    {
+      "ordinal": 1,
+      "candidate": {
+        "company_id": "company-synthetic",
+        "country_code": "FR",
+        "domain": "synthetic.invalid",
+        "employee_count": 42,
+        "industry_code": "software",
+        "name": "Synthetic Company",
+        "observed_at_ms": 1784671100000
+      }
+    }
+  ]
+}

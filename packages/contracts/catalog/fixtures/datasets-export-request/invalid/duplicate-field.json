@@ -1,0 +1,5 @@
+{
+  "dataset_id": "dataset-derived-work-emails",
+  "field_ids": ["field-work-email", "field-work-email"],
+  "format": "jsonl"
+}

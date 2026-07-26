@@ -1,0 +1,6 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": { "allowImportingTsExtensions": true },
+  "include": ["src/**/*.ts", "catalog/generated/**/*.json"],
+  "exclude": ["node_modules"]
+}

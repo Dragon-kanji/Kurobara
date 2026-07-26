@@ -1,0 +1,230 @@
+{
+  "problems": [
+    {
+      "code": "authentication-required",
+      "retryable": false,
+      "status": 401,
+      "title": "Authentication required",
+      "type": "https://problems.kurobara.invalid/authentication-required"
+    },
+    {
+      "code": "authority-capability-missing",
+      "retryable": false,
+      "status": 403,
+      "title": "Authority capability missing",
+      "type": "https://problems.kurobara.invalid/authority-capability-missing"
+    },
+    {
+      "code": "authority-permission-missing",
+      "retryable": false,
+      "status": 403,
+      "title": "Authority permission missing",
+      "type": "https://problems.kurobara.invalid/authority-permission-missing"
+    },
+    {
+      "code": "authority-subject-mismatch",
+      "retryable": false,
+      "status": 403,
+      "title": "Authority subject mismatch",
+      "type": "https://problems.kurobara.invalid/authority-subject-mismatch"
+    },
+    {
+      "code": "dataset-generation-not-found",
+      "retryable": false,
+      "status": 404,
+      "title": "Dataset generation not found",
+      "type": "https://problems.kurobara.invalid/dataset-generation-not-found"
+    },
+    {
+      "code": "dataset-import-conflict",
+      "retryable": false,
+      "status": 409,
+      "title": "Dataset import conflict",
+      "type": "https://problems.kurobara.invalid/dataset-import-conflict"
+    },
+    {
+      "code": "dataset-import-failed",
+      "retryable": false,
+      "status": 422,
+      "title": "Dataset import failed",
+      "type": "https://problems.kurobara.invalid/dataset-import-failed"
+    },
+    {
+      "code": "dataset-source-mismatch",
+      "retryable": false,
+      "status": 422,
+      "title": "Dataset source mismatch",
+      "type": "https://problems.kurobara.invalid/dataset-source-mismatch"
+    },
+    {
+      "code": "deadline-elapsed",
+      "retryable": false,
+      "status": 409,
+      "title": "Deadline elapsed",
+      "type": "https://problems.kurobara.invalid/deadline-elapsed"
+    },
+    {
+      "code": "domain-rejected",
+      "retryable": false,
+      "status": 422,
+      "title": "Run plan rejected",
+      "type": "https://problems.kurobara.invalid/domain-rejected"
+    },
+    {
+      "code": "export-delivery-not-found",
+      "retryable": false,
+      "status": 404,
+      "title": "Export delivery not found",
+      "type": "https://problems.kurobara.invalid/export-delivery-not-found"
+    },
+    {
+      "code": "export-too-large",
+      "retryable": false,
+      "status": 413,
+      "title": "Export too large",
+      "type": "https://problems.kurobara.invalid/export-too-large"
+    },
+    {
+      "code": "idempotency-key-reused",
+      "retryable": false,
+      "status": 409,
+      "title": "Idempotency key reused",
+      "type": "https://problems.kurobara.invalid/idempotency-key-reused"
+    },
+    {
+      "code": "intention-hash-mismatch",
+      "retryable": false,
+      "status": 409,
+      "title": "Run plan identity hash mismatch",
+      "type": "https://problems.kurobara.invalid/intention-hash-mismatch"
+    },
+    {
+      "code": "internal-error",
+      "retryable": false,
+      "status": 500,
+      "title": "Internal error",
+      "type": "https://problems.kurobara.invalid/internal-error"
+    },
+    {
+      "code": "invalid-budget",
+      "retryable": false,
+      "status": 422,
+      "title": "Invalid budget",
+      "type": "https://problems.kurobara.invalid/invalid-budget"
+    },
+    {
+      "code": "invalid-credential",
+      "retryable": false,
+      "status": 401,
+      "title": "Invalid credential",
+      "type": "https://problems.kurobara.invalid/invalid-credential"
+    },
+    {
+      "code": "method-not-allowed",
+      "retryable": false,
+      "status": 405,
+      "title": "Method not allowed",
+      "type": "https://problems.kurobara.invalid/method-not-allowed"
+    },
+    {
+      "code": "output-contract-violation",
+      "retryable": false,
+      "status": 500,
+      "title": "Output contract violation",
+      "type": "https://problems.kurobara.invalid/output-contract-violation"
+    },
+    {
+      "code": "payload-too-large",
+      "retryable": false,
+      "status": 413,
+      "title": "Payload too large",
+      "type": "https://problems.kurobara.invalid/payload-too-large"
+    },
+    {
+      "code": "quote-expired",
+      "retryable": false,
+      "status": 409,
+      "title": "Quote expired",
+      "type": "https://problems.kurobara.invalid/quote-expired"
+    },
+    {
+      "code": "quote-unit-mismatch",
+      "retryable": false,
+      "status": 422,
+      "title": "Quote unit mismatch",
+      "type": "https://problems.kurobara.invalid/quote-unit-mismatch"
+    },
+    {
+      "code": "recipe-application-export-unavailable",
+      "retryable": false,
+      "status": 409,
+      "title": "Recipe application export unavailable",
+      "type": "https://problems.kurobara.invalid/recipe-application-export-unavailable"
+    },
+    {
+      "code": "recipe-application-not-found",
+      "retryable": false,
+      "status": 404,
+      "title": "Recipe application not found",
+      "type": "https://problems.kurobara.invalid/recipe-application-not-found"
+    },
+    {
+      "code": "request-invalid",
+      "retryable": false,
+      "status": 400,
+      "title": "Request invalid",
+      "type": "https://problems.kurobara.invalid/request-invalid"
+    },
+    {
+      "code": "route-not-found",
+      "retryable": false,
+      "status": 404,
+      "title": "Route not found",
+      "type": "https://problems.kurobara.invalid/route-not-found"
+    },
+    {
+      "code": "run-not-found",
+      "retryable": false,
+      "status": 404,
+      "title": "Run not found",
+      "type": "https://problems.kurobara.invalid/run-not-found"
+    },
+    {
+      "code": "run-plan-already-consumed",
+      "retryable": false,
+      "status": 409,
+      "title": "Run plan already consumed",
+      "type": "https://problems.kurobara.invalid/run-plan-already-consumed"
+    },
+    {
+      "code": "run-plan-not-found",
+      "retryable": false,
+      "status": 404,
+      "title": "Run plan not found",
+      "type": "https://problems.kurobara.invalid/run-plan-not-found"
+    },
+    {
+      "code": "service-unavailable",
+      "retryable": true,
+      "status": 503,
+      "title": "Service unavailable",
+      "type": "https://problems.kurobara.invalid/service-unavailable"
+    },
+    {
+      "code": "unsupported-media-type",
+      "retryable": false,
+      "status": 415,
+      "title": "Unsupported media type",
+      "type": "https://problems.kurobara.invalid/unsupported-media-type"
+    },
+    {
+      "code": "workspace-mismatch",
+      "retryable": false,
+      "status": 403,
+      "title": "Workspace mismatch",
+      "type": "https://problems.kurobara.invalid/workspace-mismatch"
+    }
+  ],
+  "publication_status": "local-development-only",
+  "source_catalog_fingerprint": "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd"
+}

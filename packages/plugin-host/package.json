@@ -1,0 +1,36 @@
+{
+  "name": "@kurobara/plugin-host",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.14.0"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "exports": {
+    ".": {
+      "kurobara-source": {
+        "types": "./src/index.ts",
+        "import": "./src/index.ts",
+        "default": "./src/index.ts"
+      },
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "prepack": "npm run build",
+    "test": "node --conditions=kurobara-source --experimental-strip-types --test test/*.test.ts",
+    "typecheck": "tsc --project tsconfig.json --noEmit --customConditions kurobara-source"
+  },
+  "dependencies": {
+    "@kurobara/plugin-sdk": "0.1.0",
+    "jsonc-parser": "3.3.1"
+  }
+}

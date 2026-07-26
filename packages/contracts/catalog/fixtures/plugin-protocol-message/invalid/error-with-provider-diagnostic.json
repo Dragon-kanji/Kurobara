@@ -1,0 +1,13 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "result",
+  "method": "classifyError",
+  "payload": {
+    "error": {
+      "class": "provider",
+      "reasonCode": "provider-unavailable",
+      "message": "provider body must not cross this boundary",
+      "retryable": true
+    }
+  }
+}

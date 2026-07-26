@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/capabilities/list-request/1.0.0",
+  "title": "CapabilitiesListRequest",
+  "description": "Selects one exact authority envelope for a tenant-safe capability discovery snapshot.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["authority_envelope_id"],
+  "properties": {
+    "authority_envelope_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.capabilities",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

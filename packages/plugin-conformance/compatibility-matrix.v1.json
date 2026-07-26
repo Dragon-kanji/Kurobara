@@ -1,0 +1,53 @@
+{
+  "fingerprint": "sha256:4f0f6b375201f3b94f1458147b989c1aa9cd5858de63d4ffbd09eeb23e5e2b95",
+  "profile": {
+    "id": "dev.kurobara.plugin-conformance/local-v1",
+    "version": "1.1.0",
+    "fingerprint": "sha256:72c5ea9e44cf0de388fbe2ad42e6286624641db0c5b3f05ca7559ae88c2f97cf"
+  },
+  "publication_status": "local-development-only",
+  "combinations": [
+    {
+      "combination_id": "node24.14.0-darwin-arm64",
+      "architecture": "arm64",
+      "catalog_version": "0.12.0",
+      "catalog_fingerprint": "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd",
+      "contracts_package_version": "0.1.0",
+      "conformance_kit_version": "0.1.0",
+      "conformance_report_schema_version": "1.0.0",
+      "node_version": "24.14.0",
+      "platform": "darwin",
+      "plugin_api_version": "dev.kurobara.plugin/v1",
+      "plugin_host_version": "0.1.0",
+      "plugin_sdk_version": "0.1.0",
+      "protocol_api_version": "dev.kurobara.plugin-protocol/v1",
+      "schema_fingerprints": {
+        "conformance_report": "sha256:16c0d9e715287fd820ce1a3d2a665f292cf3d29bcfb0ce312f010598f2da6a50",
+        "manifest": "sha256:b5a0ef9ba9ee57cbed75cd5e422f6423eb91182cdc83ac103c398d92e0754f2d",
+        "protocol_message": "sha256:807354c01970f6e2d8dbdc192112b25a8e1066fa1a998b5078bdcca81420b59a",
+        "sidecar_json_rpc_frame": "sha256:6a80257aaf18e8b971a7d0a28a86f4c4e817d6c8521f26c4b7a59ca311fbf428"
+      }
+    },
+    {
+      "combination_id": "node24.14.0-linux-x64",
+      "architecture": "x64",
+      "catalog_version": "0.12.0",
+      "catalog_fingerprint": "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd",
+      "contracts_package_version": "0.1.0",
+      "conformance_kit_version": "0.1.0",
+      "conformance_report_schema_version": "1.0.0",
+      "node_version": "24.14.0",
+      "platform": "linux",
+      "plugin_api_version": "dev.kurobara.plugin/v1",
+      "plugin_host_version": "0.1.0",
+      "plugin_sdk_version": "0.1.0",
+      "protocol_api_version": "dev.kurobara.plugin-protocol/v1",
+      "schema_fingerprints": {
+        "conformance_report": "sha256:16c0d9e715287fd820ce1a3d2a665f292cf3d29bcfb0ce312f010598f2da6a50",
+        "manifest": "sha256:b5a0ef9ba9ee57cbed75cd5e422f6423eb91182cdc83ac103c398d92e0754f2d",
+        "protocol_message": "sha256:807354c01970f6e2d8dbdc192112b25a8e1066fa1a998b5078bdcca81420b59a",
+        "sidecar_json_rpc_frame": "sha256:6a80257aaf18e8b971a7d0a28a86f4c4e817d6c8521f26c4b7a59ca311fbf428"
+      }
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+name: Bug report
+description: Report a reproducible, non-sensitive Kurobara defect
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Do not report vulnerabilities, credentials, personal data or provider
+        payloads here. Follow SECURITY.md for sensitive reports.
+  - type: input
+    id: revision
+    attributes:
+      label: Revision
+      description: Commit SHA or released version where the issue occurs.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Expected outcome
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Use synthetic data and redact secrets, private URLs and identifiers.
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed result
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, architecture, Node/npm versions and relevant self-hosted components.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: This report contains no secret, personal data or restricted provider payload.
+          required: true

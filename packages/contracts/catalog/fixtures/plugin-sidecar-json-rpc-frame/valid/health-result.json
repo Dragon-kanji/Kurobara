@@ -1,0 +1,14 @@
+{
+  "jsonrpc": "2.0",
+  "id": "host-call-1",
+  "result": {
+    "apiVersion": "dev.kurobara.plugin-protocol/v1",
+    "direction": "result",
+    "method": "health",
+    "payload": {
+      "status": "healthy",
+      "observedAtMs": 4102444700000,
+      "validUntilMs": 4102444730000
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "country_codes": ["France"],
+  "country_scope": "office",
+  "industry_codes": ["industry:software"],
+  "industry_taxonomy": "hunter",
+  "result_kind": "company"
+}

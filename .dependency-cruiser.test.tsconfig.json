@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@kurobara/contracts": [
+        "test/architecture/fixtures/allowed-plugin-sdk-to-contracts/packages/contracts/index.ts"
+      ],
+      "@kurobara/kernel": [
+        "test/architecture/fixtures/allowed-application-to-kernel/packages/kernel/index.ts"
+      ],
+      "@kurobara/plugin-host": [
+        "test/architecture/fixtures/allowed-plugin-host-to-plugin-sdk/packages/plugin-host/index.ts"
+      ],
+      "@kurobara/plugin-sdk": [
+        "test/architecture/fixtures/allowed-provider-example-to-plugin-sdk/packages/plugin-sdk/index.ts"
+      ]
+    }
+  },
+  "include": ["test/architecture/fixtures/**/*.ts"]
+}

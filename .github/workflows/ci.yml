@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    name: Qualify OSS runtime
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:17.9-bookworm@sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      KUROBARA_TEST_POSTGRES_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.14.0
+          cache: npm
+
+      - name: Use repository npm version
+        run: npm install --global npm@10.9.4
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Audit production dependencies
+        run: npm run security:audit
+
+      - name: Verify generated contracts
+        run: npm run generate:check -w @kurobara/contracts
+
+      - name: Check formatting and architecture
+        run: npm run check
+
+      - name: Typecheck workspaces
+        run: npm run typecheck
+
+      - name: Run workspace and packaging tests
+        run: npm test
+
+      - name: Run PostgreSQL integration tests
+        run: npm run integration:test:postgres
+
+      - name: Build workspaces
+        run: npm run build
+
+      - name: Verify generated architecture graph
+        run: npm run architecture:drift
+
+      - name: Refuse generated drift
+        run: git diff --exit-code

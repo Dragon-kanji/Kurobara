@@ -1,0 +1,49 @@
+{
+  "dataset_id": "contacts-synthetic",
+  "generation_id": "contact-generation-synthetic",
+  "items": [
+    {
+      "candidate": {
+        "contact_id": "contact_synthetic_01",
+        "department": null,
+        "email": "synthetic@example.invalid",
+        "display_name": null,
+        "identity_completeness": null,
+        "job_title": null,
+        "observed_at_ms": 1000,
+        "organization_domain": null,
+        "organization_id": null,
+        "organization_name": null,
+        "person_country_code": null,
+        "profile_url": "https://social.example/synthetic-contact",
+        "seniority": null
+      },
+      "ordinal": 1
+    }
+  ],
+  "page": {
+    "after_ordinal": 0,
+    "has_more": false,
+    "limit": 100,
+    "next_after_ordinal": null
+  },
+  "provenance": {
+    "capability_id": "contacts.discover",
+    "capability_version": "1.0.0",
+    "completed_at_ms": 2000,
+    "completion_reason": "source-completed",
+    "coverage": {
+      "basis": "locked_provider_route",
+      "status": "complete_for_declared_source"
+    },
+    "generation_plan_id": "contact-plan-synthetic",
+    "materialization_content_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "materialization_id": "contact-materialization-synthetic",
+    "materialization_revision": 1,
+    "plan_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "query_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "schema_hash": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+  },
+  "record_count": 1,
+  "workspace_id": "workspace-synthetic"
+}

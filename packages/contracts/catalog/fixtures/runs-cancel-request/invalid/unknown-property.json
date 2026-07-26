@@ -1,0 +1,5 @@
+{
+  "run_id": "run-synthetic",
+  "idempotency_key": "cancel-synthetic",
+  "reason": "client-controlled"
+}

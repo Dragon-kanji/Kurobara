@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/product/cell-result/1.0.0",
+  "title": "CellResult",
+  "description": "Materialization status for one enriched cell. The required run_id references the canonical Run lifecycle; this status only describes cell availability.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "cell_result_id",
+    "dataset_id",
+    "workspace_id",
+    "record_id",
+    "field_id",
+    "recipe_id",
+    "recipe_revision",
+    "run_id",
+    "status"
+  ],
+  "properties": {
+    "cell_result_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "record_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "field_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "recipe_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "recipe_revision": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "run_id": {
+      "description": "Identifier returned by runs.create and resolved through runs.get; no second run object is embedded here.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "status": {
+      "description": "Cell availability only; exact execution state remains owned by the referenced Run.",
+      "type": "string",
+      "enum": ["pending", "running", "succeeded", "failed", "skipped"]
+    },
+    "reason": {
+      "description": "Stable, redacted explanation intended for failed or skipped cells; provider payloads are not exposed.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "retryable"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "message": {
+          "description": "Bounded public message with secrets and provider details removed.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "\\S"
+        },
+        "retryable": { "type": "boolean" }
+      }
+    },
+    "value": {
+      "description": "Bounded scalar output for the first product vertical; null is explicit, while nested arrays and objects are rejected.",
+      "type": ["string", "number", "boolean", "null"],
+      "maxLength": 16384,
+      "minimum": -1000000000000000,
+      "maximum": 1000000000000000
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["references"],
+      "properties": {
+        "references": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048,
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observed_at_ms"],
+      "properties": {
+        "observed_at_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expires_at_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit", "amount", "basis"],
+      "properties": {
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9._-]*$"
+        },
+        "amount": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000000
+        },
+        "basis": { "type": "string", "enum": ["exact", "estimated"] }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["value"],
+      "properties": {
+        "status": { "const": "succeeded" },
+        "reason": false
+      }
+    },
+    {
+      "type": "object",
+      "required": ["reason"],
+      "properties": {
+        "status": { "type": "string", "enum": ["failed", "skipped"] },
+        "value": false
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "status": { "type": "string", "enum": ["pending", "running"] },
+        "reason": false,
+        "value": false
+      }
+    }
+  ],
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "product.enrichment",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

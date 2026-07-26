@@ -1,0 +1,181 @@
+name: ${COMPOSE_PROJECT_NAME:-kurobara-local}
+
+services:
+  app-postgres:
+    image: postgres:17.9-bookworm@sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641
+    environment:
+      POSTGRES_DB: kurobara
+      POSTGRES_PASSWORD: ${KUROBARA_POSTGRES_PASSWORD:?set KUROBARA_POSTGRES_PASSWORD}
+      POSTGRES_USER: kurobara
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d kurobara -U kurobara"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+    restart: unless-stopped
+    volumes:
+      - app-postgres-data:/var/lib/postgresql/data
+
+  hatchet-postgres:
+    image: postgres:17.9-bookworm@sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641
+    command: ["postgres", "-c", "max_connections=200"]
+    environment:
+      POSTGRES_DB: hatchet
+      POSTGRES_PASSWORD: ${HATCHET_POSTGRES_PASSWORD:?set HATCHET_POSTGRES_PASSWORD}
+      POSTGRES_USER: hatchet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d hatchet -U hatchet"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+    restart: unless-stopped
+    volumes:
+      - hatchet-postgres-data:/var/lib/postgresql/data
+
+  hatchet:
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-lite-dev:v0.95.3@sha256:059e79e7f5044581cd2394b5b4212b0911642ed5486662c4a637d0bcf028ecdc
+    depends_on:
+      hatchet-postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://hatchet:${HATCHET_POSTGRES_PASSWORD:?set HATCHET_POSTGRES_PASSWORD}@hatchet-postgres:5432/hatchet?sslmode=disable
+      SERVER_AUTH_COOKIE_DOMAIN: localhost
+      SERVER_AUTH_COOKIE_INSECURE: "true"
+      SERVER_AUTH_SET_EMAIL_VERIFIED: "true"
+      SERVER_DEFAULT_ENGINE_VERSION: V1
+      SERVER_GRPC_BIND_ADDRESS: 0.0.0.0
+      SERVER_GRPC_BROADCAST_ADDRESS: hatchet:7077
+      SERVER_GRPC_INSECURE: "true"
+      SERVER_GRPC_PORT: "7077"
+      SERVER_INTERNAL_CLIENT_INTERNAL_GRPC_BROADCAST_ADDRESS: hatchet:7077
+      SERVER_URL: http://hatchet:8888
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8733/ready >/dev/null"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+    restart: unless-stopped
+    volumes:
+      - hatchet-config:/config
+
+  api:
+    image: kurobara-api:${KUROBARA_IMAGE_TAG:-local}
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: api
+    depends_on:
+      app-postgres:
+        condition: service_healthy
+    environment:
+      KUROBARA_ALLOW_NON_LOOPBACK: "true"
+      KUROBARA_API_HOST: 0.0.0.0
+      KUROBARA_DATABASE_MIGRATION_MODE: apply
+      KUROBARA_DATABASE_URL: postgresql://kurobara:${KUROBARA_POSTGRES_PASSWORD:?set KUROBARA_POSTGRES_PASSWORD}@app-postgres:5432/kurobara
+      KUROBARA_FIXTURE_MODE: deterministic
+      NODE_ENV: production
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/readyz').then(r=>{if(!r.ok)process.exit(1)})",
+        ]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+    ports:
+      - "127.0.0.1:${KUROBARA_API_PORT:-3000}:3000"
+    restart: unless-stopped
+
+  worker:
+    image: kurobara-worker:${KUROBARA_IMAGE_TAG:-local}
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: worker
+    depends_on:
+      api:
+        condition: service_healthy
+      hatchet:
+        condition: service_healthy
+    environment:
+      HATCHET_CLIENT_API_URL: http://hatchet:8888
+      HATCHET_CLIENT_HOST_PORT: hatchet:7077
+      HATCHET_CLIENT_NAMESPACE: kurobara
+      HATCHET_CLIENT_TLS_STRATEGY: none
+      HATCHET_CLIENT_TOKEN_FILE: /hatchet-config/authdisabled-token
+      KUROBARA_DATABASE_MIGRATION_MODE: verify
+      KUROBARA_DATABASE_URL: postgresql://kurobara:${KUROBARA_POSTGRES_PASSWORD:?set KUROBARA_POSTGRES_PASSWORD}@app-postgres:5432/kurobara
+      KUROBARA_DISPATCHER_ID: kurobara-local-dispatcher
+      KUROBARA_LEAF_DISPATCHER_ID: kurobara-local-leaf-dispatcher
+      KUROBARA_LEAF_EFFECT_ADAPTER: deterministic-local
+      KUROBARA_LEAF_EFFECT_RECONCILER_ID: kurobara-local-leaf-reconciler
+      KUROBARA_RECONCILER_ID: kurobara-local-reconciler
+      KUROBARA_ROUTE_SCHEDULER_ID: kurobara-local-route-scheduler
+      KUROBARA_WORKER_ID: kurobara-local-worker
+      NODE_ENV: production
+    restart: unless-stopped
+    volumes:
+      - hatchet-config:/hatchet-config:ro
+
+  bootstrap-planning:
+    profiles: ["tools"]
+    image: kurobara-api:${KUROBARA_IMAGE_TAG:-local}
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: api
+    command:
+      [
+        "node",
+        "bin/bootstrap-planning.mjs",
+        "--apply",
+        "--file",
+        "/opt/kurobara/examples/planning-bundle.v1.json",
+      ]
+    depends_on:
+      app-postgres:
+        condition: service_healthy
+    environment:
+      KUROBARA_DATABASE_URL: postgresql://kurobara:${KUROBARA_POSTGRES_PASSWORD:?set KUROBARA_POSTGRES_PASSWORD}@app-postgres:5432/kurobara
+      NODE_ENV: production
+
+  bootstrap-api-key:
+    profiles: ["tools"]
+    image: kurobara-api:${KUROBARA_IMAGE_TAG:-local}
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: api
+    command: ["node", "bin/bootstrap-api-key.mjs"]
+    depends_on:
+      app-postgres:
+        condition: service_healthy
+    environment:
+      KUROBARA_BOOTSTRAP_ACTOR_ID: actor_demo
+      KUROBARA_BOOTSTRAP_PERMISSIONS: capabilities:list,datasets:export,datasets:import,plans:quote,recipes:apply,recipes:read,recipes:register,runs:cancel,runs:create,runs:read
+      KUROBARA_BOOTSTRAP_WORKSPACE_ID: workspace_demo
+      KUROBARA_DATABASE_URL: postgresql://kurobara:${KUROBARA_POSTGRES_PASSWORD:?set KUROBARA_POSTGRES_PASSWORD}@app-postgres:5432/kurobara
+      NODE_ENV: production
+
+  cli:
+    profiles: ["tools"]
+    image: kurobara-cli:${KUROBARA_IMAGE_TAG:-local}
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: cli
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  app-postgres-data:
+  hatchet-config:
+  hatchet-postgres-data:

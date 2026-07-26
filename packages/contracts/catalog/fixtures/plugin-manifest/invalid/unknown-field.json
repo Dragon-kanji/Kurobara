@@ -1,0 +1,24 @@
+{
+  "apiVersion": "dev.kurobara.plugin/v1",
+  "id": "dev.kurobara.fixture",
+  "version": "1.0.0",
+  "capabilities": [],
+  "auth": { "modes": ["none"] },
+  "execution": {
+    "idempotency": { "mode": "native-key", "keyScope": "operation" },
+    "lookup": {
+      "mode": "by-operation-key",
+      "authoritativeNotFound": true
+    },
+    "timeouts": { "executeMs": 30000, "lookupMs": 10000 }
+  },
+  "economics": {
+    "estimateGuarantee": "estimated",
+    "usageReporting": "exact",
+    "unit": "credits"
+  },
+  "permissions": {
+    "egress": { "hosts": [], "tlsRequired": true }
+  },
+  "providerToken": "must-never-be-declared"
+}

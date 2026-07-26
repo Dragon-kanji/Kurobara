@@ -1,0 +1,6 @@
+{
+  "dataset_id": "dataset-synthetic",
+  "workspace_id": "workspace-synthetic",
+  "name": "Synthetic companies",
+  "storage_table": "datasets"
+}

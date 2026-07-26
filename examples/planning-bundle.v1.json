@@ -1,0 +1,106 @@
+{
+  "formatVersion": "1.0.0",
+  "planning": {
+    "authorities": [
+      {
+        "authorityEnvelopeId": "authority-demo",
+        "budgetLimit": {
+          "limit": 10,
+          "reserved": 0,
+          "spent": 0,
+          "unit": "requests"
+        },
+        "capabilities": [
+          {
+            "capabilityId": "organizations.website.resolve",
+            "capabilityVersion": "1.0.0"
+          }
+        ],
+        "deadline": 4102444800000,
+        "permissions": [
+          "capabilities:list",
+          "plans:quote",
+          "recipes:apply",
+          "runs:create",
+          "steps:execute"
+        ],
+        "subjectActorId": "actor_demo",
+        "version": "1.0.0",
+        "workspaceId": "workspace_demo"
+      }
+    ],
+    "defaults": {
+      "policySnapshotId": "policy-local",
+      "pricingSnapshotId": "pricing-local",
+      "workspaceId": "workspace_demo"
+    },
+    "expectedDefaultsRevision": null,
+    "policies": [
+      {
+        "policy": {
+          "factsHash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "maxAttemptsPerStep": 2,
+          "requiredPermission": "plans:quote",
+          "version": "1.0.0"
+        },
+        "snapshotId": "policy-local",
+        "workspaceId": "workspace_demo"
+      }
+    ],
+    "pricing": [
+      {
+        "guarantee": "hard",
+        "snapshotId": "pricing-local",
+        "ttlMilliseconds": 60000,
+        "unit": "requests",
+        "upperBound": 2,
+        "version": "1.0.0",
+        "workspaceId": "workspace_demo"
+      }
+    ],
+    "workflows": [
+      {
+        "allowedCapabilities": ["organizations.website.resolve"],
+        "catalogFingerprint": "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd",
+        "catalogVersion": "0.12.0",
+        "compilationLimits": {
+          "maxDepth": 2,
+          "maxFanOut": 2,
+          "maxNodes": 2
+        },
+        "compilerVersion": "1.0.0",
+        "inputContract": {
+          "catalogFingerprint": "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd",
+          "catalogVersion": "0.12.0",
+          "schemaFingerprint": "sha256:c40a6d60340e2fcc29415f4594b5b3f951da7a798d41a245bb63cecd1600eccd",
+          "schemaId": "https://schemas.kurobara.invalid/schemas/recipes/cell-input/1.0.0",
+          "schemaVersion": "1.0.0"
+        },
+        "outputContract": {
+          "catalogFingerprint": "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd",
+          "catalogVersion": "0.12.0",
+          "schemaFingerprint": "sha256:a131ddf91ef2314dbaf7af91f3ba56eec4adf766d557a70185b0bbc320d13e9d",
+          "schemaId": "https://schemas.kurobara.invalid/schemas/recipes/cell-output/1.0.0",
+          "schemaVersion": "1.0.0"
+        },
+        "workflow": {
+          "contentHash": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "nodes": [
+            {
+              "capability": {
+                "capabilityId": "organizations.website.resolve",
+                "capabilityVersion": "1.0.0"
+              },
+              "dependsOn": [],
+              "key": "summarize"
+            }
+          ],
+          "revision": "1.0.0",
+          "workflowSpecId": "workflow_organization_website_lookup"
+        },
+        "workspaceId": "workspace_demo"
+      }
+    ],
+    "workspaceId": "workspace_demo"
+  }
+}

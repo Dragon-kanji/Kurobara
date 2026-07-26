@@ -1,0 +1,12 @@
+{
+  "recipe_id": "recipe-synthetic",
+  "recipe_revision": "1",
+  "dataset_id": "dataset-synthetic",
+  "workspace_id": "workspace-synthetic",
+  "name": "Resolve company category",
+  "input_field_ids": ["field-domain", "field-domain"],
+  "target_field_id": "field-category",
+  "workflow_spec_id": "workflow-company-category",
+  "workflow_revision": "1",
+  "workflow_content_hash": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+}

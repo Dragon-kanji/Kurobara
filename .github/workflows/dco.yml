@@ -1,0 +1,64 @@
+name: DCO
+
+on:
+  pull_request_target:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  signoff:
+    name: Verify commit sign-offs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out the trusted base
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+          ref: ${{ github.event.pull_request.base.sha }}
+
+      - name: Fetch the pull request head as Git objects
+        env:
+          DCO_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          DCO_PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          case "${DCO_PR_NUMBER}" in
+            ""|*[!0-9]*)
+              echo "Pull request number is invalid." >&2
+              exit 1
+              ;;
+          esac
+          case "${DCO_HEAD_SHA}" in
+            *[!0-9a-f]*)
+              echo "Pull request head SHA is invalid." >&2
+              exit 1
+              ;;
+          esac
+          if [ "${#DCO_HEAD_SHA}" -ne 40 ]; then
+            echo "Pull request head SHA is invalid." >&2
+            exit 1
+          fi
+          head_ref="refs/remotes/origin/pull/${DCO_PR_NUMBER}/head"
+          git fetch --no-tags --force origin \
+            "refs/pull/${DCO_PR_NUMBER}/head:${head_ref}"
+          fetched_head="$(git rev-parse --verify "${head_ref}^{commit}")"
+          if [ "${fetched_head}" != "${DCO_HEAD_SHA}" ]; then
+            echo "Fetched pull request head does not match the event SHA." >&2
+            exit 1
+          fi
+
+      - name: Materialize checker from the trusted base
+        env:
+          DCO_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: git show "${DCO_BASE_SHA}:scripts/check-dco.mjs" > "$RUNNER_TEMP/check-dco.mjs"
+
+      - name: Verify DCO sign-offs
+        env:
+          DCO_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          DCO_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node "$RUNNER_TEMP/check-dco.mjs" "$DCO_BASE_SHA" "$DCO_HEAD_SHA"

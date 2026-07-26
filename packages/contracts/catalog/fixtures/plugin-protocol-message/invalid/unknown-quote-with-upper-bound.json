@@ -1,0 +1,15 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "result",
+  "method": "estimate",
+  "payload": {
+    "status": "quoted",
+    "quote": {
+      "guarantee": "unknown",
+      "upperBound": 2,
+      "unit": "credits",
+      "pricingVersion": "1.0.0",
+      "expiresAtMs": 4102444740000
+    }
+  }
+}

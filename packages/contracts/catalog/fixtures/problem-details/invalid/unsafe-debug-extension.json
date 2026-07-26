@@ -1,0 +1,8 @@
+{
+  "type": "https://problems.kurobara.invalid/domain-rejected",
+  "title": "Run plan rejected",
+  "status": 422,
+  "code": "domain-rejected",
+  "retryable": false,
+  "debug": "must never cross the public boundary"
+}

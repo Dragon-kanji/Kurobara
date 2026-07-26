@@ -1,0 +1,11 @@
+{
+  "delivery_id": "delivery-synthetic-001",
+  "dataset_id": "dataset-synthetic-001",
+  "content_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "content_length": 128,
+  "format": "csv",
+  "state": "delivered",
+  "prepared_at_ms": 1700000000000,
+  "expires_at_ms": 1700086400000,
+  "delivered_at_ms": 1700000001000
+}

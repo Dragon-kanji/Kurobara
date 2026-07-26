@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/product/record/1.0.0",
+  "title": "Record",
+  "description": "Bounded field values for one record in a dataset.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_id", "dataset_id", "workspace_id", "values"],
+  "properties": {
+    "record_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "values": {
+      "type": "array",
+      "maxItems": 256,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field_id", "value"],
+        "properties": {
+          "field_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          },
+          "value": {
+            "description": "Bounded scalar value; null is explicit and distinct from an omitted field entry. Nested arrays and objects are rejected.",
+            "type": ["string", "number", "boolean", "null"],
+            "maxLength": 16384,
+            "minimum": -1000000000000000,
+            "maximum": 1000000000000000
+          }
+        }
+      }
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "product.datasets",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

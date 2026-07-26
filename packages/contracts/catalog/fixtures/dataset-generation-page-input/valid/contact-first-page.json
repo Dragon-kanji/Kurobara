@@ -1,0 +1,54 @@
+{
+  "capability": {
+    "capabilityId": "contacts.discover",
+    "capabilityVersion": "1.0.0"
+  },
+  "datasetId": "dataset-synthetic-contacts",
+  "fields": [
+    {
+      "datasetId": "dataset-synthetic-contacts",
+      "fieldId": "field-display-name",
+      "key": "display_name",
+      "label": "Display name",
+      "valueType": "string",
+      "workspaceId": "workspace-synthetic"
+    }
+  ],
+  "generationId": "generation-synthetic-contacts",
+  "generationPlanId": "generation-plan-synthetic-contacts",
+  "inputCursor": null,
+  "kind": "dataset-generation-page-input",
+  "limits": {
+    "maxCalls": 2,
+    "maxCompanies": 1,
+    "maxContactsPerCompany": 2,
+    "maxContactsTotal": 2,
+    "maxEnrichments": 0,
+    "maxPages": 2,
+    "maxPhones": 0,
+    "maxResults": 2
+  },
+  "normalizedQuery": {
+    "company_headquarters_country_codes": ["FR"],
+    "departments": ["executive"],
+    "organization_generation_id": "generation-synthetic-organizations",
+    "organizations": [
+      {
+        "company_id": "company-synthetic",
+        "country_code": "FR",
+        "domain": "synthetic.example",
+        "name": "Synthetic Company"
+      }
+    ],
+    "person_country_codes": ["FR"],
+    "result_kind": "contact",
+    "seniorities": ["c_suite"],
+    "titles": ["Founder"]
+  },
+  "pageSequence": 1,
+  "planHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "queryHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "schemaHash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "version": "1.0.0",
+  "workspaceId": "workspace-synthetic"
+}

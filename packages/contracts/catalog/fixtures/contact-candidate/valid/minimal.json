@@ -1,0 +1,14 @@
+{
+  "contact_id": "contact_synthetic_01",
+  "department": "sales",
+  "display_name": "Synthetic Contact",
+  "identity_completeness": "full",
+  "job_title": "Sales Director",
+  "observed_at_ms": 1000,
+  "organization_domain": "synthetic.example",
+  "organization_id": "company_synthetic_01",
+  "organization_name": "Synthetic Company",
+  "person_country_code": "ES",
+  "profile_url": "https://social.example/synthetic-contact",
+  "seniority": "director"
+}

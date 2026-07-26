@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/runs/cancel-request/1.0.0",
+  "title": "RunsCancelRequest",
+  "description": "Tenant-scoped request to stop one run. REST projects run_id to the path and sends only idempotency_key in the closed JSON body.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["run_id", "idempotency_key"],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.runs",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

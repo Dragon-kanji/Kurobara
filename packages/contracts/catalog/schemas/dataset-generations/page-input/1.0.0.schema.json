@@ -1,0 +1,391 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/dataset-generations/page-input/1.0.0",
+  "title": "DatasetGenerationPageInput",
+  "description": "Stable provider-neutral effect envelope for one bounded organization, contact discovery, identity, or work-email page.",
+  "type": "object",
+  "additionalProperties": false,
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["capability", "normalizedQuery"],
+      "properties": {
+        "capability": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["capabilityId", "capabilityVersion"],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "const": "organizations.discover"
+            },
+            "capabilityVersion": { "type": "string", "const": "1.0.0" }
+          }
+        },
+        "normalizedQuery": {
+          "$ref": "https://schemas.kurobara.invalid/schemas/organizations/discovery-query/1.0.0"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": ["capability", "normalizedQuery"],
+      "properties": {
+        "capability": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["capabilityId", "capabilityVersion"],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "const": "contacts.discover"
+            },
+            "capabilityVersion": { "type": "string", "const": "1.0.0" }
+          }
+        },
+        "normalizedQuery": {
+          "$ref": "https://schemas.kurobara.invalid/schemas/contacts/discovery-execution-query/1.0.0"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": ["capability", "normalizedQuery"],
+      "properties": {
+        "capability": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["capabilityId", "capabilityVersion"],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "const": "contacts.identity.reveal"
+            },
+            "capabilityVersion": { "type": "string", "const": "1.0.0" }
+          }
+        },
+        "normalizedQuery": {
+          "$ref": "https://schemas.kurobara.invalid/schemas/contacts/identity-execution-query/1.0.0"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": ["capability", "normalizedQuery"],
+      "properties": {
+        "capability": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["capabilityId", "capabilityVersion"],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "const": "contacts.work-email.resolve"
+            },
+            "capabilityVersion": { "type": "string", "const": "1.0.0" }
+          }
+        },
+        "normalizedQuery": {
+          "$ref": "https://schemas.kurobara.invalid/schemas/contacts/work-email-execution-query/1.0.0",
+          "type": "object",
+          "properties": {
+            "operation_kind": { "type": "string", "const": "resolve" }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": ["capability", "normalizedQuery"],
+      "properties": {
+        "capability": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["capabilityId", "capabilityVersion"],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "const": "contacts.work-email.verify"
+            },
+            "capabilityVersion": { "type": "string", "const": "1.0.0" }
+          }
+        },
+        "normalizedQuery": {
+          "$ref": "https://schemas.kurobara.invalid/schemas/contacts/work-email-execution-query/1.0.0",
+          "type": "object",
+          "properties": {
+            "operation_kind": { "type": "string", "const": "verify" }
+          }
+        }
+      }
+    }
+  ],
+  "required": [
+    "capability",
+    "datasetId",
+    "fields",
+    "generationId",
+    "generationPlanId",
+    "inputCursor",
+    "kind",
+    "limits",
+    "normalizedQuery",
+    "pageSequence",
+    "planHash",
+    "queryHash",
+    "schemaHash",
+    "version",
+    "workspaceId"
+  ],
+  "properties": {
+    "capability": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["capabilityId", "capabilityVersion"],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "const": "organizations.discover"
+            },
+            "capabilityVersion": { "type": "string", "const": "1.0.0" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["capabilityId", "capabilityVersion"],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "const": "contacts.discover"
+            },
+            "capabilityVersion": { "type": "string", "const": "1.0.0" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["capabilityId", "capabilityVersion"],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "const": "contacts.identity.reveal"
+            },
+            "capabilityVersion": { "type": "string", "const": "1.0.0" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["capabilityId", "capabilityVersion"],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "const": "contacts.work-email.resolve"
+            },
+            "capabilityVersion": { "type": "string", "const": "1.0.0" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["capabilityId", "capabilityVersion"],
+          "properties": {
+            "capabilityId": {
+              "type": "string",
+              "const": "contacts.work-email.verify"
+            },
+            "capabilityVersion": { "type": "string", "const": "1.0.0" }
+          }
+        }
+      ]
+    },
+    "datasetId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "fields": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "datasetId",
+          "fieldId",
+          "key",
+          "label",
+          "valueType",
+          "workspaceId"
+        ],
+        "properties": {
+          "datasetId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          },
+          "fieldId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          },
+          "valueType": {
+            "type": "string",
+            "enum": ["boolean", "number", "string"]
+          },
+          "workspaceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
+    "generationId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "generationPlanId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "inputCursor": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "\\S"
+        }
+      ]
+    },
+    "kind": { "type": "string", "const": "dataset-generation-page-input" },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxCalls",
+        "maxCompanies",
+        "maxContactsPerCompany",
+        "maxContactsTotal",
+        "maxEnrichments",
+        "maxPages",
+        "maxPhones",
+        "maxResults"
+      ],
+      "properties": {
+        "maxCalls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxCompanies": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxContactsPerCompany": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxContactsTotal": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxEnrichments": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxPages": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxPhones": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxResults": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "normalizedQuery": {
+      "oneOf": [
+        {
+          "$ref": "https://schemas.kurobara.invalid/schemas/organizations/discovery-query/1.0.0"
+        },
+        {
+          "$ref": "https://schemas.kurobara.invalid/schemas/contacts/discovery-execution-query/1.0.0"
+        },
+        {
+          "$ref": "https://schemas.kurobara.invalid/schemas/contacts/identity-execution-query/1.0.0"
+        },
+        {
+          "$ref": "https://schemas.kurobara.invalid/schemas/contacts/work-email-execution-query/1.0.0"
+        }
+      ]
+    },
+    "pageSequence": { "type": "integer", "minimum": 1, "maximum": 10000 },
+    "planHash": {
+      "type": "string",
+      "minLength": 71,
+      "maxLength": 71,
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "queryHash": {
+      "type": "string",
+      "minLength": 71,
+      "maxLength": 71,
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "schemaHash": {
+      "type": "string",
+      "minLength": 71,
+      "maxLength": 71,
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "version": { "type": "string", "const": "1.0.0" },
+    "workspaceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.datasets",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

@@ -1,0 +1,17 @@
+{
+  "hasMore": false,
+  "items": [
+    {
+      "contentHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "record": {
+        "datasetId": "dataset-synthetic",
+        "recordId": "company-synthetic",
+        "values": [{ "fieldId": "field-name", "value": "Synthetic Company" }],
+        "workspaceId": "workspace-synthetic"
+      }
+    }
+  ],
+  "nextCursor": null,
+  "sourcePartitionCompleted": true,
+  "version": "1.0.0"
+}

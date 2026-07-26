@@ -1,0 +1,9 @@
+{
+  "idempotency_key": "privacy-restrict-synthetic-provider-key-too-long",
+  "reason": "provider-deletion",
+  "subject": {
+    "kind": "provider-subject",
+    "provider_key": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "value": "provider-subject-synthetic-boundary"
+  }
+}

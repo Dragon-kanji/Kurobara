@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/fixtures/deterministic-output/1.0.0",
+  "title": "DeterministicOutputFixture",
+  "description": "Synthetic normalized output used only to qualify Kurobara's local durable execution protocol.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "adapter",
+    "attempt_id",
+    "operation_key",
+    "run_id",
+    "status",
+    "step_run_id"
+  ],
+  "properties": {
+    "adapter": { "const": "deterministic-local" },
+    "attempt_id": { "type": "string", "minLength": 1 },
+    "operation_key": { "type": "string", "minLength": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "status": { "const": "succeeded" },
+    "step_run_id": { "type": "string", "minLength": 1 }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "adapter.effect-deterministic",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

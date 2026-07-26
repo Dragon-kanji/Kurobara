@@ -1,0 +1,21 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "result",
+  "method": "lookup",
+  "payload": {
+    "status": "found",
+    "proof": {
+      "proofReference": "proof:synthetic:invalid-usage",
+      "observedAtMs": 4102444700000
+    },
+    "outcome": {
+      "status": "succeeded",
+      "providerPayload": {},
+      "usage": {
+        "basis": "unavailable",
+        "amount": 1,
+        "unit": "credits"
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/problems/problem-details/1.0.0",
+  "title": "ProblemDetails",
+  "description": "Closed RFC 9457 Problem Details foundation with stable Kurobara code and safe correlation metadata.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "title", "status", "code", "retryable"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "pattern": "^https://problems\\.kurobara\\.invalid/[a-z0-9-]+$"
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "status": { "type": "integer", "minimum": 400, "maximum": 599 },
+    "detail": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "instance": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "code": {
+      "type": "string",
+      "enum": [
+        "authentication-required",
+        "authority-capability-missing",
+        "authority-permission-missing",
+        "authority-subject-mismatch",
+        "dataset-generation-not-found",
+        "dataset-import-conflict",
+        "dataset-import-failed",
+        "dataset-source-mismatch",
+        "deadline-elapsed",
+        "domain-rejected",
+        "export-delivery-not-found",
+        "export-too-large",
+        "idempotency-key-reused",
+        "intention-hash-mismatch",
+        "internal-error",
+        "invalid-budget",
+        "invalid-credential",
+        "method-not-allowed",
+        "output-contract-violation",
+        "payload-too-large",
+        "quote-expired",
+        "quote-unit-mismatch",
+        "recipe-application-not-found",
+        "recipe-application-export-unavailable",
+        "request-invalid",
+        "route-not-found",
+        "run-not-found",
+        "run-plan-already-consumed",
+        "run-plan-not-found",
+        "service-unavailable",
+        "unsupported-media-type",
+        "workspace-mismatch"
+      ]
+    },
+    "retryable": { "type": "boolean" },
+    "correlation_id": { "type": "string", "minLength": 1, "maxLength": 255 }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.errors",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-redaction": "safe-public-problem-fields-only",
+  "x-kurobara-publication-status": "local-development-only"
+}

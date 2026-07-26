@@ -1,0 +1,44 @@
+flowchart LR
+
+subgraph apps["apps"]
+  apps_api["api"]
+  apps_worker["worker"]
+end
+subgraph packages["packages"]
+  packages_adapters["adapters"]
+  packages_application["application"]
+  packages_cli["cli"]
+  packages_contracts["contracts"]
+  packages_kernel["kernel"]
+  packages_plugin_conformance["plugin-conformance"]
+  packages_plugin_host["plugin-host"]
+  packages_plugin_sdk["plugin-sdk"]
+  packages_policy_engine["policy-engine"]
+  packages_ports["ports"]
+  packages_sdk_ts["sdk-ts"]
+  packages_workflow_engine["workflow-engine"]
+end
+apps_api-->packages_application
+apps_api-->packages_adapters
+apps_worker-->packages_contracts
+apps_worker-->packages_application
+apps_worker-->packages_adapters
+packages_adapters-->packages_kernel
+packages_adapters-->packages_ports
+packages_adapters-->packages_plugin_sdk
+packages_adapters-->packages_application
+packages_adapters-->packages_contracts
+packages_application-->packages_kernel
+packages_application-->packages_ports
+packages_application-->packages_policy_engine
+packages_application-->packages_workflow_engine
+packages_cli-->packages_sdk_ts
+packages_plugin_conformance-->packages_plugin_sdk
+packages_plugin_conformance-->packages_contracts
+packages_plugin_conformance-->packages_plugin_host
+packages_plugin_host-->packages_plugin_sdk
+packages_plugin_sdk-->packages_contracts
+packages_policy_engine-->packages_kernel
+packages_ports-->packages_kernel
+packages_sdk_ts-->packages_contracts
+packages_workflow_engine-->packages_kernel

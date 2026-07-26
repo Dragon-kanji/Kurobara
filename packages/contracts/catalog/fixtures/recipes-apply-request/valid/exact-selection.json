@@ -1,0 +1,21 @@
+{
+  "aggregate_budget": { "limit": 6, "unit": "credits" },
+  "application_id": "recipe-application-selected-synthetic",
+  "authority_envelope_id": "authority-synthetic",
+  "cell_budget": { "limit": 2, "unit": "credits" },
+  "deadline_ms": 9007199254740991,
+  "max_cells": 3,
+  "recipe": {
+    "recipe_id": "recipe-synthetic",
+    "recipe_revision": "1",
+    "dataset_id": "dataset-synthetic",
+    "workspace_id": "workspace-synthetic",
+    "name": "Resolve selected work emails",
+    "input_field_ids": ["field-domain"],
+    "target_field_id": "field-work-email",
+    "workflow_spec_id": "workflow-work-email",
+    "workflow_revision": "1",
+    "workflow_content_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "record_ids": ["contact-1", "contact-2", "contact-3"]
+}

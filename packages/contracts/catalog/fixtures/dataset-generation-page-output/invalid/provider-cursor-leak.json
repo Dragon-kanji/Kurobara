@@ -1,0 +1,8 @@
+{
+  "hasMore": false,
+  "items": [],
+  "nextCursor": null,
+  "provider_cursor": "secret-provider-cursor",
+  "sourcePartitionCompleted": true,
+  "version": "1.0.0"
+}

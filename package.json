@@ -1,0 +1,62 @@
+{
+  "name": "kurobara",
+  "version": "0.1.0-rc.1",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "npm@10.9.4",
+  "engines": {
+    "node": "24.14.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "packages/adapters/*"
+  ],
+  "scripts": {
+    "architecture:check": "dependency-cruise --config .dependency-cruiser.mjs --output-type err-long apps packages && node scripts/check-computed-imports.mjs apps packages",
+    "architecture:drift": "npm run architecture:check && npm run architecture:test && npm run architecture:graph && git diff --exit-code -- docs/architecture/generated/module-dependencies.mmd",
+    "architecture:graph": "dependency-cruise --config .dependency-cruiser.mjs --include-only \"^(apps|packages)/\" --collapse \"^(apps|packages)/[^/]+\" --output-type mermaid apps packages > docs/architecture/generated/module-dependencies.mmd",
+    "architecture:test": "node test/architecture/run-tests.mjs",
+    "b2b:dogfood": "node scripts/b2b-dogfood.mjs",
+    "b2b:dogfood:preflight": "node scripts/b2b-dogfood.mjs preflight",
+    "build": "npm run build --workspaces --if-present",
+    "build:runtime": "node scripts/build-runtime.mjs",
+    "check": "ultracite check && npm run architecture:check && npm run architecture:test",
+    "clean-room": "node scripts/clean-room.mjs",
+    "kurobara": "npm run start -w @kurobara/cli --",
+    "release:candidate": "node scripts/release-candidate.mjs",
+    "self-host:smoke": "bash deploy/self-host/harness.sh",
+    "start:api": "npm run start -w @kurobara/api",
+    "start:worker": "npm run start -w @kurobara/worker",
+    "fix": "ultracite fix",
+    "generate:contracts": "npm run generate -w @kurobara/contracts",
+    "hatchet:down": "bash infra/hatchet/harness.sh down",
+    "hatchet:smoke": "bash infra/hatchet/harness.sh smoke",
+    "hatchet:status": "bash infra/hatchet/harness.sh status",
+    "hatchet:up": "bash infra/hatchet/harness.sh up",
+    "hatchet:worker": "bash infra/hatchet/harness.sh worker",
+    "integration:test:hatchet": "bash infra/hatchet/harness.sh smoke",
+    "integration:test:hatchet-worker": "bash infra/hatchet/harness.sh worker",
+    "integration:test:postgres": "node --experimental-strip-types --test --test-concurrency=1 test/integration/*.test.ts",
+    "security:audit": "npm audit --omit=dev --package-lock-only --audit-level=info",
+    "test": "npm run test --workspaces --if-present && npm run test:b2b-dogfood && npm run test:clean-room && npm run test:dco && npm run test:plugin-packaging && npm run test:public-preview-gate && npm run test:release-candidate && npm run test:v1-business-gate && npm run test:v1-gate && npm run architecture:test",
+    "test:b2b-dogfood": "node --test --test-concurrency=1 test/dogfood/*.test.mjs",
+    "test:clean-room": "node --test --test-concurrency=1 test/clean-room/*.test.mjs",
+    "test:dco": "node --test --test-concurrency=1 test/dco/*.test.mjs",
+    "test:plugin-packaging": "node --test --test-concurrency=1 test/plugin-packaging/*.test.mjs test/plugin-conformance-packaging/*.test.mjs",
+    "test:public-preview-gate": "node --test --test-concurrency=1 test/public-preview-gate/*.test.mjs",
+    "test:release-candidate": "node --test --test-concurrency=1 test/release-candidate/*.test.mjs",
+    "test:v1-business-gate": "node --conditions=kurobara-source --experimental-strip-types --test --test-concurrency=1 test/v1-business-gate/*.test.ts",
+    "test:v1-gate": "node --conditions=kurobara-source --experimental-strip-types --test --test-concurrency=1 test/v1-gate/*.test.mjs",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.5",
+    "@cyclonedx/cyclonedx-npm": "6.0.0",
+    "dependency-cruiser": "18.1.0",
+    "esbuild": "0.28.1",
+    "typescript": "^5.9.3",
+    "ultracite": "^7.2.5"
+  }
+}

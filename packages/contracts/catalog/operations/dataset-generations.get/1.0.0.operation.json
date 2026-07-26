@@ -1,0 +1,39 @@
+{
+  "operation_id": "dataset-generations.get",
+  "operation_version": "1.0.0",
+  "action_ref": "GetDatasetGeneration",
+  "kind": "read",
+  "auth_profile": "http-bearer",
+  "idempotence": "inherent",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/dataset-generations/get-request/1.0.0",
+  "output_schema_id": "https://schemas.kurobara.invalid/schemas/dataset-generations/get-response/1.0.0",
+  "problem_codes": [
+    "authentication-required",
+    "authority-permission-missing",
+    "dataset-generation-not-found",
+    "internal-error",
+    "invalid-credential",
+    "output-contract-violation",
+    "request-invalid",
+    "service-unavailable"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["datasets:read"],
+  "human_gates": [],
+  "accepted_data_classes": ["internal"],
+  "produced_data_classes": ["internal"],
+  "status": "experimental",
+  "projections": {
+    "rest": {
+      "method": "GET",
+      "path": "/v1/dataset-generations/{generation_id}",
+      "path_parameters": ["generation_id"]
+    },
+    "sdk_ts": { "method": "datasetGenerations.get" },
+    "cli": { "command": "company watch", "output_mode": "json" },
+    "mcp": {
+      "availability": "deferred",
+      "reason": "Generated dataset watch remains API, SDK and CLI-only until the post-V1 MCP authority surface is implemented."
+    }
+  }
+}

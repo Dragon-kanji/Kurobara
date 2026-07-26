@@ -1,0 +1,10 @@
+{
+  "problem_code": "workspace-mismatch",
+  "problem_version": "1.0.0",
+  "type_uri": "https://problems.kurobara.invalid/workspace-mismatch",
+  "title": "Workspace mismatch",
+  "default_status": 403,
+  "retryable": false,
+  "safe_extensions": ["correlation_id"],
+  "publication_status": "local-development-only"
+}

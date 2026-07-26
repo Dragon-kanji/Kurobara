@@ -1,0 +1,9 @@
+{
+  "workflow_spec_id": "workflow-synthetic",
+  "workflow_revision": "1.0.0",
+  "workflow_content_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "normalized_input_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "budget": { "unit": "credits", "limit": 5 },
+  "deadline_ms": 1800000000000,
+  "authority_envelope_id": "authority-synthetic"
+}

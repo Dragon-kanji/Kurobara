@@ -1,0 +1,19 @@
+{
+  "name": "@kurobara/adapter-effect-plugin",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --conditions=kurobara-source --experimental-strip-types --test test/*.test.ts",
+    "typecheck": "tsc --project tsconfig.json --noEmit --customConditions kurobara-source"
+  },
+  "dependencies": {
+    "@kurobara/kernel": "file:../../kernel",
+    "@kurobara/plugin-sdk": "0.1.0",
+    "@kurobara/ports": "file:../../ports"
+  }
+}

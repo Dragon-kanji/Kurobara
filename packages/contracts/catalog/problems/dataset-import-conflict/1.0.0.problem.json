@@ -1,0 +1,10 @@
+{
+  "problem_code": "dataset-import-conflict",
+  "problem_version": "1.0.0",
+  "type_uri": "https://problems.kurobara.invalid/dataset-import-conflict",
+  "title": "Dataset import conflict",
+  "default_status": 409,
+  "retryable": false,
+  "safe_extensions": ["correlation_id"],
+  "publication_status": "local-development-only"
+}

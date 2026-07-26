@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/contacts/discovery-query/1.0.0",
+  "title": "ContactDiscoveryQuery",
+  "description": "Provider-neutral filters for a bounded professional-identity shortlist; contact details are intentionally absent.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "company_headquarters_country_codes",
+    "departments",
+    "person_country_codes",
+    "result_kind",
+    "seniorities",
+    "titles"
+  ],
+  "properties": {
+    "company_headquarters_country_codes": {
+      "type": "array",
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 2,
+        "pattern": "^[A-Z]{2}$"
+      }
+    },
+    "departments": {
+      "type": "array",
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-z][a-z0-9._-]*$"
+      }
+    },
+    "person_country_codes": {
+      "type": "array",
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 2,
+        "pattern": "^[A-Z]{2}$"
+      }
+    },
+    "result_kind": { "type": "string", "enum": ["contact"] },
+    "seniorities": {
+      "type": "array",
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "owner",
+          "c_suite",
+          "vp",
+          "director",
+          "manager",
+          "senior",
+          "individual_contributor"
+        ]
+      }
+    },
+    "titles": {
+      "type": "array",
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "\\S"
+      }
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.contacts",
+  "x-kurobara-data-classification": "confidential",
+  "x-kurobara-publication-status": "local-development-only"
+}

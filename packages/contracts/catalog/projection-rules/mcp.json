@@ -1,0 +1,9 @@
+{
+  "surface": "mcp",
+  "version": "1.0.0",
+  "protocol_version": "2025-11-25",
+  "input_schema_source": "canonical-json-schema",
+  "output_schema_source": "canonical-json-schema",
+  "structured_content": true,
+  "publication_status": "local-development-only"
+}

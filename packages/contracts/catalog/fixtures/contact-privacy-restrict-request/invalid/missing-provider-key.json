@@ -1,0 +1,8 @@
+{
+  "idempotency_key": "privacy-restrict-synthetic-004",
+  "reason": "provider-deletion",
+  "subject": {
+    "kind": "provider-subject",
+    "value": "provider-subject-synthetic-001"
+  }
+}

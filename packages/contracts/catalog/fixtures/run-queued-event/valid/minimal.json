@@ -1,0 +1,12 @@
+{
+  "public_event_id": "public-event-synthetic",
+  "type": "dev.kurobara.run.queued.v1",
+  "schema_version": "1.0.0",
+  "run_id": "run-synthetic",
+  "run_plan_id": "plan-synthetic",
+  "workspace_id": "workspace-synthetic",
+  "sequence": 1,
+  "occurred_at_ms": 1700000000000,
+  "actor_id": "actor-synthetic",
+  "correlation_id": "correlation-synthetic"
+}

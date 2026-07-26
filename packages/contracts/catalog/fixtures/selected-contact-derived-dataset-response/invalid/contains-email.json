@@ -1,0 +1,12 @@
+{
+  "contact_dataset_id": "dataset-source-contacts",
+  "contact_record_ids": ["contact-1"],
+  "generation_id": "generation-email-synthetic",
+  "generation_plan_id": "generation-plan-email-synthetic",
+  "operation_id": "email-resolve-synthetic",
+  "replayed": false,
+  "result_dataset_id": "dataset-derived-emails",
+  "state": "ready",
+  "workspace_id": "workspace-synthetic",
+  "work_email": "synthetic@company.example"
+}

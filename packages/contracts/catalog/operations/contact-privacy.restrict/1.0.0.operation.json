@@ -1,0 +1,44 @@
+{
+  "operation_id": "contact-privacy.restrict",
+  "operation_version": "1.0.0",
+  "action_ref": "RestrictContactPrivacy",
+  "kind": "mutation",
+  "auth_profile": "http-bearer",
+  "idempotence": "required",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/contact-privacy/restrict-request/1.0.0",
+  "output_schema_id": "https://schemas.kurobara.invalid/schemas/contact-privacy/restrict-response/1.0.0",
+  "problem_codes": [
+    "authentication-required",
+    "authority-permission-missing",
+    "idempotency-key-reused",
+    "internal-error",
+    "invalid-credential",
+    "output-contract-violation",
+    "payload-too-large",
+    "request-invalid",
+    "service-unavailable",
+    "unsupported-media-type"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["contacts:privacy"],
+  "human_gates": [],
+  "accepted_data_classes": ["restricted"],
+  "produced_data_classes": ["internal"],
+  "status": "experimental",
+  "projections": {
+    "rest": {
+      "method": "POST",
+      "path": "/v1/contact-privacy-restrictions"
+    },
+    "sdk_ts": { "method": "contactPrivacy.restrict" },
+    "cli": {
+      "command": "contact restrict",
+      "input_mode": "arguments",
+      "output_mode": "json"
+    },
+    "mcp": {
+      "availability": "deferred",
+      "reason": "Raw contact-subject restriction remains API, SDK and CLI-only for V1."
+    }
+  }
+}

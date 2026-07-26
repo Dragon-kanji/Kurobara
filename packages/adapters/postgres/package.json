@@ -1,0 +1,19 @@
+{
+  "name": "@kurobara/adapter-postgres",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "typecheck": "tsc --project tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@kurobara/kernel": "file:../../kernel",
+    "@kurobara/ports": "file:../../ports",
+    "postgres": "^3.4.8"
+  }
+}

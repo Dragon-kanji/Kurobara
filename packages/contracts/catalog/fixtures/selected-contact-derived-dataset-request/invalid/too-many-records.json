@@ -1,0 +1,8 @@
+{
+  "authority_envelope_id": "authority-synthetic",
+  "budget": { "limit": 4, "unit": "credits" },
+  "contact_dataset_id": "dataset-source-contacts",
+  "contact_record_ids": ["contact-1", "contact-2", "contact-3", "contact-4"],
+  "deadline_ms": 20000,
+  "operation_id": "identity-reveal-synthetic"
+}

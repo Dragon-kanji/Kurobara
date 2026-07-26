@@ -1,0 +1,25 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "request",
+  "method": "classifyError",
+  "payload": {
+    "context": {
+      "capability": {
+        "capabilityId": "fixture.echo",
+        "capabilityVersion": "1.0.0"
+      },
+      "configuration": {
+        "contentHash": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "value": {
+          "endpointProfile": "synthetic"
+        }
+      },
+      "deadlineAtMs": 4102444800000
+    },
+    "phase": "execute",
+    "diagnostic": {
+      "kind": "transport",
+      "message": "synthetic raw diagnostics must not cross the boundary"
+    }
+  }
+}

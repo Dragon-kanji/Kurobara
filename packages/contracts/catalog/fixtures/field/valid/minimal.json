@@ -1,0 +1,8 @@
+{
+  "field_id": "field-domain",
+  "dataset_id": "dataset-synthetic",
+  "workspace_id": "workspace-synthetic",
+  "key": "company_domain",
+  "label": "Company domain",
+  "value_type": "string"
+}

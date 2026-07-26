@@ -1,0 +1,25 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "result",
+  "method": "lookup",
+  "payload": {
+    "status": "found",
+    "proof": {
+      "proofReference": "proof:synthetic:operation-protocol-synthetic",
+      "observedAtMs": 4102444700000
+    },
+    "outcome": {
+      "status": "succeeded",
+      "providerPayload": {
+        "echo": "synthetic"
+      },
+      "externalOperationReference": "external:synthetic:1",
+      "usage": {
+        "basis": "exact",
+        "amount": 1,
+        "unit": "credits",
+        "receiptReference": "receipt:synthetic:1"
+      }
+    }
+  }
+}

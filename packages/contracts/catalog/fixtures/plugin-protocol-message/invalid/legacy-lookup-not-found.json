@@ -1,0 +1,12 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "result",
+  "method": "lookup",
+  "payload": {
+    "status": "not-found",
+    "proof": {
+      "proofReference": "proof:synthetic:legacy",
+      "observedAtMs": 4102444700000
+    }
+  }
+}

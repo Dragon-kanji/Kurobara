@@ -1,0 +1,6 @@
+{
+  "record_id": "record-null",
+  "dataset_id": "dataset-synthetic",
+  "workspace_id": "workspace-synthetic",
+  "values": [{ "field_id": "field-category", "value": null }]
+}

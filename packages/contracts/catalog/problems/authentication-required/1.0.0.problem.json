@@ -1,0 +1,10 @@
+{
+  "problem_code": "authentication-required",
+  "problem_version": "1.0.0",
+  "type_uri": "https://problems.kurobara.invalid/authentication-required",
+  "title": "Authentication required",
+  "default_status": 401,
+  "retryable": false,
+  "safe_extensions": ["correlation_id"],
+  "publication_status": "local-development-only"
+}

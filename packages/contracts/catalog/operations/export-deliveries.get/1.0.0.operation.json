@@ -1,0 +1,43 @@
+{
+  "operation_id": "export-deliveries.get",
+  "operation_version": "1.0.0",
+  "action_ref": "GetExportDelivery",
+  "kind": "read",
+  "auth_profile": "http-bearer",
+  "idempotence": "inherent",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/export-deliveries/get-request/1.0.0",
+  "output_schema_id": "https://schemas.kurobara.invalid/schemas/export-deliveries/state-response/1.0.0",
+  "problem_codes": [
+    "authentication-required",
+    "authority-permission-missing",
+    "export-delivery-not-found",
+    "internal-error",
+    "invalid-credential",
+    "output-contract-violation",
+    "request-invalid",
+    "service-unavailable"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["contacts:export"],
+  "human_gates": [],
+  "accepted_data_classes": ["confidential"],
+  "produced_data_classes": ["confidential"],
+  "status": "experimental",
+  "projections": {
+    "rest": {
+      "method": "GET",
+      "path": "/v1/export-deliveries/{delivery_id}",
+      "path_parameters": ["delivery_id"]
+    },
+    "sdk_ts": { "method": "exportDeliveries.get" },
+    "cli": {
+      "command": "dataset export-status",
+      "input_mode": "arguments",
+      "output_mode": "json"
+    },
+    "mcp": {
+      "availability": "deferred",
+      "reason": "Export delivery lifecycle reads remain API, SDK and CLI-only for V1."
+    }
+  }
+}

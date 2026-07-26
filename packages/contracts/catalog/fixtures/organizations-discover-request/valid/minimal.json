@@ -1,0 +1,17 @@
+{
+  "authority_envelope_id": "authority-synthetic",
+  "budget": { "limit": 10, "unit": "credits" },
+  "dataset_id": "dataset-synthetic",
+  "dataset_name": "Synthetic companies",
+  "deadline_ms": 1752700060000,
+  "discovery_id": "discovery-synthetic",
+  "limits": { "max_calls": 2, "max_companies": 50, "max_pages": 2 },
+  "mode": "start",
+  "query": {
+    "country_codes": ["FR"],
+    "country_scope": "headquarters",
+    "industry_codes": ["software"],
+    "industry_taxonomy": "kurobara-v1",
+    "result_kind": "company"
+  }
+}

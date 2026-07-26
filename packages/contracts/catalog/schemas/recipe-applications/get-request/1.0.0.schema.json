@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/recipe-applications/get-request/1.0.0",
+  "title": "RecipeApplicationsGetRequest",
+  "description": "Bounded lookup of one authorized recipe application snapshot.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["application_id"],
+  "properties": {
+    "application_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.recipes",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

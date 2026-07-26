@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/organizations/discovery-query/1.0.0",
+  "title": "OrganizationDiscoveryQuery",
+  "description": "Provider-neutral structured filters for discovering organizations without an input dataset.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "country_codes",
+    "country_scope",
+    "industry_codes",
+    "industry_taxonomy",
+    "result_kind"
+  ],
+  "properties": {
+    "country_codes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 2,
+        "pattern": "^[A-Z]{2}$"
+      }
+    },
+    "country_scope": {
+      "type": "string",
+      "enum": ["headquarters"]
+    },
+    "industry_codes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-z0-9][a-z0-9._-]*$"
+      }
+    },
+    "industry_taxonomy": {
+      "type": "string",
+      "enum": ["kurobara-v1"]
+    },
+    "keywords": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "\\S"
+      }
+    },
+    "employee_count": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minimum", "maximum"],
+      "properties": {
+        "minimum": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000000000
+        },
+        "maximum": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000000
+        }
+      }
+    },
+    "result_kind": {
+      "type": "string",
+      "enum": ["company"]
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.organizations",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

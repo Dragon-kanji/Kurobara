@@ -1,0 +1,35 @@
+{
+  "operation_id": "runs.get",
+  "operation_version": "1.0.0",
+  "action_ref": "GetRun",
+  "kind": "read",
+  "auth_profile": "http-bearer",
+  "idempotence": "inherent",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/runs/get-request/1.0.0",
+  "output_schema_id": "https://schemas.kurobara.invalid/schemas/runs/get-response/1.0.0",
+  "problem_codes": [
+    "authentication-required",
+    "internal-error",
+    "invalid-credential",
+    "output-contract-violation",
+    "request-invalid",
+    "run-not-found",
+    "service-unavailable"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["runs:read"],
+  "human_gates": [],
+  "accepted_data_classes": ["internal"],
+  "produced_data_classes": ["internal"],
+  "status": "experimental",
+  "projections": {
+    "rest": {
+      "method": "GET",
+      "path": "/v1/runs/{run_id}",
+      "path_parameters": ["run_id"]
+    },
+    "sdk_ts": { "method": "runs.get" },
+    "cli": { "command": "run get" },
+    "mcp": { "tool": "get_run" }
+  }
+}

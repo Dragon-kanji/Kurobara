@@ -1,0 +1,17 @@
+{
+  "cell_result_id": "cell-result-synthetic",
+  "dataset_id": "dataset-synthetic",
+  "workspace_id": "workspace-synthetic",
+  "record_id": "record-synthetic",
+  "field_id": "field-category",
+  "recipe_id": "recipe-synthetic",
+  "recipe_revision": "1",
+  "run_id": "run-synthetic",
+  "status": "succeeded",
+  "value": "software",
+  "reason": {
+    "code": "unexpected-reason",
+    "message": "A successful cell cannot carry a failure reason.",
+    "retryable": false
+  }
+}

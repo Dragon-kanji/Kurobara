@@ -1,0 +1,26 @@
+{
+  "import_id": "import-synthetic",
+  "dataset": {
+    "dataset_id": "dataset-synthetic",
+    "workspace_id": "workspace-synthetic",
+    "name": "Synthetic organizations"
+  },
+  "fields": [
+    {
+      "field_id": "field-domain",
+      "dataset_id": "dataset-synthetic",
+      "workspace_id": "workspace-synthetic",
+      "key": "domain",
+      "label": "Domain",
+      "value_type": "string",
+      "provider": "forbidden"
+    }
+  ],
+  "format": "jsonl",
+  "source_content_hash": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "max_record_bytes": 2048,
+  "batch_limits": {
+    "max_bytes": 4096,
+    "max_items": 100
+  }
+}

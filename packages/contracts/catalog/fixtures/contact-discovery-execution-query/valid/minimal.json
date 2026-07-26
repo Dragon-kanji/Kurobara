@@ -1,0 +1,17 @@
+{
+  "company_headquarters_country_codes": ["ES"],
+  "departments": ["sales"],
+  "organization_generation_id": "organization-generation-synthetic",
+  "organizations": [
+    {
+      "company_id": "company-synthetic",
+      "country_code": "ES",
+      "domain": "synthetic.example",
+      "name": "Synthetic Company"
+    }
+  ],
+  "person_country_codes": [],
+  "result_kind": "contact",
+  "seniorities": ["director"],
+  "titles": []
+}

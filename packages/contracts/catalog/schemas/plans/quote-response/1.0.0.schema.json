@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/plans/quote-response/1.0.0",
+  "title": "PlansQuoteResponse",
+  "description": "Prepared single-use run plan reference and cost quote. Its presence does not create a run or run identifier.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "run_plan_id",
+    "workspace_id",
+    "plan_hash",
+    "catalog_version",
+    "catalog_fingerprint",
+    "quote",
+    "budget",
+    "deadline_ms",
+    "authority_envelope_id"
+  ],
+  "properties": {
+    "run_plan_id": { "type": "string", "minLength": 1 },
+    "workspace_id": { "type": "string", "minLength": 1 },
+    "plan_hash": { "$ref": "#/$defs/content_hash" },
+    "catalog_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "catalog_fingerprint": { "$ref": "#/$defs/content_hash" },
+    "quote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "quote_id",
+        "guarantee",
+        "unit",
+        "pricing_version",
+        "expires_at_ms"
+      ],
+      "properties": {
+        "quote_id": { "type": "string", "minLength": 1 },
+        "guarantee": {
+          "type": "string",
+          "enum": ["hard", "estimated", "unknown"]
+        },
+        "unit": { "type": "string", "minLength": 1 },
+        "upper_bound": { "type": "number", "minimum": 0 },
+        "pricing_version": { "type": "string", "minLength": 1 },
+        "expires_at_ms": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit", "limit", "spent", "reserved"],
+      "properties": {
+        "unit": { "type": "string", "minLength": 1 },
+        "limit": { "type": "number", "minimum": 0 },
+        "spent": { "type": "number", "minimum": 0 },
+        "reserved": { "type": "number", "minimum": 0 }
+      }
+    },
+    "deadline_ms": { "type": "integer", "minimum": 0 },
+    "authority_envelope_id": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "content_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.planning",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

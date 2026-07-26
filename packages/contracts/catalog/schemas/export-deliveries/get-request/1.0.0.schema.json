@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/export-deliveries/get-request/1.0.0",
+  "title": "ExportDeliveriesGetRequest",
+  "description": "Reads one export delivery owned by the authenticated actor.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["delivery_id"],
+  "properties": {
+    "delivery_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.exports",
+  "x-kurobara-data-classification": "confidential",
+  "x-kurobara-publication-status": "local-development-only"
+}

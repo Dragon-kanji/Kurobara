@@ -1,0 +1,25 @@
+{
+  "authority_envelope_id": "authority-synthetic",
+  "budget": { "limit": 2, "unit": "requests" },
+  "dataset_id": "contacts-synthetic",
+  "dataset_name": "Synthetic contacts",
+  "deadline_ms": 2000000000000,
+  "discovery_id": "contact-discovery-synthetic",
+  "limits": {
+    "max_calls": 2,
+    "max_companies": 10,
+    "max_contacts_per_company": 3,
+    "max_contacts_total": 30,
+    "max_pages": 2
+  },
+  "mode": "start",
+  "organization_generation_id": "organization-generation-synthetic",
+  "query": {
+    "company_headquarters_country_codes": [],
+    "departments": [],
+    "person_country_codes": [],
+    "result_kind": "contact",
+    "seniorities": [],
+    "titles": []
+  }
+}

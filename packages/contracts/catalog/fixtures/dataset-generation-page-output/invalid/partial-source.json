@@ -1,0 +1,18 @@
+{
+  "hasMore": false,
+  "items": [
+    {
+      "contentHash": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "record": {
+        "datasetId": "dataset-derived-identities",
+        "recordId": "derived-contact-1",
+        "values": [],
+        "workspaceId": "workspace-synthetic"
+      },
+      "source": { "datasetId": "dataset-source-contacts" }
+    }
+  ],
+  "nextCursor": null,
+  "sourcePartitionCompleted": true,
+  "version": "1.0.0"
+}

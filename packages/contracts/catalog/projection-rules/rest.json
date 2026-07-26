@@ -1,0 +1,9 @@
+{
+  "surface": "rest",
+  "version": "1.1.0",
+  "openapi_version": "3.1.1",
+  "json_schema_dialect": "https://json-schema.org/draft/2020-12/schema",
+  "request_media_type": "application/json",
+  "response_media_type": "application/json-or-declared-output-stream",
+  "publication_status": "local-development-only"
+}

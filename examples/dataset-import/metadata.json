@@ -1,0 +1,33 @@
+{
+  "import_id": "import_demo_orgs_v1",
+  "dataset": {
+    "dataset_id": "dataset_demo_orgs",
+    "workspace_id": "workspace_demo",
+    "name": "Organization website lookup"
+  },
+  "fields": [
+    {
+      "field_id": "field_domain",
+      "dataset_id": "dataset_demo_orgs",
+      "workspace_id": "workspace_demo",
+      "key": "domain",
+      "label": "Domain",
+      "value_type": "string"
+    },
+    {
+      "field_id": "field_official_website_url",
+      "dataset_id": "dataset_demo_orgs",
+      "workspace_id": "workspace_demo",
+      "key": "official_website_url",
+      "label": "Official website URL",
+      "value_type": "string"
+    }
+  ],
+  "format": "jsonl",
+  "source_content_hash": "sha256:c28e10c2f005e03759aa7345eabc95337e1b24f203336f62d109699e481fc48f",
+  "max_record_bytes": 4096,
+  "batch_limits": {
+    "max_bytes": 65536,
+    "max_items": 100
+  }
+}

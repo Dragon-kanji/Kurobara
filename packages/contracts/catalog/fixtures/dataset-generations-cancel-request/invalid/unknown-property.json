@@ -1,0 +1,5 @@
+{
+  "generation_id": "generation-synthetic",
+  "idempotency_key": "cancel-generation-synthetic",
+  "provider": "forbidden"
+}

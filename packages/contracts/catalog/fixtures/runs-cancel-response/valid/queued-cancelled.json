@@ -1,0 +1,11 @@
+{
+  "run_id": "run-synthetic",
+  "run_plan_id": "plan-synthetic",
+  "workspace_id": "workspace-synthetic",
+  "state": "cancelled",
+  "aggregate_version": 2,
+  "event_sequence": 3,
+  "result_completeness": "none",
+  "created_at_ms": 1752700000000,
+  "replayed": false
+}

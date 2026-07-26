@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/dataset-generations/page-output/1.0.0",
+  "title": "DatasetGenerationPageOutput",
+  "description": "Stable provider-neutral artifact returned by one bounded generation page effect.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "hasMore",
+    "items",
+    "nextCursor",
+    "sourcePartitionCompleted",
+    "version"
+  ],
+  "properties": {
+    "hasMore": { "type": "boolean" },
+    "items": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["contentHash", "record"],
+        "properties": {
+          "contentHash": {
+            "type": "string",
+            "minLength": 71,
+            "maxLength": 71,
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "providerIdentity": {
+            "description": "Restricted contact-provider lineage. Admissible for contact capabilities and never projected into the public dataset record.",
+            "x-kurobara-admissible-for-capabilities": [
+              "contacts.discover@1.0.0",
+              "contacts.identity.reveal@1.0.0",
+              "contacts.work-email.resolve@1.0.0",
+              "contacts.work-email.verify@1.0.0"
+            ],
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["providerKey", "providerSubjectId"],
+            "properties": {
+              "providerKey": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[a-z][a-z0-9._-]*$"
+              },
+              "providerSubjectId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512,
+                "pattern": "\\S"
+              }
+            }
+          },
+          "source": {
+            "description": "Exact source lineage. Required by contacts.identity.reveal, contacts.work-email.resolve, and contacts.work-email.verify page outputs.",
+            "x-kurobara-required-for-capabilities": [
+              "contacts.identity.reveal@1.0.0",
+              "contacts.work-email.resolve@1.0.0",
+              "contacts.work-email.verify@1.0.0"
+            ],
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["datasetId", "recordId"],
+            "properties": {
+              "datasetId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "recordId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              }
+            }
+          },
+          "record": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["datasetId", "recordId", "values", "workspaceId"],
+            "properties": {
+              "datasetId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "recordId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "values": {
+                "type": "array",
+                "minItems": 0,
+                "maxItems": 256,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["fieldId", "value"],
+                  "properties": {
+                    "fieldId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "\\S"
+                    },
+                    "value": {
+                      "oneOf": [
+                        { "type": "boolean" },
+                        { "type": "null" },
+                        {
+                          "type": "number",
+                          "minimum": -1000000000000000,
+                          "maximum": 1000000000000000
+                        },
+                        { "type": "string", "minLength": 0, "maxLength": 16384 }
+                      ]
+                    }
+                  }
+                }
+              },
+              "workspaceId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              }
+            }
+          }
+        }
+      }
+    },
+    "nextCursor": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "\\S"
+        }
+      ]
+    },
+    "sourcePartitionCompleted": { "type": "boolean" },
+    "version": { "type": "string", "const": "1.0.0" }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.datasets",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

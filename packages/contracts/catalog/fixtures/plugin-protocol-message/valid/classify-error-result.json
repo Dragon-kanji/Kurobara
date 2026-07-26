@@ -1,0 +1,11 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "result",
+  "method": "classifyError",
+  "payload": {
+    "error": {
+      "class": "provider",
+      "reasonCode": "provider-unavailable"
+    }
+  }
+}

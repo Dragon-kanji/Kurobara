@@ -1,0 +1,10 @@
+{
+  "problem_code": "method-not-allowed",
+  "problem_version": "1.0.0",
+  "type_uri": "https://problems.kurobara.invalid/method-not-allowed",
+  "title": "Method not allowed",
+  "default_status": 405,
+  "retryable": false,
+  "safe_extensions": ["correlation_id"],
+  "publication_status": "local-development-only"
+}

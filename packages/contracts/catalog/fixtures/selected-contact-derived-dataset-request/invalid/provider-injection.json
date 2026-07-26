@@ -1,0 +1,9 @@
+{
+  "authority_envelope_id": "authority-synthetic",
+  "budget": { "limit": 3, "unit": "credits" },
+  "contact_dataset_id": "dataset-source-contacts",
+  "contact_record_ids": ["contact-1"],
+  "deadline_ms": 20000,
+  "operation_id": "identity-reveal-synthetic",
+  "provider_key": "apollo"
+}

@@ -1,0 +1,9 @@
+{
+  "problem_code": "dataset-generation-not-found",
+  "problem_version": "1.0.0",
+  "type_uri": "https://problems.kurobara.invalid/dataset-generation-not-found",
+  "title": "Dataset generation not found",
+  "default_status": 404,
+  "retryable": false,
+  "publication_status": "local-development-only"
+}

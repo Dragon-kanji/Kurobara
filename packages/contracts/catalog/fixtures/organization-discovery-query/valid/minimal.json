@@ -1,0 +1,7 @@
+{
+  "country_codes": ["FR"],
+  "country_scope": "headquarters",
+  "industry_codes": ["software"],
+  "industry_taxonomy": "kurobara-v1",
+  "result_kind": "company"
+}

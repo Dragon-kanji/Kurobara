@@ -1,0 +1,12 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "result",
+  "method": "execute",
+  "payload": {
+    "status": "failed",
+    "error": {
+      "class": "provider",
+      "reasonCode": "provider-rejected"
+    }
+  }
+}

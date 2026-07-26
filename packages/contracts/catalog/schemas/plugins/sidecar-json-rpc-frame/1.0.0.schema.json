@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/plugins/sidecar-json-rpc-frame/1.0.0",
+  "title": "PluginSidecarJsonRpcFrame",
+  "description": "Local-development JSON-RPC 2.0 frame for one bounded Kurobara plugin sidecar request or result.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "jsonrpc": { "const": "2.0" },
+    "id": { "$ref": "#/$defs/id" },
+    "method": {
+      "type": "string",
+      "enum": [
+        "plugin.describe",
+        "plugin.validateConfig",
+        "plugin.estimate",
+        "plugin.execute",
+        "plugin.lookup",
+        "plugin.normalize",
+        "plugin.health",
+        "plugin.classifyError"
+      ]
+    },
+    "params": {
+      "$ref": "https://schemas.kurobara.invalid/schemas/plugins/protocol-message/1.0.0"
+    },
+    "result": {
+      "$ref": "https://schemas.kurobara.invalid/schemas/plugins/protocol-message/1.0.0"
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jsonrpc", "id", "method", "params"],
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "id": { "$ref": "#/$defs/id" },
+        "method": { "const": "plugin.describe" },
+        "params": {
+          "type": "object",
+          "$ref": "https://schemas.kurobara.invalid/schemas/plugins/protocol-message/1.0.0",
+          "properties": {
+            "direction": { "const": "request" },
+            "method": { "const": "describe" }
+          }
+        },
+        "result": false
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jsonrpc", "id", "method", "params"],
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "id": { "$ref": "#/$defs/id" },
+        "method": { "const": "plugin.validateConfig" },
+        "params": {
+          "type": "object",
+          "$ref": "https://schemas.kurobara.invalid/schemas/plugins/protocol-message/1.0.0",
+          "properties": {
+            "direction": { "const": "request" },
+            "method": { "const": "validateConfig" }
+          }
+        },
+        "result": false
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jsonrpc", "id", "method", "params"],
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "id": { "$ref": "#/$defs/id" },
+        "method": { "const": "plugin.estimate" },
+        "params": {
+          "type": "object",
+          "$ref": "https://schemas.kurobara.invalid/schemas/plugins/protocol-message/1.0.0",
+          "properties": {
+            "direction": { "const": "request" },
+            "method": { "const": "estimate" }
+          }
+        },
+        "result": false
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jsonrpc", "id", "method", "params"],
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "id": { "$ref": "#/$defs/id" },
+        "method": { "const": "plugin.execute" },
+        "params": {
+          "type": "object",
+          "$ref": "https://schemas.kurobara.invalid/schemas/plugins/protocol-message/1.0.0",
+          "properties": {
+            "direction": { "const": "request" },
+            "method": { "const": "execute" }
+          }
+        },
+        "result": false
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jsonrpc", "id", "method", "params"],
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "id": { "$ref": "#/$defs/id" },
+        "method": { "const": "plugin.lookup" },
+        "params": {
+          "type": "object",
+          "$ref": "https://schemas.kurobara.invalid/schemas/plugins/protocol-message/1.0.0",
+          "properties": {
+            "direction": { "const": "request" },
+            "method": { "const": "lookup" }
+          }
+        },
+        "result": false
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jsonrpc", "id", "method", "params"],
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "id": { "$ref": "#/$defs/id" },
+        "method": { "const": "plugin.normalize" },
+        "params": {
+          "type": "object",
+          "$ref": "https://schemas.kurobara.invalid/schemas/plugins/protocol-message/1.0.0",
+          "properties": {
+            "direction": { "const": "request" },
+            "method": { "const": "normalize" }
+          }
+        },
+        "result": false
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jsonrpc", "id", "method", "params"],
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "id": { "$ref": "#/$defs/id" },
+        "method": { "const": "plugin.health" },
+        "params": {
+          "type": "object",
+          "$ref": "https://schemas.kurobara.invalid/schemas/plugins/protocol-message/1.0.0",
+          "properties": {
+            "direction": { "const": "request" },
+            "method": { "const": "health" }
+          }
+        },
+        "result": false
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jsonrpc", "id", "method", "params"],
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "id": { "$ref": "#/$defs/id" },
+        "method": { "const": "plugin.classifyError" },
+        "params": {
+          "type": "object",
+          "$ref": "https://schemas.kurobara.invalid/schemas/plugins/protocol-message/1.0.0",
+          "properties": {
+            "direction": { "const": "request" },
+            "method": { "const": "classifyError" }
+          }
+        },
+        "result": false
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jsonrpc", "id", "result"],
+      "properties": {
+        "jsonrpc": { "const": "2.0" },
+        "id": { "$ref": "#/$defs/id" },
+        "method": false,
+        "params": false,
+        "result": {
+          "type": "object",
+          "$ref": "https://schemas.kurobara.invalid/schemas/plugins/protocol-message/1.0.0",
+          "properties": { "direction": { "const": "result" } }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^host-call-[1-9][0-9]{0,15}$",
+      "maxLength": 26
+    }
+  },
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-owner": "contracts",
+  "x-kurobara-publication-status": "local-development-only",
+  "x-kurobara-schema-version": "1.0.0"
+}

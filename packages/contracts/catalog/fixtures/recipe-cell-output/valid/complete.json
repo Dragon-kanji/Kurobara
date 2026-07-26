@@ -1,0 +1,11 @@
+{
+  "value": "example.invalid",
+  "provenance": {
+    "references": ["https://example.invalid/source"]
+  },
+  "freshness": {
+    "observedAt": 1767225600000,
+    "expiresAt": 1767312000000
+  },
+  "confidence": 0.9
+}

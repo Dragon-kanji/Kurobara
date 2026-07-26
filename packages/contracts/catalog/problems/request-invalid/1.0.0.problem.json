@@ -1,0 +1,10 @@
+{
+  "problem_code": "request-invalid",
+  "problem_version": "1.0.0",
+  "type_uri": "https://problems.kurobara.invalid/request-invalid",
+  "title": "Request invalid",
+  "default_status": 400,
+  "retryable": false,
+  "safe_extensions": ["correlation_id"],
+  "publication_status": "local-development-only"
+}

@@ -1,0 +1,1144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/plugins/protocol-message/1.0.0",
+  "title": "PluginProtocolMessage",
+  "description": "Local-development message contract shared by the in-process plugin SDK and the untrusted development sidecar profile.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "direction", "method", "payload"],
+  "properties": {
+    "apiVersion": {
+      "$ref": "#/$defs/api_version"
+    },
+    "direction": {
+      "type": "string",
+      "enum": ["request", "result"]
+    },
+    "method": {
+      "type": "string",
+      "enum": [
+        "describe",
+        "validateConfig",
+        "estimate",
+        "execute",
+        "lookup",
+        "normalize",
+        "health",
+        "classifyError"
+      ]
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "request" },
+        "method": { "const": "describe" },
+        "payload": { "$ref": "#/$defs/describe_request" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "result" },
+        "method": { "const": "describe" },
+        "payload": { "$ref": "#/$defs/describe_result" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "request" },
+        "method": { "const": "validateConfig" },
+        "payload": { "$ref": "#/$defs/validate_config_request" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "result" },
+        "method": { "const": "validateConfig" },
+        "payload": { "$ref": "#/$defs/validate_config_result" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "request" },
+        "method": { "const": "estimate" },
+        "payload": { "$ref": "#/$defs/estimate_request" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "result" },
+        "method": { "const": "estimate" },
+        "payload": { "$ref": "#/$defs/estimate_result" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "request" },
+        "method": { "const": "execute" },
+        "payload": { "$ref": "#/$defs/execute_request" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "result" },
+        "method": { "const": "execute" },
+        "payload": { "$ref": "#/$defs/execute_result" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "request" },
+        "method": { "const": "lookup" },
+        "payload": { "$ref": "#/$defs/lookup_request" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "result" },
+        "method": { "const": "lookup" },
+        "payload": { "$ref": "#/$defs/lookup_result" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "request" },
+        "method": { "const": "normalize" },
+        "payload": { "$ref": "#/$defs/normalize_request" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "result" },
+        "method": { "const": "normalize" },
+        "payload": { "$ref": "#/$defs/normalize_result" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "request" },
+        "method": { "const": "health" },
+        "payload": { "$ref": "#/$defs/health_request" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "result" },
+        "method": { "const": "health" },
+        "payload": { "$ref": "#/$defs/health_result" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "request" },
+        "method": { "const": "classifyError" },
+        "payload": { "$ref": "#/$defs/classify_error_request" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiVersion", "direction", "method", "payload"],
+      "properties": {
+        "apiVersion": { "$ref": "#/$defs/api_version" },
+        "direction": { "const": "result" },
+        "method": { "const": "classifyError" },
+        "payload": { "$ref": "#/$defs/classify_error_result" }
+      }
+    }
+  ],
+  "$defs": {
+    "api_version": {
+      "const": "dev.kurobara.plugin-protocol/v1"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "unit": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9._-]*$"
+    },
+    "capability_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capabilityId", "capabilityVersion"],
+      "properties": {
+        "capabilityId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[a-z][a-z0-9]*(?:[.-][a-z][a-z0-9-]*)+$"
+        },
+        "capabilityVersion": {
+          "$ref": "#/$defs/semver"
+        }
+      }
+    },
+    "contract_ref": {
+      "$ref": "https://schemas.kurobara.invalid/schemas/plugins/manifest/1.0.0#/$defs/contract_ref"
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contentHash", "value"],
+      "properties": {
+        "contentHash": {
+          "$ref": "#/$defs/content_hash"
+        },
+        "value": true
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capability", "configuration", "deadlineAtMs"],
+      "properties": {
+        "capability": {
+          "$ref": "#/$defs/capability_ref"
+        },
+        "configuration": {
+          "$ref": "#/$defs/configuration"
+        },
+        "deadlineAtMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "contentHash", "sizeBytes", "value"],
+      "properties": {
+        "contract": {
+          "$ref": "#/$defs/contract_ref"
+        },
+        "contentHash": {
+          "$ref": "#/$defs/content_hash"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65536
+        },
+        "value": true
+      }
+    },
+    "cost_limit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "unit"],
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000000
+        },
+        "unit": {
+          "$ref": "#/$defs/unit"
+        }
+      }
+    },
+    "safe_error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["class", "reasonCode"],
+      "properties": {
+        "class": {
+          "type": "string",
+          "enum": [
+            "authentication",
+            "authorization",
+            "configuration",
+            "input",
+            "rate-limit",
+            "quota",
+            "deadline",
+            "transport",
+            "provider",
+            "response",
+            "adapter",
+            "unknown"
+          ]
+        },
+        "reasonCode": {
+          "type": "string",
+          "enum": [
+            "authentication-failed",
+            "authorization-failed",
+            "configuration-invalid",
+            "input-invalid",
+            "rate-limited",
+            "quota-exhausted",
+            "deadline-exceeded",
+            "transport-failed",
+            "provider-unavailable",
+            "provider-rejected",
+            "provider-response-invalid",
+            "adapter-fault",
+            "unclassified"
+          ]
+        },
+        "retryAfterMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 86400000
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "class": { "const": "authentication" },
+            "reasonCode": { "const": "authentication-failed" }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "class": { "const": "authorization" },
+            "reasonCode": { "const": "authorization-failed" }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "class": { "const": "configuration" },
+            "reasonCode": { "const": "configuration-invalid" }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "class": { "const": "input" },
+            "reasonCode": { "const": "input-invalid" }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "class": { "const": "rate-limit" },
+            "reasonCode": { "const": "rate-limited" }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "class": { "const": "quota" },
+            "reasonCode": { "const": "quota-exhausted" }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "class": { "const": "deadline" },
+            "reasonCode": { "const": "deadline-exceeded" }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "class": { "const": "transport" },
+            "reasonCode": { "const": "transport-failed" }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "class": { "const": "provider" },
+            "reasonCode": {
+              "type": "string",
+              "enum": ["provider-unavailable", "provider-rejected"]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "class": { "const": "response" },
+            "reasonCode": { "const": "provider-response-invalid" }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "class": { "const": "adapter" },
+            "reasonCode": { "const": "adapter-fault" }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "class": { "const": "unknown" },
+            "reasonCode": { "const": "unclassified" }
+          }
+        }
+      ]
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["basis", "unit"],
+      "properties": {
+        "basis": {
+          "type": "string",
+          "enum": ["exact", "estimated", "unavailable"]
+        },
+        "amount": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000000
+        },
+        "unit": {
+          "$ref": "#/$defs/unit"
+        },
+        "receiptReference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["amount"],
+          "properties": {
+            "basis": {
+              "type": "string",
+              "enum": ["exact", "estimated"]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "basis": {
+              "const": "unavailable"
+            },
+            "amount": false,
+            "receiptReference": false
+          }
+        }
+      ]
+    },
+    "proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proofReference", "observedAtMs"],
+      "properties": {
+        "proofReference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "observedAtMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "quote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["guarantee", "unit", "pricingVersion", "expiresAtMs"],
+      "properties": {
+        "guarantee": {
+          "type": "string",
+          "enum": ["hard", "estimated", "unknown"]
+        },
+        "upperBound": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000000
+        },
+        "unit": {
+          "$ref": "#/$defs/unit"
+        },
+        "pricingVersion": {
+          "$ref": "#/$defs/semver"
+        },
+        "expiresAtMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["upperBound"],
+          "properties": {
+            "guarantee": {
+              "const": "hard"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "guarantee": {
+              "const": "estimated"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "guarantee": {
+              "const": "unknown"
+            },
+            "upperBound": false
+          }
+        }
+      ]
+    },
+    "describe_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    },
+    "describe_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest"],
+      "properties": {
+        "manifest": {
+          "$ref": "https://schemas.kurobara.invalid/schemas/plugins/manifest/1.0.0"
+        }
+      }
+    },
+    "validate_config_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capability", "configuration"],
+      "properties": {
+        "capability": {
+          "$ref": "#/$defs/capability_ref"
+        },
+        "configuration": {
+          "$ref": "#/$defs/configuration"
+        }
+      }
+    },
+    "validate_config_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["valid", "invalid"]
+        },
+        "configurationFingerprint": {
+          "$ref": "#/$defs/content_hash"
+        },
+        "reasonCodes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "configuration-missing",
+              "configuration-unknown-field",
+              "configuration-value-invalid",
+              "configuration-incompatible"
+            ]
+          }
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["configurationFingerprint"],
+          "properties": {
+            "status": {
+              "const": "valid"
+            },
+            "reasonCodes": false
+          }
+        },
+        {
+          "type": "object",
+          "required": ["reasonCodes"],
+          "properties": {
+            "status": {
+              "const": "invalid"
+            },
+            "configurationFingerprint": false
+          }
+        }
+      ]
+    },
+    "estimate_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context", "input"],
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "input": {
+          "$ref": "#/$defs/input"
+        }
+      }
+    },
+    "estimate_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["quoted", "unavailable"]
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        },
+        "error": {
+          "$ref": "#/$defs/safe_error"
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["quote"],
+          "properties": {
+            "status": {
+              "const": "quoted"
+            },
+            "error": false
+          }
+        },
+        {
+          "type": "object",
+          "required": ["error"],
+          "properties": {
+            "status": {
+              "const": "unavailable"
+            },
+            "quote": false
+          }
+        }
+      ]
+    },
+    "execute_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context", "operationKey", "input", "quote", "costLimit"],
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "operationKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "input": {
+          "$ref": "#/$defs/input"
+        },
+        "quote": {
+          "$ref": "#/$defs/quote"
+        },
+        "costLimit": {
+          "$ref": "#/$defs/cost_limit"
+        }
+      }
+    },
+    "execute_final_outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "usage"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["succeeded", "failed"]
+        },
+        "providerPayload": true,
+        "externalOperationReference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "error": {
+          "$ref": "#/$defs/safe_error"
+        },
+        "usage": {
+          "$ref": "#/$defs/usage"
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["providerPayload"],
+          "properties": {
+            "status": {
+              "const": "succeeded"
+            },
+            "error": false
+          }
+        },
+        {
+          "type": "object",
+          "required": ["error"],
+          "properties": {
+            "status": {
+              "const": "failed"
+            },
+            "providerPayload": false,
+            "externalOperationReference": false
+          }
+        }
+      ]
+    },
+    "execute_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["succeeded", "failed", "outcome-unknown"]
+        },
+        "providerPayload": true,
+        "externalOperationReference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        },
+        "error": {
+          "$ref": "#/$defs/safe_error"
+        },
+        "usage": {
+          "$ref": "#/$defs/usage"
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["providerPayload", "usage"],
+          "properties": {
+            "status": {
+              "const": "succeeded"
+            },
+            "error": false
+          }
+        },
+        {
+          "type": "object",
+          "required": ["error", "usage"],
+          "properties": {
+            "status": {
+              "const": "failed"
+            },
+            "providerPayload": false,
+            "externalOperationReference": false
+          }
+        },
+        {
+          "type": "object",
+          "required": ["error"],
+          "properties": {
+            "status": {
+              "const": "outcome-unknown"
+            },
+            "providerPayload": false,
+            "usage": false
+          }
+        }
+      ]
+    },
+    "lookup_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context", "operationKey"],
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "operationKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "externalOperationReference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "lookup_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "found",
+            "eventual-not-found",
+            "authoritative-absent",
+            "outcome-unknown"
+          ]
+        },
+        "proof": {
+          "$ref": "#/$defs/proof"
+        },
+        "outcome": {
+          "$ref": "#/$defs/execute_final_outcome"
+        },
+        "error": {
+          "$ref": "#/$defs/safe_error"
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["proof", "outcome"],
+          "properties": {
+            "status": {
+              "const": "found"
+            },
+            "error": false
+          }
+        },
+        {
+          "type": "object",
+          "required": ["proof"],
+          "properties": {
+            "status": {
+              "const": "eventual-not-found"
+            },
+            "outcome": false,
+            "error": false
+          }
+        },
+        {
+          "type": "object",
+          "required": ["proof"],
+          "properties": {
+            "status": {
+              "const": "authoritative-absent"
+            },
+            "outcome": false,
+            "error": false
+          }
+        },
+        {
+          "type": "object",
+          "required": ["error"],
+          "properties": {
+            "status": {
+              "const": "outcome-unknown"
+            },
+            "proof": false,
+            "outcome": false
+          }
+        }
+      ]
+    },
+    "normalize_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context",
+        "operationKey",
+        "providerPayload",
+        "outputContract"
+      ],
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "operationKey": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "providerPayload": true,
+        "outputContract": {
+          "$ref": "#/$defs/contract_ref"
+        }
+      }
+    },
+    "normalize_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["normalized", "failed"]
+        },
+        "output": true,
+        "normalizerVersion": {
+          "$ref": "#/$defs/semver"
+        },
+        "error": {
+          "$ref": "#/$defs/safe_error"
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["output", "normalizerVersion"],
+          "properties": {
+            "status": {
+              "const": "normalized"
+            },
+            "error": false
+          }
+        },
+        {
+          "type": "object",
+          "required": ["error"],
+          "properties": {
+            "status": {
+              "const": "failed"
+            },
+            "output": false,
+            "normalizerVersion": false
+          }
+        }
+      ]
+    },
+    "health_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context"],
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/context"
+        }
+      }
+    },
+    "health_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "observedAtMs", "validUntilMs"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["healthy", "degraded", "unavailable"]
+        },
+        "observedAtMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "validUntilMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "error": {
+          "$ref": "#/$defs/safe_error"
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "healthy"
+            },
+            "error": false
+          }
+        },
+        {
+          "type": "object",
+          "required": ["error"],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["degraded", "unavailable"]
+            }
+          }
+        }
+      ]
+    },
+    "safe_diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "http-status",
+            "provider-code",
+            "timeout",
+            "transport",
+            "adapter",
+            "unknown"
+          ]
+        },
+        "httpStatus": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 599
+        },
+        "providerCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+        },
+        "retryAfterMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 86400000
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["httpStatus"],
+          "properties": {
+            "kind": { "const": "http-status" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["providerCode"],
+          "properties": {
+            "kind": { "const": "provider-code" },
+            "httpStatus": false
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["timeout", "transport", "adapter", "unknown"]
+            },
+            "httpStatus": false,
+            "providerCode": false,
+            "retryAfterMs": false
+          }
+        }
+      ]
+    },
+    "classify_error_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context", "phase", "diagnostic"],
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/context"
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "validate-config",
+            "estimate",
+            "execute",
+            "lookup",
+            "normalize",
+            "health"
+          ]
+        },
+        "diagnostic": {
+          "$ref": "#/$defs/safe_diagnostic"
+        }
+      }
+    },
+    "classify_error_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["error"],
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/safe_error"
+        }
+      }
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "plugin-sdk",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

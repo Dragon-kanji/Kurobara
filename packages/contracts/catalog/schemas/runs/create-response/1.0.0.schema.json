@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/runs/create-response/1.0.0",
+  "title": "RunsCreateResponse",
+  "description": "Initial queued run returned after atomic creation, including idempotent replay information.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "run_id",
+    "run_plan_id",
+    "workspace_id",
+    "state",
+    "aggregate_version",
+    "event_sequence",
+    "result_completeness",
+    "created_at_ms",
+    "replayed"
+  ],
+  "properties": {
+    "run_id": { "type": "string", "minLength": 1 },
+    "run_plan_id": { "type": "string", "minLength": 1 },
+    "workspace_id": { "type": "string", "minLength": 1 },
+    "state": { "const": "queued" },
+    "aggregate_version": { "const": 1 },
+    "event_sequence": { "const": 1 },
+    "result_completeness": { "const": "none" },
+    "created_at_ms": { "type": "integer", "minimum": 0 },
+    "replayed": { "type": "boolean" }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.runs",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/runs/get-response/1.0.0",
+  "title": "RunsGetResponse",
+  "description": "Versioned run snapshot with closed lifecycle states and aggregate cost only.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "run_id",
+    "run_plan_id",
+    "workspace_id",
+    "state",
+    "aggregate_version",
+    "event_sequence",
+    "result_completeness",
+    "created_at_ms",
+    "cost"
+  ],
+  "properties": {
+    "run_id": { "type": "string", "minLength": 1 },
+    "run_plan_id": { "type": "string", "minLength": 1 },
+    "workspace_id": { "type": "string", "minLength": 1 },
+    "state": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "running",
+        "waiting",
+        "cancelling",
+        "ambiguous",
+        "completed",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "aggregate_version": { "type": "integer", "minimum": 1 },
+    "event_sequence": { "type": "integer", "minimum": 1 },
+    "result_completeness": {
+      "type": "string",
+      "enum": ["none", "partial", "complete"]
+    },
+    "created_at_ms": { "type": "integer", "minimum": 0 },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit", "spent", "reserved"],
+      "properties": {
+        "unit": { "type": "string", "minLength": 1 },
+        "spent": { "type": "number", "minimum": 0 },
+        "reserved": { "type": "number", "minimum": 0 }
+      }
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.runs",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

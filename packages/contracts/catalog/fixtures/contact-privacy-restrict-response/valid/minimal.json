@@ -1,0 +1,8 @@
+{
+  "tombstone_id": "privacy-ts-synthetic-001",
+  "reason": "operator-subject-request",
+  "registered_at_ms": 1700000000000,
+  "replayed": false,
+  "affected_delivery_count": 2,
+  "newly_revoked_delivery_count": 1
+}

@@ -1,0 +1,11 @@
+{
+  "run_id": "run-synthetic",
+  "run_plan_id": "plan-synthetic",
+  "workspace_id": "workspace-synthetic",
+  "state": "running",
+  "aggregate_version": 2,
+  "event_sequence": 2,
+  "result_completeness": "partial",
+  "created_at_ms": 1700000000000,
+  "cost": { "unit": "credits", "spent": 1, "reserved": 1 }
+}

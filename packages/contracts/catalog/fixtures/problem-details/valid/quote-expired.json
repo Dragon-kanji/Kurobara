@@ -1,0 +1,9 @@
+{
+  "type": "https://problems.kurobara.invalid/quote-expired",
+  "title": "Quote expired",
+  "status": 409,
+  "detail": "Prepare a new run plan before creating a run.",
+  "code": "quote-expired",
+  "retryable": false,
+  "correlation_id": "correlation-synthetic"
+}

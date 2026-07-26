@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/plans/quote-request/1.0.0",
+  "title": "PlansQuoteRequest",
+  "description": "Local-development contract for preparing a run plan and cost quote without creating a run.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "workspace_id",
+    "workflow_spec_id",
+    "workflow_revision",
+    "workflow_content_hash",
+    "normalized_input_hash",
+    "budget",
+    "deadline_ms",
+    "authority_envelope_id"
+  ],
+  "properties": {
+    "workspace_id": { "type": "string", "minLength": 1 },
+    "workflow_spec_id": { "type": "string", "minLength": 1 },
+    "workflow_revision": { "type": "string", "minLength": 1 },
+    "workflow_content_hash": { "$ref": "#/$defs/content_hash" },
+    "normalized_input_hash": { "$ref": "#/$defs/content_hash" },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit", "limit"],
+      "properties": {
+        "unit": { "type": "string", "minLength": 1 },
+        "limit": { "type": "number", "minimum": 0 }
+      }
+    },
+    "deadline_ms": { "type": "integer", "minimum": 0 },
+    "authority_envelope_id": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "content_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.planning",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

@@ -1,0 +1,19 @@
+{
+  "cost": { "reserved": 2, "spent": 1, "unit": "credits" },
+  "counters": {
+    "accepted": 25,
+    "calls": 1,
+    "duplicates": 0,
+    "pages": 1,
+    "rejected": 0,
+    "returned": 25
+  },
+  "dataset_id": "dataset-synthetic",
+  "generation_id": "generation-synthetic",
+  "generation_plan_id": "generation-plan-synthetic",
+  "materialization_id": "materialization-synthetic",
+  "materialization_state": "building",
+  "state": "queued",
+  "terminal": false,
+  "workspace_id": "workspace-synthetic"
+}

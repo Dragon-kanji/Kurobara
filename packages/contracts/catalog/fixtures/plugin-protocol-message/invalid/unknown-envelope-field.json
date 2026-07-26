@@ -1,0 +1,7 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "request",
+  "method": "describe",
+  "payload": {},
+  "debug": "forbidden"
+}

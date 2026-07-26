@@ -1,0 +1,22 @@
+{
+  "hasMore": false,
+  "items": [
+    {
+      "contentHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "providerIdentity": {
+        "providerKey": "apollo"
+      },
+      "record": {
+        "datasetId": "dataset-synthetic-contacts",
+        "recordId": "contact-synthetic",
+        "values": [
+          { "fieldId": "field-full-name", "value": "Synthetic Contact" }
+        ],
+        "workspaceId": "workspace-synthetic"
+      }
+    }
+  ],
+  "nextCursor": null,
+  "sourcePartitionCompleted": true,
+  "version": "1.0.0"
+}

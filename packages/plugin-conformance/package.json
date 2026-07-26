@@ -1,0 +1,40 @@
+{
+  "name": "@kurobara/plugin-conformance",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.14.0"
+  },
+  "files": [
+    "compatibility-matrix.v1.json",
+    "dist",
+    "src"
+  ],
+  "exports": {
+    ".": {
+      "kurobara-source": {
+        "types": "./src/index.ts",
+        "import": "./src/index.ts",
+        "default": "./src/index.ts"
+      },
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./compatibility-matrix.json": "./compatibility-matrix.v1.json"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "prepack": "npm run build",
+    "test": "node --conditions=kurobara-source --experimental-strip-types --test test/*.test.ts",
+    "typecheck": "tsc --project tsconfig.json --noEmit --customConditions kurobara-source"
+  },
+  "dependencies": {
+    "@kurobara/contracts": "0.1.0",
+    "@kurobara/plugin-host": "0.1.0",
+    "@kurobara/plugin-sdk": "0.1.0",
+    "ajv": "8.20.0"
+  }
+}

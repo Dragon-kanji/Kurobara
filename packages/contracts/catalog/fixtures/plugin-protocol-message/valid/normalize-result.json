@@ -1,0 +1,12 @@
+{
+  "apiVersion": "dev.kurobara.plugin-protocol/v1",
+  "direction": "result",
+  "method": "normalize",
+  "payload": {
+    "status": "normalized",
+    "output": {
+      "value": "synthetic"
+    },
+    "normalizerVersion": "1.0.0"
+  }
+}
