@@ -118,7 +118,12 @@ function validateRemoteUrl(rawUrl, allowLocalTestRemote) {
   );
 }
 
-function validateDownloadUrl(rawUrl, allowLocalTestRemote, code) {
+export function validateDownloadUrl(
+  rawUrl,
+  allowLocalTestRemote,
+  code,
+  allowSearch = false
+) {
   let parsed;
   try {
     parsed = new URL(rawUrl);
@@ -128,8 +133,13 @@ function validateDownloadUrl(rawUrl, allowLocalTestRemote, code) {
   if (parsed.username || parsed.password) {
     fail(code, "Artifact URLs must not contain credentials.");
   }
-  if (parsed.search || parsed.hash) {
-    fail(code, "Artifact URLs must not contain a query or fragment.");
+  if (parsed.hash || (!allowSearch && parsed.search)) {
+    fail(
+      code,
+      allowSearch
+        ? "Artifact redirect URLs must not contain a fragment."
+        : "Artifact URLs must not contain a query or fragment."
+    );
   }
   if (parsed.protocol === "https:") {
     return parsed;
@@ -620,7 +630,8 @@ async function fetchResponse(url, allowLocalTestRemote) {
       current = validateDownloadUrl(
         new URL(location, current).href,
         allowLocalTestRemote,
-        "artifact-redirect-invalid"
+        "artifact-redirect-invalid",
+        true
       );
       continue;
     }

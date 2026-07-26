@@ -6,6 +6,14 @@ partir de sa première publication.
 
 ## [Unreleased]
 
+## [0.1.0-rc.2] - 2026-07-26
+
+### Fixed
+
+- Le gate de preview accepte les query strings signées ajoutées par une
+  redirection HTTPS d'artifact, tout en continuant à refuser credentials,
+  fragments, protocoles non HTTPS et queries dans les URLs publiques initiales.
+
 ## [0.1.0-rc.1] - 2026-07-26
 
 ### Added

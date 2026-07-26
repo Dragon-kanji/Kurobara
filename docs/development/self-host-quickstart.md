@@ -213,7 +213,7 @@ Le package CLI peut être installé hors ligne depuis le tarball produit :
 
 ```sh
 npm install --global \
-  /absolute/new/candidate-directory/npm/kurobara-cli-0.1.0-rc.1.tgz
+  /absolute/new/candidate-directory/npm/kurobara-cli-0.1.0-rc.2.tgz
 kurobara --help
 ```
 
