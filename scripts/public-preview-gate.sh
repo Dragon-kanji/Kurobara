@@ -3,8 +3,10 @@
 set -euo pipefail
 
 readonly CONTAINER_IMAGE="node:24.14.0-bookworm@sha256:5a593d74b632d1c6f816457477b6819760e13624455d587eef0fa418c8d0777b"
+readonly CONTAINER_PLATFORM="linux/amd64"
 readonly CONTAINER_SCRIPT="/opt/kurobara/public-preview-gate.mjs"
 readonly CONTAINER_REPORT_DIRECTORY="/root/kurobara-public-preview-reports"
+readonly CONTAINER_NPM_WRAPPER_DIRECTORY="/opt/kurobara-public-preview-bin"
 readonly PRIOR_PASS_REPORT="/proof/pass-1.json"
 readonly INTERNAL_PASS_ENVIRONMENT="KUROBARA_PUBLIC_PREVIEW_ISOLATED_PASS"
 
@@ -95,8 +97,9 @@ create_container() {
   local pass_number="$1"
   shift
   docker create \
+    --platform "${CONTAINER_PLATFORM}" \
     --read-only \
-    --tmpfs /tmp:rw,nosuid,nodev,mode=1777 \
+    --tmpfs /tmp:rw,exec,nosuid,nodev,mode=1777 \
     --cap-drop ALL \
     --cap-add SETUID \
     --cap-add SETGID \
@@ -106,6 +109,7 @@ create_container() {
     --user 0:0 \
     --mount "type=bind,src=${gate_script},dst=${CONTAINER_SCRIPT},readonly" \
     --mount "type=volume,dst=/root" \
+    --mount "type=volume,dst=${CONTAINER_NPM_WRAPPER_DIRECTORY}" \
     "$@" \
     "${CONTAINER_IMAGE}" \
     /usr/bin/env -i \

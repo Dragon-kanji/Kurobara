@@ -41,11 +41,13 @@ const TEST_MODE_ENVIRONMENT_KEY = "KUROBARA_PUBLIC_PREVIEW_TESTING";
 const TEST_MODE_ENVIRONMENT_VALUE = "true";
 const ISOLATED_PASS_ENVIRONMENT_KEY = "KUROBARA_PUBLIC_PREVIEW_ISOLATED_PASS";
 const ISOLATED_REPORT_DIRECTORY = "/root/kurobara-public-preview-reports";
+const ISOLATED_NPM_WRAPPER_DIRECTORY = "/opt/kurobara-public-preview-bin";
 const PRIOR_PASS_REPORT_PATH = "/proof/pass-1.json";
 const REQUIRED_NPM_VERSION = "10.9.4";
 const ISOLATED_CHILD_IDENTITY = Object.freeze({ gid: 1000, uid: 1000 });
 export const PUBLIC_PREVIEW_CONTAINER_IMAGE =
   "node:24.14.0-bookworm@sha256:5a593d74b632d1c6f816457477b6819760e13624455d587eef0fa418c8d0777b";
+export const PUBLIC_PREVIEW_CONTAINER_PLATFORM = "linux/amd64";
 
 export class PublicPreviewGateError extends Error {
   constructor(code, message) {
@@ -303,14 +305,30 @@ async function createChildEnvironment(passRoot, sourceEnvironment, identity) {
   const homeDirectory = path.join(passRoot, "home");
   const npmGlobalConfiguration = path.join(passRoot, "npm-globalconfig");
   const npmUserConfiguration = path.join(passRoot, "npm-userconfig");
-  const npmWrapperDirectory = path.join(passRoot, "bin");
+  const npmWrapperDirectory =
+    identity === undefined
+      ? path.join(passRoot, "bin")
+      : ISOLATED_NPM_WRAPPER_DIRECTORY;
   const npmWrapper = path.join(npmWrapperDirectory, "npm");
   if (identity === undefined) {
     await mkdir(homeDirectory, { mode: 0o700 });
     await mkdir(npmWrapperDirectory, { mode: 0o700 });
   } else {
     await chmod(passRoot, 0o733);
-    await mkdir(npmWrapperDirectory, { mode: 0o755 });
+    const wrapperDirectoryMetadata = await lstat(npmWrapperDirectory).catch(
+      () => undefined
+    );
+    if (
+      wrapperDirectoryMetadata === undefined ||
+      !wrapperDirectoryMetadata.isDirectory() ||
+      wrapperDirectoryMetadata.isSymbolicLink()
+    ) {
+      fail(
+        "isolated-npm-wrapper-directory-invalid",
+        "The isolated npm wrapper volume is unavailable."
+      );
+    }
+    await chmod(npmWrapperDirectory, 0o755);
   }
   const readOnlyMode = identity === undefined ? 0o600 : 0o444;
   const executableMode = identity === undefined ? 0o700 : 0o555;
@@ -336,6 +354,7 @@ async function createChildEnvironment(passRoot, sourceEnvironment, identity) {
       environment[key] = value;
     }
   }
+  environment.PATH = `${npmWrapperDirectory}:${environment.PATH ?? ""}`;
   environment.HOME = homeDirectory;
   environment.GIT_ASKPASS = "/usr/bin/false";
   environment.GIT_CONFIG_GLOBAL = "/dev/null";
@@ -366,7 +385,7 @@ async function createChildEnvironment(passRoot, sourceEnvironment, identity) {
       }
     );
   }
-  return { environment, npmWrapper };
+  return { environment };
 }
 
 async function runCommand(command, arguments_, options) {
@@ -962,15 +981,9 @@ async function assertPinnedPackageManager(cloneDirectory) {
   }
 }
 
-async function runSafeFixture(
-  cloneDirectory,
-  passRoot,
-  environment,
-  npmWrapper,
-  identity
-) {
+async function runSafeFixture(cloneDirectory, passRoot, environment, identity) {
   await assertPinnedPackageManager(cloneDirectory);
-  await runCommand(npmWrapper, ["ci", "--ignore-scripts"], {
+  await runCommand("npm", ["ci", "--ignore-scripts"], {
     cwd: cloneDirectory,
     environment,
     failureCode: "locked-install-failed",
@@ -1124,6 +1137,7 @@ function containerIsolationContract(passNumber) {
     candidate_capabilities: "dropped-all",
     candidate_identity: "uid=1000,gid=1000",
     container_image: PUBLIC_PREVIEW_CONTAINER_IMAGE,
+    container_platform: PUBLIC_PREVIEW_CONTAINER_PLATFORM,
     cross_pass_input: passNumber === 1 ? "none" : "pass-1-json-read-only",
     host_writable_mounts: false,
     no_new_privileges: true,
@@ -1150,6 +1164,7 @@ function containerSummaryIsolationContract() {
     candidate_capabilities: "dropped-all",
     candidate_identity: "uid=1000,gid=1000",
     container_image: PUBLIC_PREVIEW_CONTAINER_IMAGE,
+    container_platform: PUBLIC_PREVIEW_CONTAINER_PLATFORM,
     cross_pass_state: "pass-1-json-read-only",
     host_writable_mounts: false,
     report_boundary: "root-only-anonymous-volume",
@@ -1313,7 +1328,7 @@ async function runPass(
     ? undefined
     : ISOLATED_CHILD_IDENTITY;
   try {
-    const { environment, npmWrapper } = await createChildEnvironment(
+    const { environment } = await createChildEnvironment(
       passRoot,
       process.env,
       identity
@@ -1327,7 +1342,6 @@ async function runPass(
       cloneDirectory,
       passRoot,
       environment,
-      npmWrapper,
       identity
     );
     const report = {
