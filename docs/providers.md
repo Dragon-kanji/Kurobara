@@ -73,7 +73,25 @@ run.
 
 ## Adding a provider
 
-An adapter must:
+Use the existing surfaces instead of inventing a new provider protocol:
+
+1. start from [`templates/plugin-adapter`](../templates/plugin-adapter) for an
+   external sidecar, or
+   [`packages/adapters/provider-example`](../packages/adapters/provider-example)
+   for an in-repository adapter;
+2. declare the capability, contracts, credential mode, egress hosts, timeouts,
+   idempotency and cost model in the manifest;
+3. implement configuration validation, estimation, execution, lookup,
+   normalization, health and safe error classification through
+   [`packages/plugin-sdk`](../packages/plugin-sdk);
+4. add hostile-response, timeout, ambiguous-outcome, idempotency, redaction and
+   cost-bound tests;
+5. for an official in-tree route, add explicit admission in
+   [`provider-registry`](../packages/adapters/provider-registry) and runtime
+   composition. A package existing in the repository must not enable a route;
+6. run packaging and conformance before requesting review.
+
+Every adapter must:
 
 - implement a declared port without leaking provider types into the domain;
 - declare capabilities, credential requirements, limits, and cost units;
@@ -91,5 +109,9 @@ npm run check
 npm run typecheck
 npm run build
 ```
+
+The plugin SDK and conformance packages are source-preview artifacts and are not
+published to npm yet. The root packaging test qualifies them through local
+tarballs and exercises the external template exactly as shipped.
 
 An adapter merged into the repository is not an endorsement by the provider.

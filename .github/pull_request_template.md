@@ -11,7 +11,7 @@
 
 - Public contract changed: yes / no
 - PostgreSQL migration added: yes / no
-- RFC or ADR: none / link
+- Design proposal issue: none / link
 
 ## Verification
 

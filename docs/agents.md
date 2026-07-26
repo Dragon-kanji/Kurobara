@@ -24,6 +24,22 @@ There is no MCP server in the current preview.
 Do not let an agent read PostgreSQL directly. IDs, status, provenance, cost,
 and results are available through the supported interfaces.
 
+## Canonical references
+
+- [OpenAPI 3.1](../packages/contracts/catalog/generated/openapi-3.1.1.json) -
+  REST paths and schemas.
+- [CLI command catalog](../packages/contracts/catalog/generated/cli-commands.json) -
+  generated command metadata.
+- [Operation catalog](../packages/contracts/catalog/operations) - versioned
+  request, response, permission and problem contracts.
+- [TypeScript client](../packages/sdk-ts/src/index.ts) - source-preview SDK.
+- [MCP tool catalog](../packages/contracts/catalog/generated/mcp-tools.json) -
+  generated projection metadata only; no MCP server ships in this preview.
+
+These are source-preview artifacts, not published npm packages. Contract
+changes start in the canonical catalog and use `npm run generate:contracts`;
+generated files are never edited directly.
+
 ## Safe execution pattern
 
 For any provider-backed action:
