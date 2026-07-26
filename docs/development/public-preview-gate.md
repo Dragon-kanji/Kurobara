@@ -60,7 +60,12 @@ Chaque pass s'exécute dans un conteneur créé avec :
    `corepack npm` depuis le clone dont le manifest doit épingler `npm@10.9.4`,
    puis
    `npm ci --ignore-scripts` ;
-9. uniquement le profil sûr
+9. la recréation du `HOME` candidat dédié, par le même UID, afin que les
+   métadonnées écrites par npm, Corepack ou l'émulation ne deviennent pas un
+   état implicite du gate. Le processus qualifié n'accepte ensuite que le
+   répertoire `.cache/rosetta` recréé au démarrage par l'émulateur, ou un
+   `HOME` vide sur un hôte natif ;
+10. uniquement le profil sûr
    `scripts/v1-gate.mjs --mode fixture --require-clean`.
 
 Le launcher utilise `docker create`, puis `docker start --attach`. Il copie les
@@ -89,11 +94,11 @@ Le manifest JSON est strict :
 {
   "format_version": "1.0.0",
   "commit": "0123456789abcdef0123456789abcdef01234567",
-  "tag": "v0.1.0-rc.3",
+  "tag": "v0.1.0-rc.4",
   "artifacts": [
     {
-      "name": "kurobara-v0.1.0-rc.3-source.tar.gz",
-      "url": "https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.3/kurobara-v0.1.0-rc.3-source.tar.gz",
+      "name": "kurobara-v0.1.0-rc.4-source.tar.gz",
+      "url": "https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.4/kurobara-v0.1.0-rc.4-source.tar.gz",
       "size_bytes": 123456,
       "sha256": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
     }
@@ -124,8 +129,8 @@ La commande suivante ne devient légitime qu'après :
 bash scripts/public-preview-gate.sh \
   --repository-url https://github.com/Dragon-kanji/Kurobara.git \
   --expected-commit 0123456789abcdef0123456789abcdef01234567 \
-  --expected-tag v0.1.0-rc.3 \
-  --artifacts-manifest-url https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.3/artifacts-manifest.json \
+  --expected-tag v0.1.0-rc.4 \
+  --artifacts-manifest-url https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.4/artifacts-manifest.json \
   --expected-artifacts-manifest-sha256 sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef \
   --passes 2 \
   --report-dir /absolute/new/path/kurobara-public-preview
