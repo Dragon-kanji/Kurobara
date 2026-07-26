@@ -25,7 +25,7 @@ installable. Node.js `24.14.0`, npm `10.9.4` et Docker Compose v2 sont requis.
 ## Statut du projet
 
 Kurobara est publié en **source preview V1 OSS headless** sous le tag
-[`v0.1.0-rc.6`](https://github.com/Dragon-kanji/Kurobara/releases/tag/v0.1.0-rc.6).
+[`v0.1.0-rc.7`](https://github.com/Dragon-kanji/Kurobara/releases/tag/v0.1.0-rc.7).
 Cette preview permet un clone anonyme et fournit des artifacts vérifiables ;
 elle ne constitue ni une release stable, ni une publication npm ou OCI, ni un
 service managé. Sur la révision courante, le

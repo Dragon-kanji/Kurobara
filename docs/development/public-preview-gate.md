@@ -1,6 +1,6 @@
 # Gate de preview publique anonyme
 
-- Statut : **outil local disponible — aucune preuve publique enregistrée**
+- Statut : **outil local disponible — qualification publique à rejouer**
 - Ticket : `KRB-PUB-007`
 - Effets externes attendus : clone et téléchargements HTTPS
 
@@ -11,11 +11,13 @@ détruit chaque conteneur. Le worker
 Le gate ne pousse aucun ref, ne crée ni tag ni release, ne change pas la
 visibilité GitHub et son parcours fixture n'appelle aucun provider.
 
-La cible `Dragon-kanji/Kurobara` étant privée et vide lors de la création de ce
-gate, l'outil est actuellement **inutilisable comme preuve publique**. Un clone
-anonyme réel ne peut réussir qu'après l'approbation `PUBLIC-001` et la bascule
-contrôlée de visibilité. Un succès obtenu depuis un remote local ou avec une
-identité GitHub ne clôt pas `KRB-PUB-007`.
+La cible [`Dragon-kanji/Kurobara`](https://github.com/Dragon-kanji/Kurobara)
+est publique. Le candidat `v0.1.0-rc.6` a révélé, lors de sa première pass
+anonyme, un défaut de récollection des processus orphelins dans le conteneur ;
+il ne constitue donc pas une qualification réussie. Le présent correctif doit
+être publié sous un nouveau tag immuable puis réussir deux passes anonymes. Un
+succès obtenu depuis un remote local ou avec une identité GitHub ne clôt pas
+`KRB-PUB-007`.
 
 ## Contrat fail-closed
 
@@ -34,7 +36,9 @@ Le launcher exige :
 
 Chaque pass s'exécute dans un conteneur créé avec :
 
-1. la racine en lecture seule, un `tmpfs` neuf `exec,nosuid,nodev` pour `/tmp`
+1. l'init minimal de Docker, chargé de récollecter les processus orphelins et
+   de transmettre les signaux, puis la racine en lecture seule et un `tmpfs`
+   neuf `exec,nosuid,nodev` pour `/tmp`
    afin d'exécuter les shims audités de `node_modules/.bin`,
    `no-new-privileges` et `--cap-drop ALL` ;
 2. un vérificateur `uid=0,gid=0` qui ne conserve que `SETUID` et `SETGID`.
@@ -94,11 +98,11 @@ Le manifest JSON est strict :
 {
   "format_version": "1.0.0",
   "commit": "0123456789abcdef0123456789abcdef01234567",
-  "tag": "v0.1.0-rc.6",
+  "tag": "v0.1.0-rc.7",
   "artifacts": [
     {
-      "name": "kurobara-0.1.0-rc.6-source.tar.gz",
-      "url": "https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.6/kurobara-0.1.0-rc.6-source.tar.gz",
+      "name": "kurobara-0.1.0-rc.7-source.tar.gz",
+      "url": "https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.7/kurobara-0.1.0-rc.7-source.tar.gz",
       "size_bytes": 123456,
       "sha256": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
     }
@@ -129,8 +133,8 @@ La commande suivante ne devient légitime qu'après :
 bash scripts/public-preview-gate.sh \
   --repository-url https://github.com/Dragon-kanji/Kurobara.git \
   --expected-commit 0123456789abcdef0123456789abcdef01234567 \
-  --expected-tag v0.1.0-rc.6 \
-  --artifacts-manifest-url https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.6/artifacts-manifest.json \
+  --expected-tag v0.1.0-rc.7 \
+  --artifacts-manifest-url https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.7/artifacts-manifest.json \
   --expected-artifacts-manifest-sha256 sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef \
   --passes 2 \
   --report-dir /absolute/new/path/kurobara-public-preview

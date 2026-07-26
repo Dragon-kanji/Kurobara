@@ -98,6 +98,7 @@ create_container() {
   shift
   docker create \
     --platform "${CONTAINER_PLATFORM}" \
+    --init \
     --read-only \
     --tmpfs /tmp:rw,exec,nosuid,nodev,mode=1777 \
     --cap-drop ALL \
