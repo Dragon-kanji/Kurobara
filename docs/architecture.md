@@ -78,9 +78,10 @@ packages/kernel           pure domain logic
 packages/application      use cases and policies
 packages/contracts        canonical public contracts
 packages/adapters         infrastructure implementations
-packages/providers        provider adapters
+packages/adapters/provider-* in-tree provider adapters
+packages/plugin-*         external plugin SDK, host, and conformance
 packages/cli              non-interactive CLI
-packages/sdk-typescript   TypeScript client
+packages/sdk-ts           TypeScript client
 deploy/self-host          local deterministic Compose profile
 test                      release, business, and architecture gates
 ```
@@ -88,12 +89,29 @@ test                      release, business, and architecture gates
 The generated dependency graph is available at
 [architecture/generated/module-dependencies.mmd](./architecture/generated/module-dependencies.mmd).
 
+## Where to make a change
+
+| Concern | Start here |
+| --- | --- |
+| Operation or schema | `packages/contracts/catalog` |
+| Use case or policy | `packages/application`, `packages/policy-engine` |
+| Pure domain or workflow rule | `packages/kernel`, `packages/workflow-engine` |
+| HTTP projection | `packages/adapters/http`, `apps/api` |
+| Provider behavior | `packages/adapters/provider-*` |
+| CLI or TypeScript client | `packages/cli`, `packages/sdk-ts` |
+| Durable storage | `packages/adapters/postgres` |
+
 ## Changing architecture
 
 Open a focused proposal before changing a public contract, security guarantee,
 layer boundary, persistence model, provider admission rule, or decision that is
 expensive to reverse. Include migration, compatibility, rollback, security,
 privacy, and verification consequences.
+
+Use the
+[feature request form](https://github.com/Dragon-kanji/Kurobara/issues/new?template=feature_request.yml)
+with a `[Design]` title and link the accepted proposal from the implementation
+pull request.
 
 Small internal refactors that preserve these boundaries can use the normal pull
 request workflow.

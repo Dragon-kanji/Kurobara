@@ -18,6 +18,13 @@ Open a design proposal first when a change:
 - changes governance, licensing, or contribution policy;
 - is expensive to reverse.
 
+Use the
+[feature request form](https://github.com/Dragon-kanji/Kurobara/issues/new?template=feature_request.yml)
+with a `[Design]` title. Describe the outcome, affected boundary, compatibility
+and migration impact, rollback, security and privacy consequences, and the
+evidence that would validate the decision. In this preview, that issue is the
+public decision record; link it from the pull request.
+
 Never disclose a vulnerability in an issue or pull request. Follow
 [SECURITY.md](./SECURITY.md).
 
@@ -38,6 +45,30 @@ npm run build
 
 Run the smallest relevant tests in addition to these baseline checks. Use
 `npm test` for a broad change.
+
+## Development loop
+
+| Change | Fast feedback |
+| --- | --- |
+| One workspace | `npm test -w <workspace-name>` |
+| Public contracts | `npm run generate:contracts` then `npm run generate:check -w @kurobara/contracts` |
+| PostgreSQL behavior | `npm run integration:test:postgres` with `KUROBARA_TEST_POSTGRES_URL` pointing to a disposable admin database |
+| Architecture imports | `npm run architecture:drift` |
+| Full runtime | `npm run self-host:smoke` |
+
+The deterministic self-host stack in
+[Getting started](./docs/getting-started.md) is the supported end-to-end
+development path. Direct `npm run start:api` and `npm run start:worker` commands
+require explicit PostgreSQL and Hatchet configuration.
+
+Contract schemas and operations under `packages/contracts/catalog` are
+canonical. Regenerate tracked outputs; never edit generated JSON or TypeScript
+to hide drift.
+
+PostgreSQL migrations are append-only files under
+`packages/adapters/postgres/migrations`. Add the next numbered migration and
+exercise both a fresh database and roll-forward behavior. Never modify a
+migration that may already have been applied: checksums are persisted.
 
 ## Change quality
 

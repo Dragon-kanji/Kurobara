@@ -42,6 +42,10 @@ when that is the honest state.
 Open a design proposal before changing a public contract, security guarantee,
 layer boundary, persistence model, provider admission rule, or another
 expensive-to-reverse decision.
+Use the
+[feature request form](https://github.com/Dragon-kanji/Kurobara/issues/new?template=feature_request.yml)
+with a `[Design]` title and link the accepted proposal from the implementation
+pull request.
 
 ## Write focused changes
 
@@ -95,6 +99,8 @@ The root manifest pins npm `10.9.4` and Node.js `24.14.0`.
 | Typecheck | `npm run typecheck` |
 | Build | `npm run build` |
 | Test | `npm test` |
+| PostgreSQL integration | `npm run integration:test:postgres` |
+| Verify architecture graph | `npm run architecture:drift` |
 | Plugin packaging | `npm run test:plugin-packaging` |
 | Regenerate contracts | `npm run generate:contracts` |
 | Build or verify clean-room output | `npm run clean-room -- <command>` |
