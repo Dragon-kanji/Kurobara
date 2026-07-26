@@ -50,9 +50,12 @@ export const PUBLIC_PREVIEW_CONTAINER_IMAGE =
 export const PUBLIC_PREVIEW_CONTAINER_PLATFORM = "linux/amd64";
 
 export class PublicPreviewGateError extends Error {
-  constructor(code, message) {
+  constructor(code, message, options = {}) {
     super(message);
     this.code = code;
+    if (options.fixtureErrorCode !== undefined) {
+      this.fixtureErrorCode = options.fixtureErrorCode;
+    }
     this.name = "PublicPreviewGateError";
   }
 }
@@ -1012,6 +1015,38 @@ async function readFixtureReceipt(fixtureReportPath, environment, identity) {
   };
 }
 
+async function readFixtureFailureCode(
+  fixtureReportPath,
+  environment,
+  identity
+) {
+  const metadata = await lstat(fixtureReportPath).catch(() => undefined);
+  if (
+    metadata === undefined ||
+    !metadata.isFile() ||
+    metadata.isSymbolicLink() ||
+    metadata.size > MAX_FIXTURE_REPORT_BYTES
+  ) {
+    return;
+  }
+  const bytes = await readFileAsIdentity(
+    fixtureReportPath,
+    MAX_FIXTURE_REPORT_BYTES,
+    environment,
+    identity
+  );
+  let report;
+  try {
+    report = JSON.parse(bytes.toString("utf8"));
+  } catch {
+    return;
+  }
+  const reasonCode = report?.failure?.reason_code;
+  return typeof reasonCode === "string" && SAFE_OUTCOME_PATTERN.test(reasonCode)
+    ? reasonCode
+    : undefined;
+}
+
 async function assertPinnedPackageManager(cloneDirectory) {
   const packageJsonPath = path.join(cloneDirectory, "package.json");
   const metadata = await lstat(packageJsonPath).catch(() => undefined);
@@ -1061,26 +1096,45 @@ async function runSafeFixture(cloneDirectory, passRoot, environment, identity) {
   });
   await resetChildHome(environment.HOME, passRoot, environment, identity);
   const fixtureReportPath = path.join(passRoot, "fixture-report.json");
-  await runCommand(
-    process.execPath,
-    [
-      "scripts/v1-gate.mjs",
-      "--mode",
-      "fixture",
-      "--require-clean",
-      "--report",
-      fixtureReportPath,
-    ],
-    {
-      cwd: cloneDirectory,
-      environment,
-      failureCode: "safe-fixture-failed",
-      identity,
-      label: "Repository safe fixture",
-      timeoutCode: "safe-fixture-timeout",
-      timeoutMs: FIXTURE_TIMEOUT_MS,
+  try {
+    await runCommand(
+      process.execPath,
+      [
+        "scripts/v1-gate.mjs",
+        "--mode",
+        "fixture",
+        "--require-clean",
+        "--report",
+        fixtureReportPath,
+      ],
+      {
+        cwd: cloneDirectory,
+        environment,
+        failureCode: "safe-fixture-failed",
+        identity,
+        label: "Repository safe fixture",
+        timeoutCode: "safe-fixture-timeout",
+        timeoutMs: FIXTURE_TIMEOUT_MS,
+      }
+    );
+  } catch (error) {
+    if (
+      error instanceof PublicPreviewGateError &&
+      error.code === "safe-fixture-failed"
+    ) {
+      const fixtureErrorCode = await readFixtureFailureCode(
+        fixtureReportPath,
+        environment,
+        identity
+      ).catch(() => undefined);
+      if (fixtureErrorCode !== undefined) {
+        throw new PublicPreviewGateError(error.code, error.message, {
+          fixtureErrorCode,
+        });
+      }
     }
-  );
+    throw error;
+  }
   return await readFixtureReceipt(fixtureReportPath, environment, identity);
 }
 
@@ -1437,6 +1491,10 @@ async function runPass(
     await writeReport(reportDirectory, `pass-${passNumber}.json`, {
       completed_at: new Date().toISOString(),
       error_code: failureCode(error),
+      ...(error instanceof PublicPreviewGateError &&
+      error.fixtureErrorCode !== undefined
+        ? { fixture_error_code: error.fixtureErrorCode }
+        : {}),
       format_version: FORMAT_VERSION,
       isolation_contract: isolationContract,
       kind: "kurobara-public-preview-pass",

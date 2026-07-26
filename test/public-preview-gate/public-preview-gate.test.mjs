@@ -25,7 +25,7 @@ import {
   validateDownloadUrl,
 } from "../../scripts/public-preview-gate.mjs";
 
-const TAG = "v0.1.0-rc.5";
+const TAG = "v0.1.0-rc.6";
 const REPOSITORY_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../.."
@@ -66,7 +66,16 @@ function git(repositoryRoot, arguments_) {
   }).trim();
 }
 
-async function writeFixtureGate(repositoryRoot) {
+async function writeFixtureGate(repositoryRoot, fixtureFailureCode) {
+  const fixtureReport =
+    fixtureFailureCode === undefined
+      ? { outcome: "fixture-passed" }
+      : {
+          failure: { reason_code: fixtureFailureCode },
+          outcome: "failed",
+        };
+  const failureExit =
+    fixtureFailureCode === undefined ? "" : "\nprocess.exitCode = 1;";
   const script = `import { readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -145,9 +154,9 @@ if (
 }
 await writeFile(
   arguments_[4],
-  \`\${JSON.stringify({ outcome: "fixture-passed" })}\\n\`,
+  \`\${JSON.stringify(${JSON.stringify(fixtureReport)})}\\n\`,
   { flag: "wx", mode: 0o600 }
-);
+);${failureExit}
 `;
   await mkdir(path.join(repositoryRoot, "scripts"), { recursive: true });
   await writeFile(
@@ -157,7 +166,7 @@ await writeFile(
   );
 }
 
-async function createFixture() {
+async function createFixture(options = {}) {
   const root = await mkdtemp(
     path.join(tmpdir(), "kurobara-public-preview-test-")
   );
@@ -208,7 +217,7 @@ async function createFixture() {
     "node_modules/\n",
     "utf8"
   );
-  await writeFixtureGate(repositoryRoot);
+  await writeFixtureGate(repositoryRoot, options.fixtureFailureCode);
   git(repositoryRoot, ["add", "--all"]);
   git(repositoryRoot, ["commit", "--no-gpg-sign", "-m", "fixture"]);
   git(repositoryRoot, [
@@ -357,8 +366,8 @@ async function withHostileEnvironment(fixture, callback) {
   }
 }
 
-async function withFixture(callback) {
-  const fixture = await createFixture();
+async function withFixture(callback, options) {
+  const fixture = await createFixture(options);
   try {
     return await callback(fixture);
   } finally {
@@ -778,6 +787,33 @@ test("fails when a downloaded artifact checksum differs", async () => {
       code: "artifact-checksum-mismatch",
     });
   });
+});
+
+test("surfaces one bounded reason code when the safe fixture fails", async () => {
+  await withFixture(
+    async (fixture) => {
+      const reportDirectory = path.join(
+        fixture.root,
+        "fixture-failure-reports"
+      );
+      const options = parseArguments(
+        argumentsFor(fixture, reportDirectory),
+        TEST_ENVIRONMENT
+      );
+
+      await assert.rejects(runPublicPreviewGate(options), {
+        code: "safe-fixture-failed",
+        fixtureErrorCode: "export-proof-invalid",
+      });
+      const report = JSON.parse(
+        await readFile(path.join(reportDirectory, "pass-1.json"), "utf8")
+      );
+      assert.equal(report.error_code, "safe-fixture-failed");
+      assert.equal(report.fixture_error_code, "export-proof-invalid");
+      assert.equal(JSON.stringify(report).includes(fixture.root), false);
+    },
+    { fixtureFailureCode: "export-proof-invalid" }
+  );
 });
 
 test("refuses to overwrite an existing report directory", async () => {

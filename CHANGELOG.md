@@ -6,6 +6,28 @@ partir de sa première publication.
 
 ## [Unreleased]
 
+## [0.1.0-rc.6] - 2026-07-26
+
+### Changed
+
+- Met à jour `@hono/node-server` vers `2.0.12`, Hono vers `4.12.32`,
+  Postgres.js vers `3.4.9` et le SDK TypeScript Hatchet vers `1.28.0`.
+- Regroupe les futures mises à jour Dependabot mineures et correctives par
+  type de dépendance, et reporte TypeScript 7 tant que la chaîne
+  d'architecture épinglée ne le prend pas en charge.
+
+### Fixed
+
+- Accepte le trailer DCO standard de Dependabot uniquement pour l'identité bot
+  exacte, une branche Dependabot du dépôt et le workflow de base approuvé.
+- Verrouille `brace-expansion` sur `5.0.8` et remplace le `node-gyp` transitif
+  de la génération SBOM par sa branche 12 compatible, puis étend la CI à
+  l'audit du graphe complet, dépendances de développement incluses.
+- Remplace les quatre motifs signalés par CodeQL par des arguments de processus
+  séparés, une validation JSONL structurée et un encodage de PURL complet.
+- Ajoute au reçu d'échec du gate public le code de raison borné du fixture,
+  sans publier ses logs, chemins ou autres données internes.
+
 ## [0.1.0-rc.5] - 2026-07-26
 
 ### Fixed

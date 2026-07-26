@@ -1,6 +1,6 @@
 {
   "name": "kurobara",
-  "version": "0.1.0-rc.5",
+  "version": "0.1.0-rc.6",
   "license": "Apache-2.0",
   "private": true,
   "type": "module",
@@ -13,6 +13,11 @@
     "packages/*",
     "packages/adapters/*"
   ],
+  "overrides": {
+    "libxmljs2": {
+      "node-gyp": "12.4.0"
+    }
+  },
   "scripts": {
     "architecture:check": "dependency-cruise --config .dependency-cruiser.mjs --output-type err-long apps packages && node scripts/check-computed-imports.mjs apps packages",
     "architecture:drift": "npm run architecture:check && npm run architecture:test && npm run architecture:graph && git diff --exit-code -- docs/architecture/generated/module-dependencies.mmd",
@@ -40,6 +45,7 @@
     "integration:test:hatchet-worker": "bash infra/hatchet/harness.sh worker",
     "integration:test:postgres": "node --experimental-strip-types --test --test-concurrency=1 test/integration/*.test.ts",
     "security:audit": "npm audit --omit=dev --package-lock-only --audit-level=info",
+    "security:audit:all": "npm audit --package-lock-only --audit-level=info",
     "test": "npm run test --workspaces --if-present && npm run test:b2b-dogfood && npm run test:clean-room && npm run test:dco && npm run test:plugin-packaging && npm run test:public-preview-gate && npm run test:release-candidate && npm run test:v1-business-gate && npm run test:v1-gate && npm run architecture:test",
     "test:b2b-dogfood": "node --test --test-concurrency=1 test/dogfood/*.test.mjs",
     "test:clean-room": "node --test --test-concurrency=1 test/clean-room/*.test.mjs",

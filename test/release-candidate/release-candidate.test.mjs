@@ -582,7 +582,7 @@ test("builds and verifies the standalone local release candidate", async () => {
     const hatchetComponent = heartbeatSbom.components.find(
       (component) => component.name === "@hatchet-dev/typescript-sdk"
     );
-    assert.equal(hatchetComponent?.version, "1.26.0");
+    assert.equal(hatchetComponent?.version, "1.28.0");
     assert.deepEqual(hatchetComponent.licenses, [{ expression: "MIT" }]);
     const hatchetIntegrity =
       candidateLock.packages["node_modules/@hatchet-dev/typescript-sdk"]

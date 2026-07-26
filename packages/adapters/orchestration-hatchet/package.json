@@ -12,7 +12,7 @@
     "typecheck": "tsc --project tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@hatchet-dev/typescript-sdk": "1.26.0",
+    "@hatchet-dev/typescript-sdk": "1.28.0",
     "@kurobara/kernel": "file:../../kernel",
     "@kurobara/ports": "file:../../ports",
     "zod": "4.4.3"

@@ -19,7 +19,7 @@ and never prints or persists it outside the image-managed local volume.
 `v0.95.3` is a published upstream tag and container candidate, but Hatchet has
 not published a matching GitHub Release. It is deliberately not described here
 as stable or supported. `v0.94.10` cannot qualify this repository's SDK
-`1.26.0` idempotency contract because the required server-side implementation
+`1.28.0` idempotency contract because the required server-side implementation
 and migrations first appear in the `v0.95.x` line.
 
 ## Commands

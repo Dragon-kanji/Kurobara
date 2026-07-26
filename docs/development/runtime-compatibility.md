@@ -19,14 +19,14 @@ composants requis du runtime Kurobara.
 | PostgreSQL Kurobara | `16.13` | tests sur bases jetables, migrations `0001` à `0027` | vérifié localement |
 | Ajv | `8.20.0` | validation stricte JSON Schema 2020-12 de l'output local, tests d'acceptation, rejet et référence de contrat | vérifié localement |
 | Plugin contracts / SDK / host / conformance | `0.1.0` | tarballs locales installées offline, template extérieur compilé et rapport canonique exercé sous le profil `dev.kurobara.plugin-conformance/local-v1@1.1.0` | matrice exacte Node `24.14.0` sur `darwin/arm64` et `linux/x64` |
-| Hatchet TypeScript SDK | `1.26.0` | tests adapter, smoke et processus worker complet contre le serveur ci-dessous | vérifié localement |
+| Hatchet TypeScript SDK | `1.28.0` | tests adapter, smoke et processus worker complet contre le serveur ci-dessous | vérifié localement |
 | PostgreSQL du harness Hatchet | `17.9` | services internes Hatchet et application Kurobara isolés, conteneurs sains, tests Kurobara sur bases jetables et trois scénarios worker | vérifié comme fixture locale |
 | Hatchet OSS server | tag/image `v0.95.3`, digest `sha256:059e79e7f5044581cd2394b5b4212b0911642ed5486662c4a637d0bcf028ecdc` | readiness, worker SDK, quatre leaf tasks automatiquement routées d'un DAG root/fan-out/fan-in avec effet `deterministic-local`, redémarrage propre, lookup du run terminé et collision dans le TTL ; Hatchet reste actif pendant le `SIGKILL` du processus Kurobara | candidat qualifié localement, non supporté |
 
 Le tag `v0.95.3` et son image sont publiés en amont, mais aucune GitHub Release
 correspondante n'est publiée. La dernière release GitHub visible est
 `v0.94.10`, qui précède l'implémentation serveur exigée par l'idempotence du SDK
-`1.26.0`. Le harness traite donc `v0.95.3` comme candidat immuable, jamais comme
+`1.28.0`. Le harness traite donc `v0.95.3` comme candidat immuable, jamais comme
 version stable ou supportée. Voir le [harness local](../../infra/hatchet/README.md),
 le [changelog du SDK](https://docs.hatchet.run/reference/changelog/typescript),
 la [release v0.94.10](https://github.com/hatchet-dev/hatchet/releases/tag/v0.94.10)

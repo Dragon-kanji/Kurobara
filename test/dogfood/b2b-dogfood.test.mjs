@@ -107,7 +107,8 @@ test("escalates an interrupted ready stubborn child and settles within a hard bo
     [
       "--input-type=module",
       "--eval",
-      `import { writeFileSync } from "node:fs"; process.on("SIGTERM", () => process.stdout.write("term-ignored\\n")); writeFileSync(${JSON.stringify(readyFile)}, "ready", { mode: 0o600 }); setInterval(() => {}, 1000);`,
+      'import { writeFileSync } from "node:fs"; process.on("SIGTERM", () => process.stdout.write("term-ignored\\n")); writeFileSync(process.argv[1], "ready", { mode: 0o600 }); setInterval(() => {}, 1000);',
+      readyFile,
     ],
     {
       forceSettlementGraceMs: 100,
@@ -180,13 +181,16 @@ test("stops a whole service group when a ready descendant ignores SIGTERM", asyn
   const parent = await mkdtemp(path.join(tmpdir(), "kurobara-dogfood-test."));
   temporaryDirectories.push(parent);
   const readyFile = path.join(parent, "descendant-ready");
-  const descendantSource = `import { writeFileSync } from "node:fs"; process.on("SIGTERM", () => {}); writeFileSync(${JSON.stringify(readyFile)}, "ready", { mode: 0o600 }); setInterval(() => {}, 1000);`;
+  const descendantSource =
+    'import { writeFileSync } from "node:fs"; process.on("SIGTERM", () => {}); writeFileSync(process.argv[1], "ready", { mode: 0o600 }); setInterval(() => {}, 1000);';
   const service = dogfoodTestHelpers.startService(
     process.execPath,
     [
       "--input-type=module",
       "--eval",
-      `import { spawn } from "node:child_process"; spawn(process.execPath, ["--input-type=module", "--eval", ${JSON.stringify(descendantSource)}], { stdio: "ignore" }); setInterval(() => {}, 1000);`,
+      'import { spawn } from "node:child_process"; spawn(process.execPath, ["--input-type=module", "--eval", process.argv[1], process.argv[2]], { stdio: "ignore" }); setInterval(() => {}, 1000);',
+      descendantSource,
+      readyFile,
     ],
     process.env
   );

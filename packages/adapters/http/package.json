@@ -16,6 +16,6 @@
     "@kurobara/application": "file:../../application",
     "@kurobara/contracts": "file:../../contracts",
     "ajv": "8.18.0",
-    "hono": "4.12.30"
+    "hono": "4.12.32"
   }
 }

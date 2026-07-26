@@ -12,14 +12,14 @@
     "typecheck": "tsc --project tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@hono/node-server": "2.0.11",
+    "@hono/node-server": "2.0.12",
     "@kurobara/adapter-dataset-codec": "file:../../packages/adapters/dataset-codec",
     "@kurobara/adapter-http": "file:../../packages/adapters/http",
     "@kurobara/adapter-postgres": "file:../../packages/adapters/postgres",
     "@kurobara/adapter-provider-registry": "file:../../packages/adapters/provider-registry",
     "@kurobara/adapter-system": "file:../../packages/adapters/system",
     "@kurobara/application": "file:../../packages/application",
-    "hono": "4.12.30",
+    "hono": "4.12.32",
     "jsonc-parser": "3.3.1"
   }
 }

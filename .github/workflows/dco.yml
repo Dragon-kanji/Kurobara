@@ -60,5 +60,13 @@ jobs:
       - name: Verify DCO sign-offs
         env:
           DCO_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          DCO_DEPENDABOT_TRUSTED: ${{ github.event.pull_request.user.login == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.event.pull_request.head.ref, 'dependabot/') }}
           DCO_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: node "$RUNNER_TEMP/check-dco.mjs" "$DCO_BASE_SHA" "$DCO_HEAD_SHA"
+        run: |
+          if [ "${DCO_DEPENDABOT_TRUSTED}" = "true" ]; then
+            node "$RUNNER_TEMP/check-dco.mjs" --allow-dependabot \
+              "$DCO_BASE_SHA" "$DCO_HEAD_SHA"
+          else
+            node "$RUNNER_TEMP/check-dco.mjs" \
+              "$DCO_BASE_SHA" "$DCO_HEAD_SHA"
+          fi
