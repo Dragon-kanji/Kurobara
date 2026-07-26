@@ -1,6 +1,6 @@
 # Fondation exécutable V1
 
-- Statut : **source preview V1 OSS headless `v0.1.0-rc.6`**
+- Statut : **source preview V1 OSS headless `v0.1.0-rc.7`**
 - Baseline initiale qualifiée localement le **2026-07-17**
 - Tranches `plans.quote`, `capabilities.list`, import/apply/watch/export,
   `runs.cancel`, ingress d'orchestration,

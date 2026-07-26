@@ -25,7 +25,7 @@ import {
   validateDownloadUrl,
 } from "../../scripts/public-preview-gate.mjs";
 
-const TAG = "v0.1.0-rc.6";
+const TAG = "v0.1.0-rc.7";
 const REPOSITORY_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../.."
@@ -637,6 +637,7 @@ test("the public launcher constructs two distinct hardened containers", async ()
     const createCalls = calls.filter(([command]) => command === "create");
     assert.equal(createCalls.length, 2);
     for (const call of createCalls) {
+      assert.equal(call.includes("--init"), true);
       assert.equal(call.includes("--read-only"), true);
       assert.equal(call.includes("--platform"), true);
       assert.equal(call.includes(PUBLIC_PREVIEW_CONTAINER_PLATFORM), true);

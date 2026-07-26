@@ -6,6 +6,16 @@ partir de sa première publication.
 
 ## [Unreleased]
 
+## [0.1.0-rc.7] - 2026-07-26
+
+### Fixed
+
+- Lance chaque conteneur du gate public avec l'init minimal de Docker afin de
+  récollecter les processus orphelins et d'éviter qu'un zombie soit interprété
+  comme un service encore actif pendant la preuve anonyme.
+- Enregistre cette garantie dans le contrat d'isolation machine-readable et
+  dans le test du launcher, sans ajouter de capability ni de montage hôte.
+
 ## [0.1.0-rc.6] - 2026-07-26
 
 ### Changed
