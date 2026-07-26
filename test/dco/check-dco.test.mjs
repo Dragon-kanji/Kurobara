@@ -202,6 +202,35 @@ test("accepts the exact Dependabot identity pair when the trusted caller opts in
     assert.equal(result.status, 0, result.stderr);
   }));
 
+test("accepts the exact Dependabot trailer after its metadata divider", () =>
+  withRepository((fixture) => {
+    const head = commit(
+      fixture.repositoryRoot,
+      `Bump dependency
+
+---
+updated-dependencies:
+- dependency-name: fixture
+  dependency-version: 1.2.3
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+...
+
+Signed-off-by: ${DEPENDABOT_SIGN_OFF}
+`,
+      {
+        email: "49699333+dependabot[bot]@users.noreply.github.com",
+        name: "dependabot[bot]",
+      }
+    );
+
+    const result = runCheck(fixture.repositoryRoot, fixture.base, head, {
+      allowDependabot: true,
+    });
+
+    assert.equal(result.status, 0, result.stderr);
+  }));
+
 test("rejects a Dependabot lookalike even when the trusted caller opts in", () =>
   withRepository((fixture) => {
     const head = commit(

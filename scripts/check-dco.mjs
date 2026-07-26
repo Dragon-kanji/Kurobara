@@ -145,7 +145,7 @@ const readCommitAuthor = (cwd, commit) => {
 };
 
 const parseTrailers = (cwd, message) => {
-  const result = spawnGit(["interpret-trailers", "--parse"], {
+  const result = spawnGit(["interpret-trailers", "--parse", "--no-divider"], {
     cwd,
     input: message,
   });
