@@ -198,7 +198,7 @@ const run = async () => {
         "--mode",
         options.mode,
       ],
-      callTimeoutMs: 2000,
+      callTimeoutMs: 20_000,
       executablePath: process.execPath,
       expectedManifest: pluginManifest,
       workingDirectory: packageRoot,

@@ -16,13 +16,14 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
   PUBLIC_PREVIEW_CONTAINER_IMAGE,
+  PUBLIC_PREVIEW_CONTAINER_PLATFORM,
   PublicPreviewGateError,
   parseArguments,
   runPublicPreviewGate,
   validateDownloadUrl,
 } from "../../scripts/public-preview-gate.mjs";
 
-const TAG = "v0.1.0-rc.2";
+const TAG = "v0.1.0-rc.3";
 const REPOSITORY_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../.."
@@ -593,6 +594,8 @@ test("the public launcher constructs two distinct hardened containers", async ()
     assert.equal(createCalls.length, 2);
     for (const call of createCalls) {
       assert.equal(call.includes("--read-only"), true);
+      assert.equal(call.includes("--platform"), true);
+      assert.equal(call.includes(PUBLIC_PREVIEW_CONTAINER_PLATFORM), true);
       assert.equal(call.includes("--cap-drop"), true);
       assert.equal(call.includes("ALL"), true);
       assert.equal(call.includes("--cap-add"), true);
@@ -605,10 +608,14 @@ test("the public launcher constructs two distinct hardened containers", async ()
       assert.equal(call.includes("--security-opt"), true);
       assert.equal(call.includes("no-new-privileges=true"), true);
       assert.equal(call.includes("--tmpfs"), true);
-      assert.equal(call.includes("/tmp:rw,nosuid,nodev,mode=1777"), true);
+      assert.equal(call.includes("/tmp:rw,exec,nosuid,nodev,mode=1777"), true);
       assert.equal(call.includes("--user"), true);
       assert.equal(call.includes("0:0"), true);
       assert.equal(call.includes("type=volume,dst=/root"), true);
+      assert.equal(
+        call.includes("type=volume,dst=/opt/kurobara-public-preview-bin"),
+        true
+      );
       assert.equal(call.includes(PUBLIC_PREVIEW_CONTAINER_IMAGE), true);
       assert.equal(call.includes("/usr/bin/env"), true);
       assert.equal(call.includes("-i"), true);

@@ -23,6 +23,8 @@ Le launcher exige :
 
 - Docker et l'image immuable
   `node:24.14.0-bookworm@sha256:5a593d74b632d1c6f816457477b6819760e13624455d587eef0fa418c8d0777b` ;
+- la plateforme qualifiée `linux/amd64`, y compris sous émulation sur un hôte
+  Apple Silicon ;
 - une URL de dépôt HTTPS sans credential, query ou fragment ;
 - le SHA complet du commit attendu et le tag exact qui doit pointer vers lui ;
 - une URL HTTPS de manifest d'artifacts ;
@@ -32,7 +34,8 @@ Le launcher exige :
 
 Chaque pass s'exécute dans un conteneur créé avec :
 
-1. la racine en lecture seule, un `tmpfs` neuf pour `/tmp`,
+1. la racine en lecture seule, un `tmpfs` neuf `exec,nosuid,nodev` pour `/tmp`
+   afin d'exécuter les shims audités de `node_modules/.bin`,
    `no-new-privileges` et `--cap-drop ALL` ;
 2. un vérificateur `uid=0,gid=0` qui ne conserve que `SETUID` et `SETGID`.
    Ces deux capabilities servent exclusivement à lancer les commandes Git,
@@ -42,18 +45,20 @@ Chaque pass s'exécute dans un conteneur créé avec :
    proxy, configuration TLS, npm ou option Node de l'hôte n'est transmis ;
 4. uniquement le worker comme montage bind dans la première pass. Chaque
    conteneur reçoit sous `/root` son propre volume Docker anonyme de sortie,
-   possédé par root, en mode `0700`, jamais partagé et supprimé avec lui. Le
-   candidat ne peut ni le lire ni l'écrire, y compris depuis un processus
-   laissé en arrière-plan. La seconde pass reçoit en plus `pass-1.json`, monté
-   en lecture seule ;
+   possédé par root, en mode `0700`, jamais partagé et supprimé avec lui. Un
+   second volume anonyme root-owned, non inscriptible par le candidat, porte
+   uniquement le wrapper npm exécutable. Le candidat ne peut ni lire ni écrire
+   le volume de rapports, y compris depuis un processus laissé en arrière-plan.
+   La seconde pass reçoit en plus `pass-1.json`, monté en lecture seule ;
 5. un clone `--no-local`, sans tags ni checkout implicite, créé dans le
    `tmpfs` du conteneur ;
 6. la récupération du seul tag attendu, la vérification de son commit puis le
    checkout du SHA exact en detached HEAD ;
 7. un nouveau téléchargement du manifest et de chaque artifact, avec limites
    de taille et vérification de la taille et du SHA-256 ;
-8. un wrapper npm sous `/tmp` qui exécute `corepack npm` depuis le clone dont
-   le manifest doit épingler `npm@10.9.4`, puis
+8. un wrapper npm root-owned dans son volume anonyme qui exécute
+   `corepack npm` depuis le clone dont le manifest doit épingler `npm@10.9.4`,
+   puis
    `npm ci --ignore-scripts` ;
 9. uniquement le profil sûr
    `scripts/v1-gate.mjs --mode fixture --require-clean`.
@@ -84,11 +89,11 @@ Le manifest JSON est strict :
 {
   "format_version": "1.0.0",
   "commit": "0123456789abcdef0123456789abcdef01234567",
-  "tag": "v0.1.0-rc.2",
+  "tag": "v0.1.0-rc.3",
   "artifacts": [
     {
-      "name": "kurobara-v0.1.0-rc.2-source.tar.gz",
-      "url": "https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.2/kurobara-v0.1.0-rc.2-source.tar.gz",
+      "name": "kurobara-v0.1.0-rc.3-source.tar.gz",
+      "url": "https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.3/kurobara-v0.1.0-rc.3-source.tar.gz",
       "size_bytes": 123456,
       "sha256": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
     }
@@ -119,8 +124,8 @@ La commande suivante ne devient légitime qu'après :
 bash scripts/public-preview-gate.sh \
   --repository-url https://github.com/Dragon-kanji/Kurobara.git \
   --expected-commit 0123456789abcdef0123456789abcdef01234567 \
-  --expected-tag v0.1.0-rc.2 \
-  --artifacts-manifest-url https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.2/artifacts-manifest.json \
+  --expected-tag v0.1.0-rc.3 \
+  --artifacts-manifest-url https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.3/artifacts-manifest.json \
   --expected-artifacts-manifest-sha256 sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef \
   --passes 2 \
   --report-dir /absolute/new/path/kurobara-public-preview

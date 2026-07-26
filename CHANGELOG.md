@@ -6,6 +6,20 @@ partir de sa première publication.
 
 ## [Unreleased]
 
+## [0.1.0-rc.3] - 2026-07-26
+
+### Fixed
+
+- Le gate de preview place son wrapper `corepack npm` dans un volume anonyme
+  root-owned et rend explicitement exécutable le `tmpfs` candidat requis par
+  les shims audités de `node_modules/.bin`, tout en conservant `nosuid`,
+  `nodev`, `no-new-privileges` et la suppression des capabilities.
+- La plateforme du conteneur est fixée à `linux/amd64`, seule cible Linux du
+  profil de conformité V1, au lieu de dépendre de l'architecture de l'hôte.
+- Le template d'adapter externe laisse vingt secondes aux appels de
+  qualification locaux afin que leur contrat reste portable sur un hôte ARM
+  exécutant le profil `linux/amd64` épinglé.
+
 ## [0.1.0-rc.2] - 2026-07-26
 
 ### Fixed

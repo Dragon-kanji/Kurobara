@@ -42,7 +42,7 @@ export const pluginManifest = {
   execution: {
     idempotency: { keyScope: "operation", mode: "native-key" },
     lookup: { authoritativeNotFound: true, mode: "by-operation-key" },
-    timeouts: { executeMs: 5000, lookupMs: 5000 },
+    timeouts: { executeMs: 20_000, lookupMs: 20_000 },
   },
   id: "dev.kurobara.plugin-adapter-template",
   permissions: { egress: { hosts: [], tlsRequired: true } },
