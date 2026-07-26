@@ -1,96 +1,57 @@
-# Code de conduite de Kurobara
+# Kurobara code of conduct
 
-## Objet
+## Our standard
 
-Kurobara veut offrir un espace de collaboration où les désaccords peuvent être examinés sans intimidation, exclusion ou attaque personnelle. Toute participation au projet implique de respecter cette politique.
+Kurobara should be a place where technical and product disagreements can be
+examined without intimidation, exclusion, or personal attack.
 
-Ce code encadre les comportements communautaires. Il ne modifie pas les droits accordés par la licence du logiciel, ne crée pas un service de support et ne remplace pas la [gouvernance](./GOVERNANCE.md).
+Expected behavior includes:
 
-## Portée
+- discussing evidence, code, and decisions rather than demeaning people;
+- giving specific, actionable, and proportionate feedback;
+- welcoming good-faith questions and explaining implicit context;
+- respecting names, pronouns, boundaries, and accessibility needs;
+- protecting confidential information and personal data;
+- disclosing relevant conflicts of interest;
+- acknowledging mistakes and repairing their impact.
 
-Cette politique s'applique :
+Firm criticism is welcome when it addresses the work, explains its reasoning,
+and leaves room for a response.
 
-- aux contributions, revues et échanges associés au projet ;
-- aux espaces communautaires que Kurobara désigne explicitement ;
-- aux événements organisés au nom du projet ;
-- aux personnes qui représentent Kurobara avec une autorisation explicite.
+## Unacceptable behavior
 
-Elle peut aussi couvrir un comportement extérieur lorsqu'il vise directement un participant en raison de son activité dans le projet ou compromet de manière crédible la sécurité de la communauté.
+- harassment, discrimination, humiliation, threats, or targeted hostility;
+- unwanted sexual attention or imposed sexualized content;
+- insults, personal attacks, stalking, or retaliation;
+- publishing or seeking private information without authorization;
+- impersonation, fabricated evidence, or coordinated manipulation;
+- disclosing a secret or private vulnerability on a public surface;
+- deliberate disruption, spam, or evasion of moderation.
 
-## Comportements attendus
+Technical, political, or strategic disagreement is not itself a violation.
 
-Les participants sont invités à :
+## Scope
 
-- discuter des faits, du code et des décisions plutôt que de dévaloriser les personnes ;
-- accueillir les questions posées de bonne foi et expliquer les connaissances implicites ;
-- donner un feedback précis, actionnable et proportionné au sujet ;
-- reconnaître une erreur, corriger son impact et apprendre de la situation ;
-- respecter les limites, pronoms, noms et besoins d'accessibilité exprimés ;
-- protéger les informations confidentielles et demander l'accord avant de partager le contenu d'autrui ;
-- déclarer les conflits d'intérêts pertinents ;
-- laisser de l'espace aux personnes moins entendues et éviter de monopoliser une décision.
+This policy applies to project contributions, reviews, issues, pull requests,
+and any community space explicitly operated as Kurobara. It may also apply to
+outside behavior that credibly threatens a participant because of their
+project activity.
 
-Une critique ferme reste acceptable lorsqu'elle porte sur le travail, expose ses raisons et laisse une possibilité de réponse.
+## Enforcement
 
-## Comportements interdits
+Maintainers may clarify expectations, remove content, restrict participation,
+remove access, or exclude a participant. Actions should be proportionate to
+impact and recurrence, documented privately, and focused on restoring a safe
+working environment.
 
-Ne sont pas acceptés :
+Reports should be handled by people without a material conflict of interest
+when possible. Public communication must minimize personal information and
+must not expose the reporter.
 
-- harcèlement, discrimination, humiliation ou hostilité ciblée ;
-- menace, intimidation, traque ou incitation à nuire ;
-- attention sexuelle non sollicitée ou contenu sexualisé imposé ;
-- insultes, attaques personnelles et provocations répétées destinées à épuiser un échange ;
-- publication ou recherche de données privées sans autorisation ;
-- usurpation d'identité, falsification de preuves ou manipulation coordonnée d'une décision ;
-- représailles envers une personne qui signale un problème, témoigne ou participe à une revue ;
-- divulgation d'un secret, d'une vulnérabilité ou d'un incident confidentiel dans une surface publique ;
-- perturbation délibérée, spam ou contournement d'une mesure de modération.
+The project does not currently publish a dedicated private conduct-reporting
+channel. Do not post sensitive conduct details publicly. Security
+vulnerabilities use [SECURITY.md](./SECURITY.md); non-sensitive project
+questions use [SUPPORT.md](./SUPPORT.md).
 
-Le désaccord politique, technique ou stratégique n'est pas une infraction en lui-même. Son expression devient contraire à ce code lorsqu'elle adopte un comportement interdit ou empêche durablement les autres de participer.
-
-## Principes d'enforcement
-
-Une décision d'enforcement doit viser la sécurité et la restauration d'un espace de travail viable, pas la punition publique. Elle tient compte des faits disponibles, de l'impact, du contexte, d'éventuelles répétitions et du risque de récidive.
-
-Selon la situation, les mesures possibles comprennent :
-
-- une clarification privée des attentes ;
-- la correction ou le retrait d'un contenu ;
-- une limite temporaire de participation ou de contact ;
-- le retrait d'un rôle ou d'un accès ;
-- l'exclusion durable des espaces contrôlés par le projet.
-
-La mesure retenue doit être proportionnée et consignée de manière confidentielle. Une communication publique éventuelle doit minimiser les données personnelles et ne pas exposer la personne ayant signalé l'incident.
-
-Ce document ne promet aucun délai de réponse, d'enquête, de décision ou d'appel.
-
-## Confidentialité
-
-Un signalement doit être accessible uniquement aux personnes nécessaires à son traitement. Elles collectent le minimum d'information utile, limitent les copies et évitent d'inclure des détails sensibles dans les outils généraux du projet.
-
-La confidentialité ne peut pas être garantie de façon absolue. Une divulgation limitée peut être nécessaire pour évaluer les faits, protéger une personne, respecter une obligation applicable ou permettre à la personne mise en cause de répondre. Dans ce cas, seules les informations nécessaires doivent être partagées.
-
-Un incident de sécurité technique suit séparément [SECURITY.md](./SECURITY.md). Une question ou demande d'aide non sensible peut suivre [SUPPORT.md](./SUPPORT.md).
-
-## Conflits d'intérêts
-
-Une personne chargée d'un signalement déclare tout lien avec les parties ou les faits qui pourrait affecter son impartialité. Elle se récuse lorsqu'une évaluation indépendante n'est pas raisonnablement possible.
-
-Le dispositif d'enforcement doit prévoir une voie d'escalade vers une personne nommée qui n'a pas participé à la décision contestée. Si aucune personne indépendante n'est disponible, cette limite doit être communiquée sans révéler le contenu confidentiel du dossier.
-
-## Appel
-
-Une personne directement concernée par une mesure peut demander une nouvelle revue au moyen du canal privé vérifié, lorsqu'il existe. L'appel indique l'erreur factuelle, procédurale ou de proportionnalité alléguée ; il ne sert pas à répéter un comportement interdit ni à contacter la personne ayant signalé l'incident.
-
-La revue d'appel doit être menée, lorsque cela est possible, par une personne non impliquée dans la décision initiale. Elle peut confirmer, modifier ou annuler la mesure. Aucun résultat ni calendrier n'est garanti.
-
-## Statut pré-release
-
-Le projet n'annonce pas encore de canal privé de signalement du comportement ni d'équipe d'enforcement opérationnelle. Ne publiez pas de détail confidentiel en attendant qu'un moyen vérifié soit indiqué dans les fichiers publics du dépôt.
-
-L'ouverture communautaire reste conditionnée à deux preuves :
-
-1. un canal privé, contrôlé et testé est annoncé publiquement ;
-2. les responsables et la voie d'escalade sont nommés avec leur consentement dans [MAINTAINERS.md](./MAINTAINERS.md).
-
-La présence de ce code de conduite ne prouve pas que ces conditions sont remplies. Le [guide de contribution](./CONTRIBUTING.md) s'appliquera avec cette politique lorsque la participation publique sera ouverte.
+This policy does not create an SLA, investigation deadline, appeal guarantee,
+or support service.

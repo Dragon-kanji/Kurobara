@@ -1,123 +1,118 @@
-# Règles de travail du dépôt Kurobara
+# Kurobara repository instructions
 
-## Partir du résultat demandé
+## Start from the requested outcome
 
-Chaque intervention commence par le résultat du ticket, son périmètre et ses contraintes. Inspectez les fichiers concernés et l'état réel du dépôt avant de proposer ou d'appliquer un changement.
+Inspect the relevant files, repository state, and real behavior before changing
+anything. Treat scope restrictions as boundaries:
 
-Une instruction restrictive est une frontière, pas une préférence :
+- `docs-only` changes no code, configuration, or generated artifact;
+- `no-code` changes only explicitly allowed non-executable files;
+- read-only work creates no local or external mutation;
+- no publication means no push, release, or deployment.
 
-- un ticket `docs-only` ne modifie ni code, ni configuration, ni artifact généré ;
-- un ticket `no-code` peut modifier uniquement les fichiers non exécutables explicitement autorisés ;
-- une revue en lecture seule ne produit aucune écriture locale ou externe ;
-- une liste de fichiers autorisés est exhaustive ;
-- une demande sans publication n'autorise ni push, ni release, ni déploiement.
+Do not expand a task to fix unrelated problems. Report them separately.
 
-N'élargissez pas le ticket pour corriger un problème voisin. Signalez-le séparément avec son impact et sa preuve.
+## Separate current behavior from direction
 
-## Distinguer cible et réalité
+Use this evidence order:
 
-Les ADR et [l'architecture V1](./docs/architecture/v1-oss-agentic.md) définissent la direction du produit. Ils sont normatifs pour les nouvelles décisions, mais ne prouvent pas que leur contenu est déjà implémenté.
+1. tracked code and manifests;
+2. checks that were actually run;
+3. observed runtime behavior;
+4. built artifact contents;
+5. documentation for decisions and stated limits.
 
-Pour établir la réalité actuelle, utilisez dans cet ordre les surfaces pertinentes :
+Never announce a documented route, package, plan, or diagram as implemented
+without runtime or test evidence. Use `planned`, `unverified`, or `unavailable`
+when that is the honest state.
 
-1. le code et les manifests suivis ;
-2. les tests et commandes réellement exécutés ;
-3. le comportement observé dans le runtime ou l'interface ;
-4. les artifacts construits et leur contenu ;
-5. la documentation, uniquement pour les décisions et limites qu'elle décrit explicitement.
+## Preserve architecture boundaries
 
-Ne transformez jamais une route documentée, un package nommé, une cible de backlog ou un diagramme en fonctionnalité annoncée. Lorsque la preuve manque, écrivez `cible`, `prévu`, `non vérifié` ou `indisponible`, selon le cas.
+- The kernel performs no I/O and imports no framework, provider, or adapter.
+- Use cases and policies live in the application layer.
+- PostgreSQL owns durable business state; Hatchet is an execution mechanism.
+- External effects model idempotency, cost, ambiguity, and reconciliation.
+- Public contracts come from one canonical, versioned source.
+- REST, SDK, and CLI project the same logic.
+- Adapters implement ports and do not leak provider semantics into the domain.
+- Agent authority is bounded by permission, budget, deadline, and stop rules.
+- A managed service may consume the public core; the public core never depends
+  on it.
 
-## Respecter les frontières d'architecture
+Open a design proposal before changing a public contract, security guarantee,
+layer boundary, persistence model, provider admission rule, or another
+expensive-to-reverse decision.
 
-Tout nouveau code doit rester compatible avec les décisions d'architecture applicables :
+## Write focused changes
 
-- le kernel ne réalise pas d'I/O et n'importe aucun framework, provider ou adapter ;
-- les use cases et policies résident dans la couche application, pas dans les clients ;
-- PostgreSQL porte l'état métier durable ; l'orchestrateur reste un mécanisme interne ;
-- les effets externes prévoient idempotence, résultat ambigu, réconciliation et coût ;
-- les contrats publics sont versionnés à partir d'une source canonique ;
-- REST, SDK TypeScript, CLI et MCP exposent la même logique au lieu de la dupliquer ;
-- les adapters implémentent des ports et ne contaminent pas le domaine ;
-- l'autorité d'un agent est bornée par permissions, budget, deadline et conditions d'arrêt ;
-- le service managé peut consommer le cœur public, jamais l'inverse.
+- Prefer explicit types and `unknown` over unsafe assertions or `any`.
+- Validate external and generated data at the receiving boundary.
+- Keep side effects visible and errors descriptive.
+- Do not hand-edit generated output to hide contract drift.
+- Remove debug code and temporary bypasses before review.
+- Add tests proportional to business, compatibility, and failure risk.
 
-Une proposition qui change une frontière, un contrat public, une garantie de compatibilité ou une décision coûteuse à inverser suit le [processus RFC](./docs/rfcs/README.md).
+## Write verifiable documentation
 
-## Produire des changements focalisés
+- Keep public documentation in English.
+- Separate current behavior, design direction, and release conditions.
+- Publish only commands present in tracked manifests.
+- Use synthetic examples without secrets or plausible personal identities.
+- State when a command can spend provider credits.
+- Verify every modified local link.
+- Do not invent support channels, SLAs, hosted services, or compatibility
+  guarantees.
 
-- Préférez des types explicites aux assertions risquées et `unknown` à `any` lorsque la donnée n'est pas qualifiée.
-- Validez les entrées à la frontière qui les reçoit ; ne faites pas confiance à un payload externe ou généré.
-- Gardez les fonctions courtes, les erreurs descriptives et les effets de bord visibles.
-- Utilisez les composants et éléments HTML adaptés à leur fonction, avec clavier, labels et états accessibles.
-- Évitez les exports globaux par barrel lorsque des imports précis suffisent.
-- Retirez logs de debug, valeurs temporaires et chemins de contournement avant le handoff.
-- Ajoutez des tests proportionnés au risque métier, à la compatibilité et aux scénarios d'échec.
+## Protect existing work
 
-Une génération de contrats doit partir de la source approuvée. Ne corrigez pas manuellement un output généré pour masquer un drift.
+Inspect `git status` before editing. Existing changes belong to the user unless
+their origin is known.
 
-## Écrire une documentation vérifiable
+- Do not restore, delete, or reformat out-of-scope files.
+- Do not hide a dirty worktree.
+- Re-read overlapping diffs and stop when concurrent intent is incompatible.
+- Prefer reversible operations and explicit paths.
 
-La documentation décrit séparément :
+## Security and provenance
 
-- ce qui fonctionne sur la révision actuelle ;
-- ce qui constitue une décision de conception ;
-- ce qui reste une condition de release ou une question ouverte.
+- Never commit secrets, real `.env` files, dumps, sensitive logs, or personal
+  data.
+- Redact diagnostics before placing them in documentation or issues.
+- DCO sign-off does not replace license or provenance review.
+- Verify dependency, asset, fixture, and generated-content obligations.
+- Follow [SECURITY.md](./SECURITY.md) for non-public vulnerabilities.
 
-Les commandes publiées doivent avoir été lues dans les manifests et, lorsque le ticket le permet, exécutées. Un exemple utilise des données synthétiques et ne contient ni identité plausible, ni secret, ni endpoint privé. Vérifiez chaque lien local modifié.
+## Commands
 
-Ne créez pas par le texte un canal de support, un SLA, une équipe, un bot, une protection de branche, une version supportée ou une politique hébergée. Ces éléments ne deviennent documentables qu'après un readback de leur état réel.
+The root manifest pins npm `10.9.4` and Node.js `24.14.0`.
 
-## Protéger le travail existant
+| Need | Command |
+| --- | --- |
+| Install | `npm ci` |
+| Production dependency audit | `npm run security:audit` |
+| Full dependency audit | `npm run security:audit:all` |
+| Lint and architecture checks | `npm run check` |
+| Typecheck | `npm run typecheck` |
+| Build | `npm run build` |
+| Test | `npm test` |
+| Plugin packaging | `npm run test:plugin-packaging` |
+| Regenerate contracts | `npm run generate:contracts` |
+| Build or verify clean-room output | `npm run clean-room -- <command>` |
+| Run deterministic self-host smoke | `npm run self-host:smoke` |
 
-Inspectez `git status` avant toute modification. Les changements déjà présents appartiennent à l'utilisateur ou à un autre travail tant que leur origine n'est pas établie.
+Choose the smallest set that covers the change. Documentation-only work must at
+least verify local links, forbidden content, `git diff --check`, and the final
+clean-room candidate when publication is in scope.
 
-- Ne supprimez, ne restaurez et ne reformatez pas un fichier hors périmètre.
-- Ne masquez pas un worktree sale pour obtenir un diff artificiellement propre.
-- En cas de modification concurrente d'un fichier autorisé, relisez le diff et intégrez sans écraser l'autre travail ; arrêtez-vous si les intentions sont incompatibles.
-- Utilisez des opérations réversibles et des chemins explicites.
+## Git closeout
 
-## Sécurité, secrets et provenance
+Before handoff:
 
-- Ne committez jamais de secret, token, credential, fichier `.env` réel, dump, log sensible ou donnée personnelle.
-- Les exemples de configuration utilisent des valeurs manifestement factices.
-- Redactez les sorties de diagnostic avant de les placer dans un document ou un ticket.
-- Un sign-off DCO ne remplace pas la preuve de provenance, de licence ou de droit de publication.
-- Vérifiez les obligations des dépendances, assets, fixtures et contenus générés destinés à une distribution.
-- Une vulnérabilité non publique suit [SECURITY.md](./SECURITY.md) et ne doit pas être détaillée dans une surface publique.
+1. inspect the branch, status, and complete diff;
+2. run `git diff --check`;
+3. remove only task-created disposable artifacts;
+4. check for secrets, debug code, generated drift, and unrelated files;
+5. report checks, results, and unverified areas.
 
-## Commandes disponibles
-
-Le manifest racine épingle `npm@10.9.4` et déclare les commandes suivantes. Leur présence ne signifie pas que la baseline est verte ; consignez le code de sortie et les diagnostics pertinents.
-
-| Besoin | Commande | Remarque |
-| --- | --- | --- |
-| Installer le graphe verrouillé | `npm ci` | Utiliser le lockfile suivi ; peut modifier `node_modules`, jamais les sources. |
-| Auditer les dépendances de production | `npm run security:audit` | Interroge la base d'advisories npm depuis le lockfile et échoue dès le niveau `info` ; ne masque aucun finding. |
-| Lint et format check | `npm run check` | Lance Ultracite en lecture de diagnostic. |
-| Typecheck des workspaces | `npm run typecheck` | Exécute les scripts disponibles avec `--if-present`. |
-| Build des workspaces | `npm run build` | Exécute les builds disponibles avec `--if-present`. |
-| Qualifier le packaging et la conformité plugin | `npm run test:plugin-packaging` | Construit les tarballs locales, installe leur fermeture offline, exerce un plugin externe via le host local et vérifie le rapport machine-readable du template. |
-| Régénérer les contrats | `npm run generate:contracts` | Seulement lorsque la source canonique et le ticket l'exigent. |
-| Construire ou vérifier un export clean-room | `npm run clean-room -- <commande>` | Outil source/opérateur : il refuse l'écrasement, exige une destination absolue et ne pousse rien. |
-| Corriger avec Ultracite | `npm run fix` | Commande mutante ; limiter son effet aux fichiers autorisés puis relire le diff. |
-| Démarrer l'API locale V1 | `npm run start:api` | Exige une configuration PostgreSQL explicite ; écoute loopback par défaut. |
-| Importer un dataset par la CLI locale | `npm run kurobara -- dataset import --metadata <fichier> --source <fichier-ou-tiret>` | Exige l'API locale, `KUROBARA_API_KEY` ou `--api-key-file` et une metadata conforme. |
-| Suivre une application de recette | `npm run kurobara -- recipe watch --application-id <id> --timeout-ms <ms>` | Polling HTTP borné ; `0` effectue une lecture ponctuelle, sans accès direct à PostgreSQL. |
-| Démarrer le worker V1 | `npm run start:worker` | Exige PostgreSQL et Hatchet explicitement configurés. |
-
-Choisissez le plus petit ensemble de checks qui couvre le changement. Pour un lot documentaire, vérifiez au minimum les liens locaux, le contenu interdit et `git diff --check`. Pour du code, ajoutez typecheck, tests, build ou smoke test selon la surface touchée.
-
-Si un check échoue hors périmètre ou sur une dette préexistante, ne la corrigez pas silencieusement. Rapportez la commande, le résultat et la séparation entre régression du ticket et état antérieur.
-
-## Clôture Git
-
-Avant le handoff :
-
-1. relisez le diff complet des fichiers autorisés ;
-2. lancez `git diff --check` ;
-3. confirmez que le statut ne contient aucun artifact accidentel, secret ou fichier hors scope créé par le ticket ;
-4. indiquez les checks exécutés, leurs résultats et toute zone non vérifiée ;
-5. distinguez vos changements des modifications concurrentes laissées intactes.
-
-Stagez ou committez uniquement lorsque le ticket l'autorise. Un commit local n'autorise pas un push. Aucun push, changement GitHub, publication, release ou déploiement ne doit être effectué sans demande explicite.
+Commit only intended files when repository policy permits. A local commit does
+not authorize a push, release, or deployment.
