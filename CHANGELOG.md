@@ -6,6 +6,16 @@ partir de sa première publication.
 
 ## [Unreleased]
 
+## [0.1.0-rc.4] - 2026-07-26
+
+### Fixed
+
+- Le gate recrée son `HOME` candidat dédié après `npm ci --ignore-scripts`.
+  Les caches npm et Corepack restent isolés séparément, tandis que les
+  métadonnées d'émulation antérieures ne contaminent plus le fixture V1. Seul
+  le cache `.cache/rosetta` recréé au démarrage du processus qualifié est
+  admis sous émulation ; le `HOME` reste vide sur un hôte natif.
+
 ## [0.1.0-rc.3] - 2026-07-26
 
 ### Fixed

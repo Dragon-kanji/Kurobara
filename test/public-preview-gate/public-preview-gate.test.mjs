@@ -5,6 +5,7 @@ import {
   chmod,
   mkdir,
   mkdtemp,
+  readdir,
   readFile,
   rm,
   writeFile,
@@ -19,11 +20,12 @@ import {
   PUBLIC_PREVIEW_CONTAINER_PLATFORM,
   PublicPreviewGateError,
   parseArguments,
+  resetChildHome,
   runPublicPreviewGate,
   validateDownloadUrl,
 } from "../../scripts/public-preview-gate.mjs";
 
-const TAG = "v0.1.0-rc.3";
+const TAG = "v0.1.0-rc.4";
 const REPOSITORY_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../.."
@@ -103,9 +105,25 @@ const npmConfigurations = await Promise.all([
 if (npmConfigurations.some((contents) => contents !== "")) {
   process.exit(24);
 }
-const homeEntries = await readdir(process.env.HOME);
-if (homeEntries.length !== 0) {
+const homeEntries = await readdir(process.env.HOME, { withFileTypes: true });
+if (
+  homeEntries.length > 1 ||
+  (homeEntries.length === 1 &&
+    (homeEntries[0].name !== ".cache" || !homeEntries[0].isDirectory()))
+) {
   process.exit(23);
+}
+if (homeEntries.length === 1) {
+  const cacheEntries = await readdir(path.join(process.env.HOME, ".cache"), {
+    withFileTypes: true,
+  });
+  if (
+    cacheEntries.length !== 1 ||
+    cacheEntries[0].name !== "rosetta" ||
+    !cacheEntries[0].isDirectory()
+  ) {
+    process.exit(23);
+  }
 }
 await writeFile(path.join(process.env.HOME, ".preview-pass-used"), "", {
   flag: "wx",
@@ -501,6 +519,23 @@ test("accepts signed HTTPS queries only after an artifact redirect", () => {
   }
 });
 
+test("resets package-manager metadata from the dedicated child home", async () => {
+  const passRoot = await mkdtemp(
+    path.join(tmpdir(), "kurobara-public-preview-home-")
+  );
+  try {
+    const homeDirectory = path.join(passRoot, "home");
+    await mkdir(path.join(homeDirectory, ".cache"), { recursive: true });
+    await writeFile(path.join(homeDirectory, ".cache", "metadata"), "");
+
+    await resetChildHome(homeDirectory, passRoot, {}, undefined);
+
+    assert.deepEqual(await readdir(homeDirectory), []);
+  } finally {
+    await rm(passRoot, { force: true, recursive: true });
+  }
+});
+
 test("the local harness runs two fresh passes with a fail-closed child environment", async () => {
   await withFixture(async (fixture) => {
     const reportDirectory = path.join(fixture.root, "reports");
@@ -549,7 +584,7 @@ test("the local harness runs two fresh passes with a fail-closed child environme
         child_environment: "allowlisted",
         credential_helper: "disabled",
         git_configuration: "isolated",
-        home: "fresh-empty",
+        home: "fresh-runtime-cache-only",
         interactive_prompt: false,
         node_options: "cleared",
         npm_configuration: "isolated",

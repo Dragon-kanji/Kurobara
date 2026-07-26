@@ -430,6 +430,73 @@ async function runCommand(command, arguments_, options) {
   });
 }
 
+export async function resetChildHome(
+  homeDirectory,
+  passRoot,
+  environment,
+  identity
+) {
+  if (homeDirectory !== path.join(passRoot, "home")) {
+    fail(
+      "child-home-reset-invalid",
+      "The child home reset target is outside the fresh pass boundary."
+    );
+  }
+  const metadata = await lstat(homeDirectory).catch(() => undefined);
+  if (
+    metadata === undefined ||
+    !metadata.isDirectory() ||
+    metadata.isSymbolicLink()
+  ) {
+    fail(
+      "child-home-reset-invalid",
+      "The child home reset target is not a regular directory."
+    );
+  }
+  if (identity === undefined) {
+    await rm(homeDirectory, { force: false, recursive: true });
+    await mkdir(homeDirectory, { mode: 0o700 });
+  } else {
+    await runCommand(
+      process.execPath,
+      [
+        "-e",
+        `
+const fs = require("node:fs");
+const homeDirectory = process.argv[1];
+const metadata = fs.lstatSync(homeDirectory);
+if (!metadata.isDirectory() || metadata.isSymbolicLink()) {
+  process.exit(71);
+}
+fs.rmSync(homeDirectory, { force: false, recursive: true });
+fs.mkdirSync(homeDirectory, { mode: 0o700 });
+`,
+        homeDirectory,
+      ],
+      {
+        cwd: passRoot,
+        environment,
+        failureCode: "child-home-reset-failed",
+        identity,
+        label: "Child home reset",
+        timeoutCode: "child-home-reset-timeout",
+        timeoutMs: 30_000,
+      }
+    );
+  }
+  const resetMetadata = await lstat(homeDirectory).catch(() => undefined);
+  if (
+    resetMetadata === undefined ||
+    !resetMetadata.isDirectory() ||
+    resetMetadata.isSymbolicLink()
+  ) {
+    fail(
+      "child-home-reset-invalid",
+      "The child home reset did not create a regular directory."
+    );
+  }
+}
+
 async function git(
   repositoryRoot,
   arguments_,
@@ -992,6 +1059,7 @@ async function runSafeFixture(cloneDirectory, passRoot, environment, identity) {
     timeoutCode: "locked-install-timeout",
     timeoutMs: INSTALL_TIMEOUT_MS,
   });
+  await resetChildHome(environment.HOME, passRoot, environment, identity);
   const fixtureReportPath = path.join(passRoot, "fixture-report.json");
   await runCommand(
     process.execPath,
@@ -1124,7 +1192,7 @@ function credentialContract() {
     child_environment: "allowlisted",
     credential_helper: "disabled",
     git_configuration: "isolated",
-    home: "fresh-empty",
+    home: "fresh-runtime-cache-only",
     interactive_prompt: false,
     node_options: "cleared",
     npm_configuration: "isolated",
