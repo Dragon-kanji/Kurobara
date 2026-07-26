@@ -6,6 +6,15 @@ partir de sa première publication.
 
 ## [Unreleased]
 
+## [0.1.0-rc.5] - 2026-07-26
+
+### Fixed
+
+- Le test dogfood de fermeture d'un groupe de processus conserve une borne de
+  cinq secondes après `SIGKILL`. Cette marge couvre le délai de récollection
+  observé sous émulation `linux/amd64` sans modifier les délais du runtime
+  produit.
+
 ## [0.1.0-rc.4] - 2026-07-26
 
 ### Fixed
