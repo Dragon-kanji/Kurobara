@@ -13,6 +13,7 @@ if (dogfoodTestHelpers === undefined) {
   throw new Error("Dogfood test helpers were not enabled.");
 }
 const CONSTRUCTION_FAILURE_PATTERN = /synthetic state write failure/u;
+const EMULATED_PROCESS_GROUP_SETTLEMENT_GRACE_MS = 5000;
 const temporaryDirectories = [];
 const services = [];
 
@@ -37,7 +38,7 @@ after(async () => {
     services.splice(0).map((service) =>
       dogfoodTestHelpers
         .stopService(service, {
-          forceSettlementGraceMs: 1000,
+          forceSettlementGraceMs: EMULATED_PROCESS_GROUP_SETTLEMENT_GRACE_MS,
           terminationGraceMs: 50,
         })
         .catch(() => undefined)
@@ -195,7 +196,7 @@ test("stops a whole service group when a ready descendant ignores SIGTERM", asyn
   assert.equal(dogfoodTestHelpers.processGroupExists(processGroupId), true);
 
   await dogfoodTestHelpers.stopService(service, {
-    forceSettlementGraceMs: 1000,
+    forceSettlementGraceMs: EMULATED_PROCESS_GROUP_SETTLEMENT_GRACE_MS,
     terminationGraceMs: 50,
   });
 
