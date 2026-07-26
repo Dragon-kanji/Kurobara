@@ -8,7 +8,7 @@ la stack Compose, la preuve déterministe, le bootstrap, la CLI, le
 backup/restore et la construction des artifacts locaux.
 Le [gate de preview publique](./development/public-preview-gate.md) documente
 séparément les deux clones anonymes et la vérification des artifacts du tag
-`v0.1.0-rc.1`. Son outil ne publie rien et ses reçus restent des preuves
+`v0.1.0-rc.2`. Son outil ne publie rien et ses reçus restent des preuves
 opérateur distinctes du code.
 
 ## Comprendre la cible

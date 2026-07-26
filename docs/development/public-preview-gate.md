@@ -84,11 +84,11 @@ Le manifest JSON est strict :
 {
   "format_version": "1.0.0",
   "commit": "0123456789abcdef0123456789abcdef01234567",
-  "tag": "v0.1.0-rc.1",
+  "tag": "v0.1.0-rc.2",
   "artifacts": [
     {
-      "name": "kurobara-v0.1.0-rc.1-source.tar.gz",
-      "url": "https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.1/kurobara-v0.1.0-rc.1-source.tar.gz",
+      "name": "kurobara-v0.1.0-rc.2-source.tar.gz",
+      "url": "https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.2/kurobara-v0.1.0-rc.2-source.tar.gz",
       "size_bytes": 123456,
       "sha256": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
     }
@@ -119,8 +119,8 @@ La commande suivante ne devient légitime qu'après :
 bash scripts/public-preview-gate.sh \
   --repository-url https://github.com/Dragon-kanji/Kurobara.git \
   --expected-commit 0123456789abcdef0123456789abcdef01234567 \
-  --expected-tag v0.1.0-rc.1 \
-  --artifacts-manifest-url https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.1/artifacts-manifest.json \
+  --expected-tag v0.1.0-rc.2 \
+  --artifacts-manifest-url https://github.com/Dragon-kanji/Kurobara/releases/download/v0.1.0-rc.2/artifacts-manifest.json \
   --expected-artifacts-manifest-sha256 sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef \
   --passes 2 \
   --report-dir /absolute/new/path/kurobara-public-preview

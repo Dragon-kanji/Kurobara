@@ -19,9 +19,10 @@ import {
   PublicPreviewGateError,
   parseArguments,
   runPublicPreviewGate,
+  validateDownloadUrl,
 } from "../../scripts/public-preview-gate.mjs";
 
-const TAG = "v0.1.0-rc.1";
+const TAG = "v0.1.0-rc.2";
 const REPOSITORY_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../.."
@@ -475,6 +476,28 @@ test("rejects credentials encoded as download URL components", async () => {
       code: "artifact-url-invalid",
     });
   });
+});
+
+test("accepts signed HTTPS queries only after an artifact redirect", () => {
+  assert.equal(
+    validateDownloadUrl(
+      "https://release-assets.githubusercontent.com/source.tar.gz?sig=synthetic",
+      false,
+      "artifact-redirect-invalid",
+      true
+    ).href,
+    "https://release-assets.githubusercontent.com/source.tar.gz?sig=synthetic"
+  );
+  for (const url of [
+    "https://release-assets.githubusercontent.com/source.tar.gz#fragment",
+    "https://fixture:credential@example.invalid/source.tar.gz?sig=synthetic",
+    "http://release-assets.githubusercontent.com/source.tar.gz?sig=synthetic",
+  ]) {
+    assert.throws(
+      () => validateDownloadUrl(url, false, "artifact-redirect-invalid", true),
+      { code: "artifact-redirect-invalid" }
+    );
+  }
 });
 
 test("the local harness runs two fresh passes with a fail-closed child environment", async () => {
