@@ -1,101 +1,91 @@
-# Contribuer à Kurobara
+# Contributing to Kurobara
 
-Ce guide décrit comment préparer une contribution vérifiable au projet. Il complète la [gouvernance](./GOVERNANCE.md), le [processus RFC](./docs/rfcs/README.md) et le [code de conduite](./CODE_OF_CONDUCT.md).
+Thank you for helping improve Kurobara. Keep changes focused, verifiable, and
+safe for a headless system that can spend provider credits and process contact
+data.
 
-## Choisir le bon périmètre
+## Before you start
 
-Une contribution ordinaire doit poursuivre un résultat précis et rester aussi petite que possible. Évitez d'y mêler un renommage général, un reformatage ou un refactoring sans rapport.
+Use a normal pull request for a local fix, documentation improvement, test, or
+refactor that preserves public behavior.
 
-Commencez par un RFC lorsque la proposition :
+Open a design proposal first when a change:
 
-- crée ou casse un contrat public ;
-- traverse plusieurs sous-systèmes ;
-- modifie une garantie de sécurité, de données ou de compatibilité ;
-- déplace une frontière entre kernel, adapters, applications ou service hébergé ;
-- change la gouvernance, la licence ou le modèle de contribution ;
-- introduit une décision difficile à annuler.
+- creates or breaks a public contract;
+- crosses several subsystems;
+- changes a security, privacy, compatibility, or durability guarantee;
+- moves a kernel, application, adapter, or hosted-service boundary;
+- changes governance, licensing, or contribution policy;
+- is expensive to reverse.
 
-Une correction locale, une clarification ou un refactoring qui préserve les interfaces peut suivre directement ce guide. L'acceptation d'un RFC ne remplace pas l'implémentation, ses tests ou sa documentation.
+Never disclose a vulnerability in an issue or pull request. Follow
+[SECURITY.md](./SECURITY.md).
 
-Une vulnérabilité ou un rapport sensible ne doit pas être exposé dans une proposition publique. Suivez uniquement [SECURITY.md](./SECURITY.md).
+## Development setup
 
-## Préparer le changement
+Requirements:
 
-Travaillez depuis un checkout à jour sur une branche dédiée. Avant de proposer le changement :
+- Node.js `24.14.0`
+- npm `10.9.4`
+- Docker with Compose v2 for integration and self-host checks
 
-1. définissez le comportement attendu et les éléments hors périmètre ;
-2. identifiez les contrats, migrations, données et surfaces de sécurité affectés ;
-3. ajoutez ou adaptez les tests proportionnellement au risque ;
-4. mettez à jour la documentation lorsque le comportement, la configuration, les erreurs ou les limites changent ;
-5. relisez le diff complet et retirez les fichiers accidentels, données sensibles et traces de debug ;
-6. vérifiez que chaque commit reste compréhensible et cohérent avec son message.
-
-Ne soumettez jamais de secret, credential, donnée personnelle inutile, dump, log non expurgé ou fixture dont l'usage n'est pas autorisé.
-
-## Provenance
-
-Vous devez pouvoir expliquer l'origine de tout code, texte, schéma, asset, fixture ou donnée ajouté au dépôt.
-
-- Identifiez les auteurs et les sources externes utilisées.
-- Conservez les mentions, licences et notices exigées par les éléments tiers.
-- Ne copiez pas un exemple, un design ou une implémentation dont les droits de réutilisation ne sont pas établis.
-- Signalez le contenu généré ou assisté par un outil lorsque cette information est nécessaire pour comprendre sa provenance.
-- Pour un fichier régénéré, indiquez la source canonique et le mécanisme de génération.
-- Si un employeur ou un contrat peut détenir les droits, obtenez l'autorisation nécessaire avant la soumission.
-
-La présence d'une dépendance, d'une citation ou d'un lien ne prouve pas à elle seule le droit de redistribuer son contenu.
-
-## Checks disponibles
-
-Le manifest racine expose actuellement les checks suivants :
-
-```bash
+```sh
+npm ci
 npm run check
 npm run typecheck
 npm run build
 ```
 
-Exécutez ceux qui s'appliquent à votre changement et reportez la commande, son résultat et l'environnement utile. Si un check ne peut pas être exécuté, expliquez pourquoi et quelle zone reste non vérifiée.
+Run the smallest relevant tests in addition to these baseline checks. Use
+`npm test` for a broad change.
 
-Lorsqu'un package possède un check plus précis dans son propre manifest, utilisez-le également et reportez-le. N'affirmez pas qu'un test, une image, un déploiement ou une intégration fonctionne sans l'avoir vérifié sur la surface concernée.
+## Change quality
 
-## Commits et sign-off DCO
+- State the intended outcome and non-goals.
+- Keep unrelated formatting and refactors out of the diff.
+- Validate external data at the receiving boundary.
+- Add tests proportional to business and failure risk.
+- Update English documentation when behavior, configuration, or limits change.
+- Use synthetic fixtures with no secrets or plausible personal identities.
+- Review the complete diff for generated drift, debug code, and accidental
+  files.
 
-Kurobara utilise le [Developer Certificate of Origin 1.1](./DCO). Chaque commit proposé doit porter un trailer `Signed-off-by` correspondant à la personne qui effectue la certification. Utilisez l'option Git `-s` ou `--signoff` lors de la création du commit.
+## Provenance
 
-Avant de signer, lisez le DCO et assurez-vous de pouvoir certifier personnellement la provenance et le droit de soumettre la contribution sous la licence indiquée dans le dépôt. N'ajoutez pas le sign-off d'une autre personne sans chaîne de certification valide.
+You must have the right to submit every code, text, asset, fixture, and generated
+artifact in the contribution. Preserve required licenses and notices. Do not
+copy provider output, proprietary examples, or employer-owned work without
+authorization.
 
-Le sign-off DCO :
+## DCO sign-off
 
-- est une certification attachée au commit ;
-- ne transfère pas automatiquement les droits d'auteur au projet ;
-- n'est pas une signature cryptographique ;
-- ne remplace pas la revue des licences et de la provenance.
+Every commit must certify the
+[Developer Certificate of Origin 1.1](./DCO):
 
-Kurobara n'utilise pas de Contributor License Agreement en V1.
+```sh
+git commit --signoff
+```
 
-## Décrire la proposition
+The `Signed-off-by` trailer certifies provenance. It is not a cryptographic
+signature, copyright assignment, or replacement for license review. Kurobara
+does not use a Contributor License Agreement in V1.
 
-Une proposition doit permettre une revue sans deviner son intention. Décrivez :
+## Pull request description
 
-- le problème et le résultat obtenu ;
-- le périmètre et les non-objectifs ;
-- les changements de comportement ou de contrat ;
-- les risques de sécurité, confidentialité, compatibilité, migration et exploitation ;
-- la provenance des éléments nouveaux ou repris ;
-- les tests et checks exécutés, avec leurs résultats ;
-- les vérifications non réalisées et les incertitudes restantes ;
-- les mises à jour de documentation ;
-- les RFC, ADR ou sujets reliés lorsque cela s'applique.
+Include:
 
-Les commits doivent rester focalisés, porter un message descriptif et inclure leur sign-off. Une pull request peut contenir plusieurs commits lorsque leur ordre aide la revue, mais chacun doit rester justifiable et vérifiable.
+- problem and outcome;
+- scope and non-goals;
+- public contract or behavior changes;
+- security, privacy, compatibility, migration, and operational risks;
+- provenance of new third-party material;
+- checks run and their results;
+- unverified areas;
+- documentation changes.
 
-Ce document ne suppose pas l'existence d'un template de pull request, d'un bot DCO, d'un ruleset ou d'un autre contrôle hébergé. Les preuves demandées restent nécessaires même lorsqu'aucune automatisation ne les vérifie.
+Maintainers may ask for a smaller scope, more evidence, or a design proposal.
+Approval does not guarantee a release or support commitment.
 
-## Revue et décision
-
-Les reviewers évaluent le comportement, les contrats, les risques, les preuves et la provenance. Ils peuvent demander une réduction de périmètre, des tests supplémentaires, une mise à jour documentaire ou un RFC.
-
-Les mainteneurs prennent les décisions selon [GOVERNANCE.md](./GOVERNANCE.md). Une revue favorable ne promet ni intégration, ni release, ni support. Aucun délai de première réponse, de décision ou de publication n'est garanti.
-
-Sauf disposition explicitement acceptée avant intégration, les contributions au produit sont destinées à être distribuées sous la [licence Apache 2.0](./LICENSE), conformément à la certification DCO applicable.
+Contributions are intended for distribution under
+[Apache-2.0](./LICENSE), subject to the DCO and applicable third-party
+obligations.

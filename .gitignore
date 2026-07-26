@@ -11,4 +11,5 @@ coverage
 .env
 .env.*
 !.env.example
+.local/
 *.tsbuildinfo
