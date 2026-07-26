@@ -37,7 +37,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
 
   hatchet:
-    # Candidate v0.95.3 adds the server-side idempotency used by SDK 1.26.0.
+    # Candidate v0.95.3 adds the server-side idempotency used by SDK 1.28.0.
     image: ghcr.io/hatchet-dev/hatchet/hatchet-lite-dev:v0.95.3@sha256:059e79e7f5044581cd2394b5b4212b0911642ed5486662c4a637d0bcf028ecdc
     depends_on:
       postgres:

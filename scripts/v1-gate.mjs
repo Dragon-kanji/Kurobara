@@ -1602,8 +1602,33 @@ const liveQualification = async (report, options) => {
       const receipt = await exportApplication(firstExport);
       const bytes = await readFile(firstExport);
       const text = bytes.toString("utf8");
+      let exportedRecords;
+      try {
+        exportedRecords = text
+          .split("\n")
+          .filter(Boolean)
+          .map((line) => JSON.parse(line));
+      } catch {
+        throw new V1GateError(
+          "export-proof-invalid",
+          "The export is not valid JSONL."
+        );
+      }
+      const containsNormalizedPublicResult = exportedRecords.some(
+        (record) =>
+          record !== null &&
+          typeof record === "object" &&
+          Array.isArray(record.values) &&
+          record.values.some(
+            (field) =>
+              field !== null &&
+              typeof field === "object" &&
+              field.field_id === "field_official_website_url" &&
+              field.value === "https://example.com"
+          )
+      );
       if (
-        !text.includes("https://example.com") ||
+        !containsNormalizedPublicResult ||
         [...secrets].some((secret) => text.includes(secret))
       ) {
         throw new V1GateError(

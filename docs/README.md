@@ -8,7 +8,7 @@ la stack Compose, la preuve déterministe, le bootstrap, la CLI, le
 backup/restore et la construction des artifacts locaux.
 Le [gate de preview publique](./development/public-preview-gate.md) documente
 séparément les deux clones anonymes et la vérification des artifacts du tag
-`v0.1.0-rc.5`. Son outil ne publie rien et ses reçus restent des preuves
+`v0.1.0-rc.6`. Son outil ne publie rien et ses reçus restent des preuves
 opérateur distinctes du code.
 
 ## Comprendre la cible
@@ -105,9 +105,10 @@ ni une API hébergée.
 
 - Le [modèle d’autorité agentique](./architecture/agent-authority.md) définit l’enveloppe, la réduction monotone des droits, les budgets, les gates humains et les invariants attendus pour la délégation multi-agent. Il s’agit d’une cible normative, pas d’un contrat ou d’un runtime livré.
 - Les [frontières et hypothèses de sécurité](./architecture/security-boundaries.md) décrivent le graphe V1 réellement présent, ses contrôles démontrés et les inconnues à valider. Ce registre prépare le futur modèle de menace sans se présenter comme une analyse de risques finale.
-- `npm run security:audit` contrôle le graphe de production du lockfile dans la
-  CI. Ce contrôle ponctuel ne qualifie ni les futurs artifacts ni un
-  déploiement.
+- `npm run security:audit` contrôle le graphe de production du lockfile ;
+  `npm run security:audit:all` étend ce contrôle à l'outillage de développement
+  et bloque la CI. Ces contrôles ponctuels ne qualifient ni les futurs
+  artifacts ni un déploiement.
 - La [politique opératoire des données de contact](./policies/contact-data-handling.md) documente classification, décisions fail-closed, rétention et runbook cible. La shortlist Contact reste sans email ni téléphone et conserve sa lineage provider en zone restreinte. Les tombstones sont contrôlés avant et juste avant chaque effet sélectionné, puis avant et pendant l'export ; celui-ci exige `datasets:export` et `contacts:export`. Le registre v2, le TTL dérivé côté serveur, la propagation atomique, le keyring HMAC multi-version, REST/SDK/CLI et un dump/restore sont qualifiés localement. Le retrait d'une ancienne clé, toute future lecture Contact, les droits provider et la publication restent ouverts.
 - Le [preflight de budget et de cardinalité du sourcing](./policies/sourcing-budget-preflight.md) définit les caps explicites et le refus des coûts inconnus. Il est composé dans le runtime paginé avec compteurs, ledger et surfaces publiques company/Contact. Une preuve provider live locale bornée couvre Hunter Discover et le parcours Prospeo principal ; le lifecycle complet de livraison et les gates de release restent séparés et ouverts.
 

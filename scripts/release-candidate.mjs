@@ -930,7 +930,7 @@ const packageRootForInput = async (input, sourceRoot) => {
 };
 
 const componentPurl = (name, version) =>
-  `pkg:npm/${encodeURIComponent(name).replace("%2F", "/")}@${version}`;
+  `pkg:npm/${encodeURIComponent(name).replaceAll("%2F", "/")}@${version}`;
 
 const integrityHash = (integrity) => {
   if (typeof integrity !== "string") {

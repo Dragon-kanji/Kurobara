@@ -1,6 +1,6 @@
 # Fondation exécutable V1
 
-- Statut : **source preview V1 OSS headless `v0.1.0-rc.5`**
+- Statut : **source preview V1 OSS headless `v0.1.0-rc.6`**
 - Baseline initiale qualifiée localement le **2026-07-17**
 - Tranches `plans.quote`, `capabilities.list`, import/apply/watch/export,
   `runs.cancel`, ingress d'orchestration,
@@ -209,7 +209,7 @@ Le socle neuf respecte les frontières du monolithe modulaire :
   Hatchet ; après timeout, exception ou expiration du lease, il effectue
   uniquement un lookup exact. Une issue non prouvée reste en
   `reconciliation_required` et ne déclenche jamais un second start aveugle ;
-- l'adapter Hatchet `1.26.0` et le fake déterministe implémentent le même port.
+- l'adapter Hatchet `1.28.0` et le fake déterministe implémentent le même port.
   Les identifiants et états Hatchet ne traversent ni le kernel, ni les contrats
   publics. Une collision n'est acceptée comme replay qu'après lookup et
   validation de l'identité complète. Le payload enveloppé de `runs.list` est

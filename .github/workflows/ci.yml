@@ -53,8 +53,8 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
 
-      - name: Audit production dependencies
-        run: npm run security:audit
+      - name: Audit the locked dependency graph
+        run: npm run security:audit:all
 
       - name: Verify generated contracts
         run: npm run generate:check -w @kurobara/contracts

@@ -9,6 +9,10 @@ const LINE_BREAKS = /\r?\n/u;
 const SIGN_OFF_CANDIDATE = /^\s*signed-off-by\b/iu;
 const VALID_SIGN_OFF =
   /^Signed-off-by: ([^<>\r\n]+?) <([^<>\s@]+@[^<>\s@]+)>$/u;
+const DEPENDABOT_AUTHOR_NAME = "dependabot[bot]";
+const DEPENDABOT_AUTHOR_EMAIL =
+  "49699333+dependabot[bot]@users.noreply.github.com";
+const DEPENDABOT_SIGN_OFF_EMAIL = ["support", "github.com"].join("@");
 
 export class DcoCheckError extends Error {
   constructor(message) {
@@ -115,14 +119,20 @@ const readCommitMessage = (cwd, commit) => {
   return result.stdout;
 };
 
-const readCommitAuthorEmail = (cwd, commit) => {
+const readCommitAuthor = (cwd, commit) => {
   const result = spawnGit(
-    ["show", "--no-patch", "--format=%ae", commit, "--"],
+    ["show", "--no-patch", "--format=%an%x00%ae", commit, "--"],
     { cwd }
   );
-  const email = result.stdout.trim();
+  const [name, email, ...unexpected] = result.stdout.trim().split("\0");
   if (
     result.status !== 0 ||
+    unexpected.length > 0 ||
+    name === undefined ||
+    name.length === 0 ||
+    name.includes("\n") ||
+    name.includes("\r") ||
+    email === undefined ||
     email.length === 0 ||
     email.includes("\n") ||
     email.includes("\r")
@@ -131,7 +141,7 @@ const readCommitAuthorEmail = (cwd, commit) => {
       `Unable to read the author of commit ${commit.slice(0, 12)}.`
     );
   }
-  return email.toLowerCase();
+  return { email: email.toLowerCase(), name };
 };
 
 const parseTrailers = (cwd, message) => {
@@ -145,7 +155,19 @@ const parseTrailers = (cwd, message) => {
   return result.stdout.split("\n").filter(Boolean);
 };
 
-const validateCommitMessage = (cwd, commit, message, authorEmail) => {
+const isOfficialDependabotSignOff = (author, match) =>
+  author.name === DEPENDABOT_AUTHOR_NAME &&
+  author.email === DEPENDABOT_AUTHOR_EMAIL &&
+  match?.[1] === DEPENDABOT_AUTHOR_NAME &&
+  match[2].toLowerCase() === DEPENDABOT_SIGN_OFF_EMAIL;
+
+const validateCommitMessage = (
+  cwd,
+  commit,
+  message,
+  author,
+  allowDependabot
+) => {
   const candidateLines = message
     .split(LINE_BREAKS)
     .filter((line) => SIGN_OFF_CANDIDATE.test(line));
@@ -171,7 +193,10 @@ const validateCommitMessage = (cwd, commit, message, authorEmail) => {
   }
   const authorSignedOff = parsedSignOffs.some((line) => {
     const match = VALID_SIGN_OFF.exec(line);
-    return match?.[2].toLowerCase() === authorEmail;
+    return (
+      match?.[2].toLowerCase() === author.email ||
+      (allowDependabot && isOfficialDependabotSignOff(author, match))
+    );
   });
   if (!authorSignedOff) {
     throw new DcoCheckError(
@@ -180,7 +205,12 @@ const validateCommitMessage = (cwd, commit, message, authorEmail) => {
   }
 };
 
-export const checkDcoRange = ({ baseRef, cwd = process.cwd(), headRef }) => {
+export const checkDcoRange = ({
+  allowDependabot = false,
+  baseRef,
+  cwd = process.cwd(),
+  headRef,
+}) => {
   const baseCommit = resolveCommit(cwd, "baseRef", baseRef);
   const headCommit = resolveCommit(cwd, "headRef", headRef);
   assertAncestorRange(cwd, baseCommit, headCommit);
@@ -191,7 +221,8 @@ export const checkDcoRange = ({ baseRef, cwd = process.cwd(), headRef }) => {
       cwd,
       commit,
       readCommitMessage(cwd, commit),
-      readCommitAuthorEmail(cwd, commit)
+      readCommitAuthor(cwd, commit),
+      allowDependabot
     );
   }
 
@@ -203,15 +234,21 @@ export const checkDcoRange = ({ baseRef, cwd = process.cwd(), headRef }) => {
 };
 
 const runCli = () => {
-  const [baseRef, headRef, ...unexpected] = process.argv.slice(2);
+  const arguments_ = process.argv.slice(2);
+  const allowDependabot = arguments_[0] === "--allow-dependabot";
+  const [baseRef, headRef, ...unexpected] = allowDependabot
+    ? arguments_.slice(1)
+    : arguments_;
   if (!(baseRef && headRef) || unexpected.length > 0) {
-    console.error("Usage: node scripts/check-dco.mjs <base-ref> <head-ref>");
+    console.error(
+      "Usage: node scripts/check-dco.mjs [--allow-dependabot] <base-ref> <head-ref>"
+    );
     process.exitCode = 2;
     return;
   }
 
   try {
-    const result = checkDcoRange({ baseRef, headRef });
+    const result = checkDcoRange({ allowDependabot, baseRef, headRef });
     console.log(
       `DCO check passed for ${result.checkedCommits.length} commit(s) in ${result.baseCommit.slice(0, 12)}..${result.headCommit.slice(0, 12)}.`
     );

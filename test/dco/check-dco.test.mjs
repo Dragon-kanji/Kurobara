@@ -28,6 +28,13 @@ const PERSISTED_READ_ONLY_CREDENTIAL = /persist-credentials: true/u;
 const PULL_REQUEST_OBJECT_FETCH = /refs\/pull\/\$\{DCO_PR_NUMBER\}\/head:/u;
 const TRUSTED_BASE_CHECKER =
   /git show "\$\{DCO_BASE_SHA\}:scripts\/check-dco\.mjs"/u;
+const TRUSTED_DEPENDABOT_CONDITION =
+  /github\.event\.pull_request\.user\.login == 'dependabot\[bot\]'.*github\.event\.pull_request\.head\.repo\.full_name == github\.repository.*startsWith\(github\.event\.pull_request\.head\.ref, 'dependabot\/'\)/u;
+const TRUSTED_DEPENDABOT_FLAG =
+  /node "\$RUNNER_TEMP\/check-dco\.mjs" --allow-dependabot/u;
+const DEPENDABOT_SIGN_OFF = `dependabot[bot] <${["support", "github.com"].join(
+  "@"
+)}>`;
 
 const git = (repositoryRoot, arguments_, options = {}) =>
   execFileSync("git", ["-C", repositoryRoot, ...arguments_], {
@@ -43,12 +50,30 @@ const git = (repositoryRoot, arguments_, options = {}) =>
     stdio: ["pipe", "pipe", "pipe"],
   }).trim();
 
-const commit = (repositoryRoot, message) => {
-  git(
-    repositoryRoot,
-    ["commit", "--allow-empty", "--no-gpg-sign", "--file=-"],
+const commit = (repositoryRoot, message, identity = {}) => {
+  execFileSync(
+    "git",
+    [
+      "-C",
+      repositoryRoot,
+      "-c",
+      `user.name=${identity.name ?? "Fixture Author"}`,
+      "-c",
+      `user.email=${identity.email ?? "fixture@example.invalid"}`,
+      "commit",
+      "--allow-empty",
+      "--no-gpg-sign",
+      "--file=-",
+    ],
     {
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        GIT_COMMITTER_EMAIL: identity.email ?? "fixture@example.invalid",
+        GIT_COMMITTER_NAME: identity.name ?? "Fixture Author",
+      },
       input: message,
+      stdio: ["pipe", "pipe", "pipe"],
     }
   );
   return git(repositoryRoot, ["rev-parse", "HEAD"]);
@@ -63,13 +88,22 @@ const createRepository = async () => {
   return { base, repositoryRoot, root };
 };
 
-const runCheck = (repositoryRoot, baseRef, headRef) =>
-  spawnSync(process.execPath, [DCO_SCRIPT, baseRef, headRef], {
-    cwd: repositoryRoot,
-    encoding: "utf8",
-    shell: false,
-    stdio: ["ignore", "pipe", "pipe"],
-  });
+const runCheck = (repositoryRoot, baseRef, headRef, options = {}) =>
+  spawnSync(
+    process.execPath,
+    [
+      DCO_SCRIPT,
+      ...(options.allowDependabot ? ["--allow-dependabot"] : []),
+      baseRef,
+      headRef,
+    ],
+    {
+      cwd: repositoryRoot,
+      encoding: "utf8",
+      shell: false,
+      stdio: ["ignore", "pipe", "pipe"],
+    }
+  );
 
 const withRepository = async (run) => {
   const fixture = await createRepository();
@@ -128,6 +162,60 @@ test("rejects a sign-off from an identity other than the commit author", () =>
     );
 
     const result = runCheck(fixture.repositoryRoot, fixture.base, head);
+
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, AUTHOR_SIGN_OFF_FAILURE);
+  }));
+
+test("rejects the standard Dependabot identity pair unless explicitly trusted", () =>
+  withRepository((fixture) => {
+    const head = commit(
+      fixture.repositoryRoot,
+      `Bump dependency\n\nSigned-off-by: ${DEPENDABOT_SIGN_OFF}\n`,
+      {
+        email: "49699333+dependabot[bot]@users.noreply.github.com",
+        name: "dependabot[bot]",
+      }
+    );
+
+    const result = runCheck(fixture.repositoryRoot, fixture.base, head);
+
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, AUTHOR_SIGN_OFF_FAILURE);
+  }));
+
+test("accepts the exact Dependabot identity pair when the trusted caller opts in", () =>
+  withRepository((fixture) => {
+    const head = commit(
+      fixture.repositoryRoot,
+      `Bump dependency\n\nSigned-off-by: ${DEPENDABOT_SIGN_OFF}\n`,
+      {
+        email: "49699333+dependabot[bot]@users.noreply.github.com",
+        name: "dependabot[bot]",
+      }
+    );
+
+    const result = runCheck(fixture.repositoryRoot, fixture.base, head, {
+      allowDependabot: true,
+    });
+
+    assert.equal(result.status, 0, result.stderr);
+  }));
+
+test("rejects a Dependabot lookalike even when the trusted caller opts in", () =>
+  withRepository((fixture) => {
+    const head = commit(
+      fixture.repositoryRoot,
+      `Bump dependency\n\nSigned-off-by: ${DEPENDABOT_SIGN_OFF}\n`,
+      {
+        email: "impostor@example.invalid",
+        name: "dependabot[bot]",
+      }
+    );
+
+    const result = runCheck(fixture.repositoryRoot, fixture.base, head, {
+      allowDependabot: true,
+    });
 
     assert.equal(result.status, 1);
     assert.match(result.stderr, AUTHOR_SIGN_OFF_FAILURE);
@@ -194,4 +282,6 @@ test("keeps fork pull request code out of the trusted workflow", async () => {
   assert.match(workflow, PERSISTED_READ_ONLY_CREDENTIAL);
   assert.match(workflow, PULL_REQUEST_OBJECT_FETCH);
   assert.match(workflow, TRUSTED_BASE_CHECKER);
+  assert.match(workflow, TRUSTED_DEPENDABOT_CONDITION);
+  assert.match(workflow, TRUSTED_DEPENDABOT_FLAG);
 });
