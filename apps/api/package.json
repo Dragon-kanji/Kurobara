@@ -19,7 +19,7 @@
     "@kurobara/adapter-provider-registry": "file:../../packages/adapters/provider-registry",
     "@kurobara/adapter-system": "file:../../packages/adapters/system",
     "@kurobara/application": "file:../../packages/application",
-    "hono": "4.12.30",
+    "hono": "4.12.32",
     "jsonc-parser": "3.3.1"
   }
 }
