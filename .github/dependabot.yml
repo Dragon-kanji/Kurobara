@@ -23,12 +23,18 @@ updates:
           - minor
           - patch
     ignore:
+      - dependency-name: "@biomejs/biome"
+        update-types:
+          - version-update:semver-minor
       - dependency-name: ajv
         update-types:
           - version-update:semver-minor
       - dependency-name: typescript
         update-types:
           - version-update:semver-major
+      - dependency-name: ultracite
+        update-types:
+          - version-update:semver-minor
 
   - package-ecosystem: github-actions
     directory: /
