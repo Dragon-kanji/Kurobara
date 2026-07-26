@@ -14,6 +14,6 @@
   "dependencies": {
     "@kurobara/contracts": "file:../contracts",
     "@noble/hashes": "2.2.0",
-    "ajv": "8.20.0"
+    "ajv": "^8.20.0"
   }
 }

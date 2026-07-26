@@ -27,6 +27,6 @@
   },
   "dependencies": {
     "@kurobara/contracts": "0.1.0",
-    "ajv": "8.20.0"
+    "ajv": "^8.20.0"
   }
 }

@@ -35,6 +35,6 @@
     "@kurobara/contracts": "0.1.0",
     "@kurobara/plugin-host": "0.1.0",
     "@kurobara/plugin-sdk": "0.1.0",
-    "ajv": "8.20.0"
+    "ajv": "^8.20.0"
   }
 }
