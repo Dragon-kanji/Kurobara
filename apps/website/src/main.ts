@@ -34,6 +34,9 @@ const stageControls = document.querySelectorAll<HTMLButtonElement>(
   "[data-stage-control]"
 );
 const stages = document.querySelectorAll<HTMLElement>("[data-stage]");
+const stageStreams = document.querySelectorAll<HTMLElement>(
+  "[data-stream-stage]"
+);
 const stageStatus = document.querySelector<HTMLElement>("[data-stage-status]");
 
 for (const control of stageControls) {
@@ -53,6 +56,13 @@ for (const control of stageControls) {
       stage.classList.toggle(
         "is-active",
         stage.dataset.stage === selectedStage
+      );
+    }
+
+    for (const stream of stageStreams) {
+      stream.classList.toggle(
+        "is-active",
+        stream.dataset.streamStage === selectedStage
       );
     }
 

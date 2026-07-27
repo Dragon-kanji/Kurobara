@@ -208,6 +208,98 @@ button {
   );
 }
 
+.hero-streams {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+}
+
+.data-stream {
+  --stream-left: calc(var(--rail-x) - clamp(17rem, 21vw, 25rem));
+  position: absolute;
+  right: calc(100% - var(--rail-x) - 0.35rem);
+  left: var(--stream-left);
+  height: 1.85rem;
+  overflow: hidden;
+  background-image: radial-gradient(
+    circle,
+    var(--pink) 0 1.25px,
+    transparent 1.7px
+  );
+  background-repeat: repeat-x;
+  background-position: 0 50%;
+  background-size: 12px 8px;
+  opacity: 0.8;
+  mask-image: linear-gradient(to right, transparent 0, #000 13%, #000 100%);
+  transition:
+    opacity 220ms ease,
+    filter 220ms ease;
+  animation: stream-flow 2.8s linear infinite;
+}
+
+.data-stream::before {
+  position: absolute;
+  top: 0.08rem;
+  right: 1.5rem;
+  width: clamp(6rem, 9vw, 10rem);
+  height: 1.7rem;
+  content: "";
+  background-image: radial-gradient(
+    circle,
+    var(--pink) 0 1.5px,
+    transparent 1.9px
+  );
+  background-size: 6px 6px;
+  mask-image: linear-gradient(to right, transparent, #000 32%);
+}
+
+.data-stream::after {
+  position: absolute;
+  top: 0.18rem;
+  right: 0;
+  width: clamp(1.8rem, 2.7vw, 3rem);
+  height: 1.5rem;
+  content: "";
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgb(0 0 0 / 85%) 0 2px,
+      transparent 2px 5px
+    ),
+    var(--pink);
+  border: 1px solid var(--pink);
+}
+
+.data-stream:nth-child(1) {
+  top: 20.7%;
+}
+
+.data-stream:nth-child(2) {
+  --stream-left: calc(var(--rail-x) - clamp(20rem, 23vw, 27rem));
+  top: 33.7%;
+}
+
+.data-stream:nth-child(3) {
+  --stream-left: calc(var(--rail-x) - clamp(18rem, 20vw, 23rem));
+  top: 46.7%;
+}
+
+.data-stream:nth-child(4) {
+  --stream-left: calc(var(--rail-x) - clamp(15rem, 18vw, 21rem));
+  top: 59.7%;
+}
+
+.data-stream:nth-child(5) {
+  --stream-left: calc(var(--rail-x) - clamp(21rem, 25vw, 29rem));
+  top: 72.7%;
+}
+
+.data-stream.is-active {
+  opacity: 1;
+  filter: drop-shadow(0 0 0.2rem rgb(255 0 100 / 45%));
+}
+
 .hero-brand {
   position: relative;
   z-index: 2;
@@ -385,6 +477,163 @@ button {
   transform: rotate(-12deg);
 }
 
+.tech-petals {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  width: 54%;
+  height: 9rem;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.tech-petal,
+.signal-cube,
+.signal-dash {
+  position: absolute;
+  display: block;
+}
+
+.tech-petal {
+  top: var(--petal-y);
+  left: var(--petal-x);
+  width: var(--petal-size);
+  aspect-ratio: 1.25;
+  background:
+    radial-gradient(rgb(0 0 0 / 72%) 0 1px, transparent 1.3px) 0 0 / 4px 4px,
+    var(--pink);
+  clip-path: polygon(8% 4%, 92% 0, 100% 58%, 63% 100%, 0 76%);
+  transform-origin: 50% 60%;
+  rotate: var(--petal-rotate);
+  scale: var(--petal-scale, 1);
+  animation: petal-float var(--petal-speed, 8s) var(--ease-out) infinite;
+  animation-delay: var(--petal-delay, 0s);
+}
+
+.tech-petal::after {
+  position: absolute;
+  inset: 14%;
+  content: "";
+  border: 1px solid rgb(0 0 0 / 48%);
+  clip-path: polygon(8% 4%, 92% 0, 100% 58%, 63% 100%, 0 76%);
+}
+
+.tech-petal-1 {
+  --petal-x: 10%;
+  --petal-y: 42%;
+  --petal-size: 2.1rem;
+  --petal-rotate: -28deg;
+  --petal-delay: -3s;
+}
+
+.tech-petal-2 {
+  --petal-x: 32%;
+  --petal-y: 22%;
+  --petal-size: 3.1rem;
+  --petal-rotate: 12deg;
+  --petal-speed: 10s;
+}
+
+.tech-petal-3 {
+  --petal-x: 58%;
+  --petal-y: 51%;
+  --petal-size: 1.8rem;
+  --petal-rotate: 32deg;
+  --petal-scale: 0.82;
+  --petal-delay: -6s;
+}
+
+.tech-petal-4 {
+  --petal-x: 72%;
+  --petal-y: 27%;
+  --petal-size: 2.35rem;
+  --petal-rotate: -16deg;
+  --petal-speed: 9s;
+  --petal-delay: -2s;
+}
+
+.tech-petal-5 {
+  --petal-x: 87%;
+  --petal-y: 63%;
+  --petal-size: 1.35rem;
+  --petal-rotate: 28deg;
+  --petal-delay: -5s;
+}
+
+.tech-petal-6 {
+  --petal-x: 44%;
+  --petal-y: 76%;
+  --petal-size: 1.15rem;
+  --petal-rotate: 61deg;
+  --petal-speed: 7s;
+}
+
+.signal-cube {
+  width: 1.25rem;
+  aspect-ratio: 1;
+  border: 1px solid var(--pink);
+  rotate: var(--cube-rotate);
+  animation: cube-drift var(--cube-speed, 7s) ease-in-out infinite;
+}
+
+.signal-cube::before {
+  position: absolute;
+  inset: 22%;
+  content: "";
+  border: 1px solid rgb(255 0 100 / 58%);
+}
+
+.signal-cube-1 {
+  --cube-rotate: 14deg;
+  right: 13%;
+  bottom: 0.85rem;
+}
+
+.signal-cube-2 {
+  --cube-rotate: 48deg;
+  --cube-speed: 9s;
+  top: 1.2rem;
+  left: 21%;
+  width: 1.2rem;
+}
+
+.signal-cube-3 {
+  --cube-rotate: -18deg;
+  --cube-speed: 6s;
+  top: 4.2rem;
+  right: 3%;
+  width: 0.7rem;
+}
+
+.signal-dash {
+  width: 4rem;
+  border-top: 1px solid var(--pink);
+  transform-origin: left center;
+}
+
+.signal-dash::after {
+  position: absolute;
+  top: -0.18rem;
+  right: 0;
+  width: 0.35rem;
+  height: 0.35rem;
+  content: "";
+  background: var(--pink);
+}
+
+.signal-dash-1 {
+  top: 1.7rem;
+  left: 7%;
+  transform: rotate(42deg);
+}
+
+.signal-dash-2 {
+  right: 25%;
+  bottom: 1.2rem;
+  transform: rotate(-21deg);
+}
+
 .hero-data {
   position: relative;
   z-index: 1;
@@ -400,6 +649,50 @@ button {
   position: absolute;
   top: 1rem;
   left: 50%;
+}
+
+.hero-scale {
+  position: absolute;
+  top: 1rem;
+  right: 0.75rem;
+  bottom: 1rem;
+  width: 1.4rem;
+  border-right: 1px solid rgb(0 0 0 / 25%);
+}
+
+.hero-scale::before {
+  position: absolute;
+  top: 2.8rem;
+  right: -1px;
+  bottom: 2.5rem;
+  width: 0.55rem;
+  content: "";
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 1.35rem,
+    var(--black) 1.35rem 1.48rem,
+    transparent 1.48rem 2.7rem
+  );
+  opacity: 0.5;
+}
+
+.hero-scale::after {
+  position: absolute;
+  right: -1px;
+  bottom: -1rem;
+  width: 1.25rem;
+  height: 1px;
+  content: "";
+  background: var(--black);
+}
+
+.scale-cube {
+  position: absolute;
+  top: 0;
+  right: -1px;
+  width: 0.7rem;
+  aspect-ratio: 1;
+  border: 1px solid var(--pink);
 }
 
 .stage-list {
@@ -664,6 +957,41 @@ button {
   clip-path: polygon(0 2.5rem, 13% 2.5rem, 15% 0, 100% 0, 100% 100%, 0 100%);
 }
 
+.workflow-frame {
+  position: absolute;
+  top: 1.35rem;
+  right: 4.5rem;
+  left: 14.4%;
+  z-index: 2;
+  height: 1.4rem;
+  pointer-events: none;
+  border-top: 1px solid var(--black);
+}
+
+.workflow-frame::before {
+  position: absolute;
+  top: -1px;
+  left: -3rem;
+  width: 3.2rem;
+  height: 1.35rem;
+  content: "";
+  border-top: 1px solid var(--black);
+  border-left: 1px solid var(--black);
+  transform: skewX(-37deg);
+  transform-origin: right top;
+}
+
+.workflow-frame::after {
+  position: absolute;
+  top: -0.28rem;
+  left: 52%;
+  width: 0.58rem;
+  aspect-ratio: 1;
+  content: "";
+  background: var(--black);
+  rotate: 45deg;
+}
+
 .workflow::after {
   position: absolute;
   top: 0;
@@ -673,6 +1001,32 @@ button {
   content: "";
   background: var(--pink);
   clip-path: polygon(100% 0, 100% 100%, 0 0);
+}
+
+.workflow-corner-cross {
+  position: absolute;
+  top: 1.15rem;
+  right: 1.1rem;
+  z-index: 2;
+  width: 1.8rem;
+  aspect-ratio: 1;
+  color: var(--white);
+  pointer-events: none;
+}
+
+.workflow-corner-cross::before,
+.workflow-corner-cross::after {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  content: "";
+  background: currentcolor;
+}
+
+.workflow-corner-cross::after {
+  rotate: 90deg;
 }
 
 .section-heading {
@@ -1164,6 +1518,39 @@ button {
   }
 }
 
+@keyframes stream-flow {
+  from {
+    background-position: 0 50%;
+  }
+  to {
+    background-position: 24px 50%;
+  }
+}
+
+@keyframes petal-float {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: var(--petal-rotate);
+  }
+  50% {
+    translate: 0 -0.8rem;
+    rotate: calc(var(--petal-rotate) + 7deg);
+  }
+}
+
+@keyframes cube-drift {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: var(--cube-rotate);
+  }
+  50% {
+    translate: 0.35rem -0.5rem;
+    rotate: calc(var(--cube-rotate) - 9deg);
+  }
+}
+
 @media (max-width: 1180px) {
   :root {
     --rail-x: 57%;
@@ -1180,6 +1567,10 @@ button {
 
   .hero-brand {
     padding-right: 4rem;
+  }
+
+  .tech-petals {
+    width: 67%;
   }
 
   .hero-title {
@@ -1290,6 +1681,49 @@ button {
     background: var(--black);
   }
 
+  .hero-streams {
+    top: 54rem;
+    bottom: auto;
+    height: 42rem;
+  }
+
+  .data-stream,
+  .data-stream:nth-child(n) {
+    --stream-left: 2rem;
+    right: auto;
+    width: 8rem;
+  }
+
+  .data-stream:nth-child(1) {
+    top: 7%;
+  }
+
+  .data-stream:nth-child(2) {
+    top: 25%;
+  }
+
+  .data-stream:nth-child(3) {
+    top: 43%;
+  }
+
+  .data-stream:nth-child(4) {
+    top: 61%;
+  }
+
+  .data-stream:nth-child(5) {
+    top: 79%;
+  }
+
+  .data-stream::before {
+    right: 1rem;
+    width: 4.8rem;
+  }
+
+  .data-stream::after {
+    right: 0;
+    width: 1.65rem;
+  }
+
   .hero-brand {
     min-height: 54rem;
     padding: calc(var(--header-height) + 0.7rem) var(--gutter) 3rem;
@@ -1327,6 +1761,18 @@ button {
     left: auto;
     width: 25rem;
     opacity: 0.88;
+  }
+
+  .tech-petals {
+    right: -1rem;
+    bottom: 1rem;
+    left: auto;
+    width: min(34rem, 88%);
+    height: 11.5rem;
+  }
+
+  .hero-scale {
+    display: none;
   }
 
   .hero-data {
@@ -1412,6 +1858,20 @@ button {
     color: var(--white);
     background: var(--black);
     clip-path: none;
+  }
+
+  .workflow-frame {
+    right: 3.75rem;
+    left: 2.6rem;
+    border-color: var(--white);
+  }
+
+  .workflow-frame::before {
+    display: none;
+  }
+
+  .workflow-frame::after {
+    background: var(--white);
   }
 
   .workflow::after {
@@ -1532,6 +1992,10 @@ button {
     min-height: 47.5rem;
   }
 
+  .hero-streams {
+    top: 47.5rem;
+  }
+
   .hero-title {
     font-size: 37vw;
   }
@@ -1553,6 +2017,19 @@ button {
     right: -9rem;
     bottom: 5rem;
     width: 21rem;
+  }
+
+  .tech-petals {
+    right: -3rem;
+    bottom: 1.5rem;
+    width: 26rem;
+    opacity: 0.9;
+  }
+
+  .tech-petal-1,
+  .tech-petal-4,
+  .signal-dash-1 {
+    display: none;
   }
 
   .stage-list {
