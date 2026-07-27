@@ -10,10 +10,15 @@
     >
     <meta name="theme-color" content="#000000">
     <meta name="color-scheme" content="dark light">
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    >
     <link rel="canonical" href="https://kurobara.systems/">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="/site.webmanifest">
     <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
     <meta property="og:site_name" content="Kurobara">
     <meta property="og:title" content="Kurobara — B2B list building for agents">
     <meta
@@ -25,8 +30,13 @@
       property="og:image"
       content="https://kurobara.systems/assets/social/og-kurobara.jpg"
     >
+    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    <meta
+      property="og:image:alt"
+      content="Kurobara — open-source B2B list building for agents"
+    >
     <meta name="twitter:card" content="summary_large_image">
     <meta
       name="twitter:title"
@@ -40,6 +50,57 @@
       name="twitter:image"
       content="https://kurobara.systems/assets/social/og-kurobara.jpg"
     >
+    <meta
+      name="twitter:image:alt"
+      content="Kurobara — open-source B2B list building for agents"
+    >
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://kurobara.systems/#organization",
+            "name": "Kurobara",
+            "url": "https://kurobara.systems/",
+            "logo": "https://kurobara.systems/favicon.svg",
+            "sameAs": ["https://github.com/Dragon-kanji/Kurobara"]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://kurobara.systems/#website",
+            "url": "https://kurobara.systems/",
+            "name": "Kurobara",
+            "description": "Open-source, BYOK infrastructure for agent-driven B2B list building.",
+            "inLanguage": "en",
+            "publisher": {
+              "@id": "https://kurobara.systems/#organization"
+            }
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://kurobara.systems/#software",
+            "name": "Kurobara",
+            "url": "https://kurobara.systems/",
+            "description": "Open-source, BYOK infrastructure for agents to discover companies, enrich contacts, verify work emails, and export structured B2B data.",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Platform independent",
+            "isAccessibleForFree": true,
+            "offers": {
+              "@type": "Offer",
+              "price": 0,
+              "priceCurrency": "USD"
+            },
+            "license": "https://www.apache.org/licenses/LICENSE-2.0",
+            "codeRepository": "https://github.com/Dragon-kanji/Kurobara",
+            "image": "https://kurobara.systems/assets/social/og-kurobara.jpg",
+            "author": {
+              "@id": "https://kurobara.systems/#organization"
+            }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -82,7 +143,12 @@
     <main id="main">
       <section class="hero" id="top" aria-labelledby="hero-title">
         <div class="hero-brand">
-          <h1 id="hero-title" class="hero-title">KUROBARA</h1>
+          <h1 id="hero-title" class="hero-title">
+            KUROBARA
+            <span class="visually-hidden">
+              — open-source B2B list building for agents
+            </span>
+          </h1>
           <div class="hero-message">
             <p class="hero-line">NO SPREADSHEET REQUIRED.</p>
             <p class="hero-line hero-line-accent">
@@ -370,7 +436,7 @@
           </p>
           <a
             class="text-link"
-            href="https://github.com/Dragon-kanji/Kurobara/blob/main/docs/architecture/contract-system.md"
+            href="https://github.com/Dragon-kanji/Kurobara/blob/main/docs/architecture.md"
           >
             Read the contract system
             <svg aria-hidden="true" viewBox="0 0 24 24">
