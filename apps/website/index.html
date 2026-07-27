@@ -142,6 +142,17 @@
 
     <main id="main">
       <section class="hero" id="top" aria-labelledby="hero-title">
+        <div class="hero-streams" aria-hidden="true">
+          <span
+            class="data-stream is-active"
+            data-stream-stage="discover"
+          ></span>
+          <span class="data-stream" data-stream-stage="shortlist"></span>
+          <span class="data-stream" data-stream-stage="enrich"></span>
+          <span class="data-stream" data-stream-stage="verify"></span>
+          <span class="data-stream" data-stream-stage="export"></span>
+        </div>
+
         <div class="hero-brand">
           <h1 id="hero-title" class="hero-title">
             KUROBARA
@@ -184,11 +195,27 @@
             height="1536"
             fetchpriority="high"
           >
+          <div class="tech-petals" aria-hidden="true">
+            <span class="tech-petal tech-petal-1"></span>
+            <span class="tech-petal tech-petal-2"></span>
+            <span class="tech-petal tech-petal-3"></span>
+            <span class="tech-petal tech-petal-4"></span>
+            <span class="tech-petal tech-petal-5"></span>
+            <span class="tech-petal tech-petal-6"></span>
+            <span class="signal-cube signal-cube-1"></span>
+            <span class="signal-cube signal-cube-2"></span>
+            <span class="signal-cube signal-cube-3"></span>
+            <span class="signal-dash signal-dash-1"></span>
+            <span class="signal-dash signal-dash-2"></span>
+          </div>
         </div>
 
         <div class="hero-data">
           <div class="hero-target" aria-hidden="true">
             <span class="crosshair"></span>
+          </div>
+          <div class="hero-scale" aria-hidden="true">
+            <span class="scale-cube"></span>
           </div>
           <div class="stage-list" aria-label="Kurobara workflow">
             <article class="data-stage is-active" data-stage="discover">
@@ -339,6 +366,8 @@
         id="workflow"
         aria-labelledby="workflow-title"
       >
+        <span class="workflow-frame" aria-hidden="true"></span>
+        <span class="workflow-corner-cross" aria-hidden="true"></span>
         <div class="section-heading">
           <h2 id="workflow-title">BUILT FOR AGENTS.<br>DESIGNED FOR SCALE.</h2>
         </div>
