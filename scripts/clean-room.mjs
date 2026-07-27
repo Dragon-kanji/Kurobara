@@ -29,6 +29,19 @@ const GENERATED_PATHS = new Set([
   "packages/contracts/catalog/generated/problem-registry.json",
   "packages/contracts/src/generated/v1.ts",
 ]);
+const APPROVED_BINARY_ASSETS = new Map([
+  [
+    "apps/website/public/assets/kurobara-rose.webp",
+    { format: "webp-vp8", maxBytes: 256 * 1024 },
+  ],
+  [
+    "apps/website/public/assets/social/og-kurobara.jpg",
+    { format: "jpeg", maxBytes: 256 * 1024 },
+  ],
+]);
+const JPEG_ALLOWED_SEGMENT_MARKERS = new Set([
+  0xc0, 0xc2, 0xc4, 0xda, 0xdb, 0xdd, 0xe0,
+]);
 const APACHE_LICENSE_SHA256 =
   "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30";
 const POLICY_FIELD_BREAK_PATTERN = /[\t\r\n]/u;
@@ -257,6 +270,15 @@ function repositoryRelativePath(repositoryRoot, candidate, label) {
 }
 
 function dispositionForPath(candidate) {
+  if (candidate.startsWith("apps/website/design/")) {
+    return {
+      curationOwner: "project-owner",
+      decision: "exclude",
+      licenseReview: "not-applicable-to-candidate",
+      provenance: "generated-source-design-reference",
+      reason: "source-private-design-reference",
+    };
+  }
   if (
     candidate.startsWith("docs/audits/") ||
     candidate.startsWith("docs/legal/") ||
@@ -1106,6 +1128,159 @@ async function inspectCandidateText({ absolute, body, entry, treeRoot }) {
   return counts;
 }
 
+function failBinaryAsset(entry, reason) {
+  fail("invalid-approved-binary-asset", `${entry.path}: ${reason}`);
+}
+
+function inspectWebpAsset(entry, bytes) {
+  if (
+    bytes.length < 30 ||
+    bytes.subarray(0, 4).toString("ascii") !== "RIFF" ||
+    bytes.subarray(8, 12).toString("ascii") !== "WEBP"
+  ) {
+    failBinaryAsset(entry, "invalid WebP signature");
+  }
+  if (bytes.readUInt32LE(4) + 8 !== bytes.length) {
+    failBinaryAsset(entry, "invalid WebP container length");
+  }
+
+  const chunkType = bytes.subarray(12, 16).toString("ascii");
+  const chunkLength = bytes.readUInt32LE(16);
+  const paddedChunkLength = chunkLength + (chunkLength % 2);
+  if (
+    chunkType !== "VP8 " ||
+    chunkLength < 10 ||
+    20 + paddedChunkLength !== bytes.length
+  ) {
+    failBinaryAsset(entry, "expected one metadata-free VP8 chunk");
+  }
+}
+
+function readJpegMarker(entry, bytes, startOffset) {
+  if (bytes[startOffset] !== 0xff) {
+    failBinaryAsset(entry, "invalid JPEG marker boundary");
+  }
+  let offset = startOffset;
+  while (bytes[offset] === 0xff) {
+    offset += 1;
+  }
+  const marker = bytes[offset];
+  offset += 1;
+
+  if (
+    marker === undefined ||
+    marker === 0x00 ||
+    marker === 0xd8 ||
+    marker === 0x01 ||
+    (marker >= 0xd0 && marker <= 0xd7)
+  ) {
+    failBinaryAsset(entry, "unexpected JPEG marker");
+  }
+  return { marker, offset };
+}
+
+function readJpegSegment(entry, bytes, marker, offset) {
+  if (marker === 0xfe || (marker >= 0xe1 && marker <= 0xef)) {
+    failBinaryAsset(entry, "JPEG metadata is not allowed");
+  }
+  if (!JPEG_ALLOWED_SEGMENT_MARKERS.has(marker) || offset + 2 > bytes.length) {
+    failBinaryAsset(entry, "unsupported JPEG segment");
+  }
+
+  const segmentLength = bytes.readUInt16BE(offset);
+  if (segmentLength < 2 || offset + segmentLength > bytes.length) {
+    failBinaryAsset(entry, "invalid JPEG segment length");
+  }
+  const dataStart = offset + 2;
+  if (
+    marker === 0xe0 &&
+    bytes.subarray(dataStart, dataStart + 5).toString("ascii") !== "JFIF\u0000"
+  ) {
+    failBinaryAsset(entry, "unexpected JPEG application segment");
+  }
+  return {
+    isFrame: marker === 0xc0 || marker === 0xc2,
+    isScan: marker === 0xda,
+    offset: offset + segmentLength,
+  };
+}
+
+function findJpegScanBoundary(entry, bytes, startOffset) {
+  let offset = startOffset;
+  while (offset < bytes.length) {
+    if (bytes[offset] !== 0xff) {
+      offset += 1;
+      continue;
+    }
+    const markerStart = offset;
+    while (bytes[offset] === 0xff) {
+      offset += 1;
+    }
+    const marker = bytes[offset];
+    if (
+      marker === 0x00 ||
+      (marker !== undefined && marker >= 0xd0 && marker <= 0xd7)
+    ) {
+      offset += 1;
+      continue;
+    }
+    return markerStart;
+  }
+  failBinaryAsset(entry, "unterminated JPEG scan");
+}
+
+function inspectJpegAsset(entry, bytes) {
+  if (
+    bytes.length < 4 ||
+    bytes[0] !== 0xff ||
+    bytes[1] !== 0xd8 ||
+    bytes.at(-2) !== 0xff ||
+    bytes.at(-1) !== 0xd9
+  ) {
+    failBinaryAsset(entry, "invalid JPEG boundary");
+  }
+
+  let offset = 2;
+  let sawFrame = false;
+  let sawScan = false;
+  while (offset < bytes.length) {
+    const markerResult = readJpegMarker(entry, bytes, offset);
+    offset = markerResult.offset;
+    if (markerResult.marker === 0xd9) {
+      if (offset !== bytes.length || !sawFrame || !sawScan) {
+        failBinaryAsset(entry, "invalid JPEG image termination");
+      }
+      return;
+    }
+
+    const segment = readJpegSegment(entry, bytes, markerResult.marker, offset);
+    sawFrame ||= segment.isFrame;
+    sawScan ||= segment.isScan;
+    offset = segment.isScan
+      ? findJpegScanBoundary(entry, bytes, segment.offset)
+      : segment.offset;
+  }
+  failBinaryAsset(entry, "missing JPEG end marker");
+}
+
+function inspectApprovedBinaryAsset(entry, bytes) {
+  const policy = APPROVED_BINARY_ASSETS.get(entry.path);
+  if (!policy) {
+    return false;
+  }
+  if (bytes.length === 0 || bytes.length > policy.maxBytes) {
+    failBinaryAsset(entry, "asset exceeds its bounded size");
+  }
+  if (policy.format === "webp-vp8") {
+    inspectWebpAsset(entry, bytes);
+  } else if (policy.format === "jpeg") {
+    inspectJpegAsset(entry, bytes);
+  } else {
+    failBinaryAsset(entry, "unsupported approved format");
+  }
+  return true;
+}
+
 export async function scanCandidate({
   destination,
   expectedManifestSha256,
@@ -1130,6 +1305,9 @@ export async function scanCandidate({
     }
     const absolute = path.join(treeRoot, ...entry.path.split("/"));
     const bytes = await readFile(absolute);
+    if (inspectApprovedBinaryAsset(entry, bytes)) {
+      continue;
+    }
     if (bytes.includes(0)) {
       fail("binary-candidate-file", entry.path);
     }

@@ -186,6 +186,19 @@ async function createFixture() {
   };
 }
 
+async function commitPolicyUpdate(fixture, message) {
+  git(fixture.repositoryRoot, ["add", "--all", ".", ":(exclude)untracked.txt"]);
+  await writePolicy({
+    outputPath: "docs/publication/clean-room-policy.tsv",
+    repositoryRoot: fixture.repositoryRoot,
+  });
+  git(fixture.repositoryRoot, [
+    "add",
+    "docs/publication/clean-room-policy.tsv",
+  ]);
+  git(fixture.repositoryRoot, ["commit", "--no-gpg-sign", "-m", message]);
+}
+
 async function materializeGeneratedOutput(destination, repositoryRoot) {
   const relative = "packages/contracts/src/generated/v1.ts";
   const target = path.join(destination, "tree", relative);
@@ -253,6 +266,156 @@ test("verifies regenerated outputs and the public content scan", async () => {
       markdown_file_count: 1,
       package_manifest_count: 1,
     }
+  );
+});
+
+test("admits only the two audited website images and excludes design references", async () => {
+  const fixture = await createFixture();
+  const rosePath = "apps/website/public/assets/kurobara-rose.webp";
+  const socialPath = "apps/website/public/assets/social/og-kurobara.jpg";
+  const designPath = "apps/website/design/desktop-reference.png";
+  for (const candidate of [rosePath, socialPath, designPath]) {
+    await mkdir(path.dirname(path.join(fixture.repositoryRoot, candidate)), {
+      recursive: true,
+    });
+  }
+  const [rose, social] = await Promise.all([
+    readFile(path.join(REPOSITORY_ROOT, rosePath)),
+    readFile(path.join(REPOSITORY_ROOT, socialPath)),
+  ]);
+  await Promise.all([
+    writeFile(path.join(fixture.repositoryRoot, rosePath), rose),
+    writeFile(path.join(fixture.repositoryRoot, socialPath), social),
+    writeFile(
+      path.join(fixture.repositoryRoot, designPath),
+      Buffer.from([0x00, 0x01, 0x02])
+    ),
+  ]);
+  await commitPolicyUpdate(fixture, "add audited website assets");
+
+  const validDestination = path.join(fixture.root, "valid-binary-candidate");
+  const validReceipt = await exportCandidate({
+    ...fixture,
+    destination: validDestination,
+  });
+  await materializeGeneratedOutput(validDestination, fixture.repositoryRoot);
+  assert.deepEqual(
+    await scanCandidate({
+      destination: validDestination,
+      expectedManifestSha256: validReceipt.manifest_sha256,
+    }),
+    {
+      email_count: 1,
+      file_count: 12,
+      markdown_file_count: 1,
+      package_manifest_count: 1,
+    }
+  );
+  await assert.rejects(
+    readFile(path.join(validDestination, "tree", designPath)),
+    { code: "ENOENT" }
+  );
+
+  await writeFile(
+    path.join(fixture.repositoryRoot, rosePath),
+    Buffer.concat([rose, Buffer.from([0x00])])
+  );
+  await commitPolicyUpdate(fixture, "corrupt approved website asset");
+  const corruptDestination = path.join(
+    fixture.root,
+    "corrupt-binary-candidate"
+  );
+  const corruptReceipt = await exportCandidate({
+    ...fixture,
+    destination: corruptDestination,
+  });
+  await materializeGeneratedOutput(corruptDestination, fixture.repositoryRoot);
+  await assert.rejects(
+    scanCandidate({
+      destination: corruptDestination,
+      expectedManifestSha256: corruptReceipt.manifest_sha256,
+    }),
+    (error) =>
+      error instanceof CleanRoomError &&
+      error.code === "invalid-approved-binary-asset"
+  );
+
+  await writeFile(
+    path.join(fixture.repositoryRoot, rosePath),
+    Buffer.alloc(256 * 1024 + 1)
+  );
+  await commitPolicyUpdate(fixture, "oversize approved website asset");
+  const oversizedDestination = path.join(
+    fixture.root,
+    "oversized-binary-candidate"
+  );
+  const oversizedReceipt = await exportCandidate({
+    ...fixture,
+    destination: oversizedDestination,
+  });
+  await materializeGeneratedOutput(
+    oversizedDestination,
+    fixture.repositoryRoot
+  );
+  await assert.rejects(
+    scanCandidate({
+      destination: oversizedDestination,
+      expectedManifestSha256: oversizedReceipt.manifest_sha256,
+    }),
+    (error) =>
+      error instanceof CleanRoomError &&
+      error.code === "invalid-approved-binary-asset"
+  );
+
+  const exifSegment = Buffer.from([
+    0xff, 0xe1, 0x00, 0x08, 0x45, 0x78, 0x69, 0x66, 0x00, 0x00,
+  ]);
+  await Promise.all([
+    writeFile(path.join(fixture.repositoryRoot, rosePath), rose),
+    writeFile(
+      path.join(fixture.repositoryRoot, socialPath),
+      Buffer.concat([social.subarray(0, 2), exifSegment, social.subarray(2)])
+    ),
+  ]);
+  await commitPolicyUpdate(fixture, "add forbidden website metadata");
+  const metadataDestination = path.join(
+    fixture.root,
+    "metadata-binary-candidate"
+  );
+  const metadataReceipt = await exportCandidate({
+    ...fixture,
+    destination: metadataDestination,
+  });
+  await materializeGeneratedOutput(metadataDestination, fixture.repositoryRoot);
+  await assert.rejects(
+    scanCandidate({
+      destination: metadataDestination,
+      expectedManifestSha256: metadataReceipt.manifest_sha256,
+    }),
+    (error) =>
+      error instanceof CleanRoomError &&
+      error.code === "invalid-approved-binary-asset"
+  );
+});
+
+test("keeps unapproved binary files denied by default", async () => {
+  const fixture = await createFixture();
+  await writeFile(
+    path.join(fixture.repositoryRoot, "alpha/unapproved.bin"),
+    Buffer.from([0x00, 0x01, 0x02])
+  );
+  await commitPolicyUpdate(fixture, "add unapproved binary");
+
+  const destination = path.join(fixture.root, "unapproved-binary-candidate");
+  const receipt = await exportCandidate({ ...fixture, destination });
+  await materializeGeneratedOutput(destination, fixture.repositoryRoot);
+  await assert.rejects(
+    scanCandidate({
+      destination,
+      expectedManifestSha256: receipt.manifest_sha256,
+    }),
+    (error) =>
+      error instanceof CleanRoomError && error.code === "binary-candidate-file"
   );
 });
 
