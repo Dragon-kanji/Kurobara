@@ -6,6 +6,11 @@ from its first stable release.
 
 ## [Unreleased]
 
+### Added
+
+- Added the static `kurobara.systems` project website with responsive,
+  agent-focused product framing and a hardened unprivileged container image.
+
 ### Changed
 
 - Replaced the public documentation with a smaller English guide organized for

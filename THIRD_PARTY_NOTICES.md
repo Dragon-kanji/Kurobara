@@ -1,7 +1,17 @@
 # Third-party notices
 
 Kurobara distributions incorporate software developed by Hatchet Technologies
-Inc.
+Inc. The project website also redistributes the font software listed below.
+
+## Website fonts
+
+- Bebas Neue: Copyright 2019 The Bebas Neue Project Authors.
+- IBM Plex Mono: Copyright 2017 IBM Corp. All rights reserved.
+
+Both fonts are distributed under the SIL Open Font License 1.1. The complete
+license is included at
+[`apps/website/public/licenses/OFL-1.1.txt`](./apps/website/public/licenses/OFL-1.1.txt)
+and published with the website.
 
 ## Hatchet TypeScript SDK
 

@@ -1,0 +1,11 @@
+Website font notices
+
+Bebas Neue
+Copyright 2019 The Bebas Neue Project Authors
+(https://github.com/dharmatype/Bebas-Neue)
+
+IBM Plex Mono
+Copyright 2017 IBM Corp. All rights reserved.
+
+Both fonts are distributed under the SIL Open Font License 1.1. The complete
+license is available in this directory as OFL-1.1.txt.

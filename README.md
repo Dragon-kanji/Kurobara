@@ -40,6 +40,7 @@ the CLI directly and parse its JSON output.
 | Understand the system boundaries | [Architecture](./docs/architecture.md) |
 | Run backups or handle contact data | [Operations and privacy](./docs/operations.md) |
 | Contribute code or documentation | [Contributing](./CONTRIBUTING.md) |
+| See the project website | [kurobara.systems](https://kurobara.systems) |
 
 The complete, intentionally small documentation index is in
 [docs/README.md](./docs/README.md).
@@ -112,7 +113,8 @@ There is no MCP server in this preview. Agents use the CLI or REST API today.
 The latest published preview is
 [`v0.1.0-rc.7`](https://github.com/Dragon-kanji/Kurobara/releases/tag/v0.1.0-rc.7).
 It is a source preview, not a stable release. The repository does not currently
-publish an npm package, an OCI image, a hosted API, a UI, or a managed service.
+publish an npm package, an OCI image, a hosted API, a product UI, or a managed
+service. The public project website is a static introduction to the OSS project.
 
 The preview has passed:
 
@@ -125,6 +127,7 @@ Current limitations are tracked in [ROADMAP.md](./ROADMAP.md).
 
 ## Project
 
+- [Website](https://kurobara.systems)
 - [Documentation](./docs/README.md)
 - [Roadmap](./ROADMAP.md)
 - [Security policy](./SECURITY.md)
