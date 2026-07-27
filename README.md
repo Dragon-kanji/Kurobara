@@ -43,7 +43,9 @@ the CLI directly and parse its JSON output.
 | See the project website | [kurobara.systems](https://kurobara.systems) |
 
 The complete, intentionally small documentation index is in
-[docs/README.md](./docs/README.md).
+[docs/README.md](./docs/README.md). The public website source is maintained
+separately in
+[`Dragon-kanji/kurobara.systems`](https://github.com/Dragon-kanji/kurobara.systems).
 
 ## Two-command evaluation
 
@@ -114,7 +116,8 @@ The latest published preview is
 [`v0.1.0-rc.7`](https://github.com/Dragon-kanji/Kurobara/releases/tag/v0.1.0-rc.7).
 It is a source preview, not a stable release. The repository does not currently
 publish an npm package, an OCI image, a hosted API, a product UI, or a managed
-service. The public project website is a static introduction to the OSS project.
+service. The separately maintained public project website is a static
+introduction to the OSS project.
 
 The preview has passed:
 
@@ -128,6 +131,7 @@ Current limitations are tracked in [ROADMAP.md](./ROADMAP.md).
 ## Project
 
 - [Website](https://kurobara.systems)
+- [Website source](https://github.com/Dragon-kanji/kurobara.systems)
 - [Documentation](./docs/README.md)
 - [Roadmap](./ROADMAP.md)
 - [Security policy](./SECURITY.md)

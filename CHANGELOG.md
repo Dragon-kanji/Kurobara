@@ -8,14 +8,18 @@ from its first stable release.
 
 ### Added
 
-- Added the static `kurobara.systems` project website with responsive,
-  agent-focused product framing and a hardened unprivileged container image.
+- Published the static [`kurobara.systems`](https://kurobara.systems) project
+  website with responsive, agent-focused product framing and a hardened
+  unprivileged container image.
 
 ### Changed
 
 - Replaced the public documentation with a smaller English guide organized for
   evaluators, B2B operators, coding agents, provider users, contributors, and
   self-host operators.
+- Moved the public website source to the dedicated
+  [`Dragon-kanji/kurobara.systems`](https://github.com/Dragon-kanji/kurobara.systems)
+  repository so the core runtime and marketing site can evolve independently.
 - Updated `@biomejs/biome` from `2.4.5` to `2.4.16`.
 
 ## [0.1.0-rc.7] - 2026-07-26
