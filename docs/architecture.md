@@ -73,7 +73,6 @@ projections, not current runtime claims.
 
 ```text
 apps/api                  HTTP composition and bootstrap
-apps/website              static public project website
 apps/worker               durable scheduling and effects
 packages/kernel           pure domain logic
 packages/application      use cases and policies
@@ -98,7 +97,7 @@ The generated dependency graph is available at
 | Use case or policy | `packages/application`, `packages/policy-engine` |
 | Pure domain or workflow rule | `packages/kernel`, `packages/workflow-engine` |
 | HTTP projection | `packages/adapters/http`, `apps/api` |
-| Public project website | `apps/website` |
+| Public project website | [`Dragon-kanji/kurobara.systems`](https://github.com/Dragon-kanji/kurobara.systems) |
 | Provider behavior | `packages/adapters/provider-*` |
 | CLI or TypeScript client | `packages/cli`, `packages/sdk-ts` |
 | Durable storage | `packages/adapters/postgres` |
