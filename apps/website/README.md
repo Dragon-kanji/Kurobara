@@ -4,6 +4,7 @@ Static, no-tracking landing page for `kurobara.systems`.
 
 ```sh
 npm run dev --workspace @kurobara/website
+npm test --workspace @kurobara/website
 npm run typecheck --workspace @kurobara/website
 npm run build --workspace @kurobara/website
 ```
