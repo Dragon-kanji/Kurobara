@@ -452,9 +452,9 @@ test("rolls 0015 failure manifests through 0022 without inventing input, recipe,
     `;
     assert.equal(
       migrations.at(-1)?.migration_name,
-      "0030_contact_export_delivery_lifecycle.sql"
+      "0031_gtm_context_play_workbook.sql"
     );
-    assert.equal(migrations.length, 30);
+    assert.equal(migrations.length, 31);
     const inputState = await sql<
       readonly { input_count: string; normalized_input_hash: string | null }[]
     >`
@@ -552,8 +552,8 @@ test("rolls the exact 0017 schema into bounded dataset and recipe storage", asyn
       LIMIT 1
     `;
     assert.deepEqual(migrationState[0], {
-      migration_count: "30",
-      migration_name: "0030_contact_export_delivery_lifecycle.sql",
+      migration_count: "31",
+      migration_name: "0031_gtm_context_play_workbook.sql",
     });
     const preservedState = await sql<
       readonly {

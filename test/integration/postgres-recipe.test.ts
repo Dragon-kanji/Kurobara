@@ -364,10 +364,10 @@ test("executes and caches one exact PostgreSQL recipe cell end to end", async ()
     FROM kurobara_core.schema_migrations
     ORDER BY migration_name
   `;
-  assert.equal(migrations.length, 30);
+  assert.equal(migrations.length, 31);
   assert.equal(
     migrations.at(-1)?.migration_name,
-    "0030_contact_export_delivery_lifecycle.sql"
+    "0031_gtm_context_play_workbook.sql"
   );
 
   const workspace = workspaceId("workspace-recipe-integration");

@@ -402,10 +402,10 @@ test("rolls forward, isolates, replays, and reloads privacy tombstones", async (
       WHERE workspace_id = ${workspaceA}
     `;
     assert.equal(readback[0]?.delivery_revocation_count, "1");
-    assert.equal(readback[0]?.migration_count, "30");
+    assert.equal(readback[0]?.migration_count, "31");
     assert.equal(
       readback[0]?.migration_name,
-      "0030_contact_export_delivery_lifecycle.sql"
+      "0031_gtm_context_play_workbook.sql"
     );
     assert.equal(readback[0]?.registration_count, "2");
     assert.equal(readback[0]?.subject_alias_count, "2");
