@@ -36,6 +36,7 @@ import {
   makeListCapabilities,
   makeListCompanyCandidates,
   makeListContactCandidates,
+  makeLoadImportedCompanyCandidates,
   makeLoadReadyCompanyCandidates,
   makePlanDatasetGeneration,
   makePrepareExportDelivery,
@@ -158,6 +159,9 @@ export const composeApi = ({
       loadOrganizations: makeLoadReadyCompanyCandidates(
         datasetGenerationResults
       ),
+      loadImportedOrganizations: makeLoadImportedCompanyCandidates({
+        datasets: datasetImport.datasets,
+      }),
       planGeneration,
     }),
     deriveContactIdentities: makeDeriveSelectedContactIdentities({

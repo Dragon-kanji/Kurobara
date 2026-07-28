@@ -5,7 +5,7 @@ import {
 } from "@kurobara/plugin-sdk";
 
 const CATALOG_FINGERPRINT =
-  "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd";
+  "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4";
 
 export const pluginManifest = {
   apiVersion: "dev.kurobara.plugin/v1",

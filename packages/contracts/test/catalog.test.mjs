@@ -692,7 +692,7 @@ test("exposes only canonical V1 contracts from the package root", async () => {
     "./catalog/schemas/organizations/candidates-list-response/1.0.0.schema.json"
   );
   assert.equal(catalogManifest.catalog_version, "0.12.0");
-  assert.equal(catalogManifest.members.length, 119);
+  assert.equal(catalogManifest.members.length, 121);
   assert.deepEqual(
     Object.fromEntries(
       [...Map.groupBy(catalogManifest.members, (member) => member.role)].map(
@@ -701,7 +701,7 @@ test("exposes only canonical V1 contracts from the package root", async () => {
     ),
     {
       event: 1,
-      schema: 61,
+      schema: 63,
       operation: 22,
       problem: 32,
       "projection-rule": 3,
@@ -1245,7 +1245,7 @@ test("generates byte-identical artifacts repeatedly from one catalog", async () 
   assert.equal(first.catalogFingerprint, second.catalogFingerprint);
   assert.equal(
     first.catalogFingerprint,
-    "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd"
+    "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4"
   );
   assert.deepEqual([...first.outputs], [...second.outputs]);
   assert.equal(first.outputs.size, 7);

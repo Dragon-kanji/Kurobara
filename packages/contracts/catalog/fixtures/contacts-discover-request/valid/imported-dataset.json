@@ -1,0 +1,32 @@
+{
+  "authority_envelope_id": "authority-synthetic",
+  "budget": { "limit": 2, "unit": "requests" },
+  "dataset_id": "contacts-synthetic",
+  "dataset_name": "Synthetic contacts",
+  "deadline_ms": 2000000000000,
+  "discovery_id": "contact-discovery-imported-synthetic",
+  "limits": {
+    "max_calls": 2,
+    "max_companies": 3,
+    "max_contacts_per_company": 1,
+    "max_contacts_total": 3,
+    "max_pages": 2
+  },
+  "mode": "dry-run",
+  "organization_dataset": {
+    "dataset_id": "companies-imported-synthetic",
+    "default_country_code": "FR",
+    "field_mapping": {
+      "domain": "website",
+      "name": "company_name"
+    }
+  },
+  "query": {
+    "company_headquarters_country_codes": [],
+    "departments": ["purchasing"],
+    "person_country_codes": [],
+    "result_kind": "contact",
+    "seniorities": ["manager"],
+    "titles": ["Category Manager"]
+  }
+}

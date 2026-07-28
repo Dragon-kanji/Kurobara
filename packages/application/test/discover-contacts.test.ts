@@ -161,7 +161,10 @@ const request = (): DiscoverContactsRequest => {
       workspaceId: workspace,
     },
     mode: "dry_run",
-    organizationGenerationId: organizationGenerationIdentity,
+    organizationSource: {
+      generationId: organizationGenerationIdentity,
+      kind: "generation",
+    },
     planning: {
       actorId: actorId("actor-contact-discovery"),
       authorityEnvelopeId: "authority-contact-discovery",
@@ -190,7 +193,10 @@ const request = (): DiscoverContactsRequest => {
       query: {
         company_headquarters_country_codes: ["ES", "FR"],
         departments: ["sales"],
-        organization_generation_id: organizationGenerationIdentity,
+        organization_source: {
+          generation_id: organizationGenerationIdentity,
+          kind: "generation",
+        },
         person_country_codes: [],
         result_kind: "contact",
         seniorities: ["director"],
@@ -220,12 +226,6 @@ const effectiveRequest = (): DiscoverContactsRequest => {
             domain: "one.example",
             name: "Company One",
           },
-          {
-            company_id: "company-2",
-            country_code: "FR",
-            domain: null,
-            name: "Company Two",
-          },
         ],
       },
     },
@@ -238,6 +238,8 @@ const makeDependencies = (
   authorizePage: () => Promise.reject(new Error("not used in dry-run")),
   authorizePrivacy: () => Promise.resolve(succeed({ allowed: true as const })),
   createGeneration: () => Promise.reject(new Error("not used in dry-run")),
+  loadImportedOrganizations: () =>
+    Promise.reject(new Error("not used for generation sources")),
   loadOrganizations: () => Promise.resolve(parentResult()),
   planGeneration: () =>
     Promise.resolve(
@@ -288,13 +290,16 @@ test("loads the bounded parent page and plans with an exact detached snapshot", 
   const plannedRequest = plannedRequests[0];
   assert.ok(plannedRequest !== undefined);
   const plannedQuery = plannedRequest.query as Readonly<{
-    organization_generation_id: string;
+    organization_source: Readonly<{
+      generation_id: string;
+      kind: "generation";
+    }>;
     organizations: readonly unknown[];
   }>;
-  assert.equal(
-    plannedQuery.organization_generation_id,
-    organizationGenerationIdentity
-  );
+  assert.deepEqual(plannedQuery.organization_source, {
+    generation_id: organizationGenerationIdentity,
+    kind: "generation",
+  });
   assert.deepEqual(plannedQuery.organizations, [
     {
       company_id: "company-1",
@@ -302,13 +307,98 @@ test("loads the bounded parent page and plans with an exact detached snapshot", 
       domain: "one.example",
       name: "Company One",
     },
-    {
-      company_id: "company-2",
-      country_code: "FR",
-      domain: null,
-      name: "Company Two",
-    },
   ]);
+});
+
+test("plans directly from an imported dataset with canonical lineage", async () => {
+  const base = request();
+  const datasetRequest: DiscoverContactsRequest = {
+    ...base,
+    organizationSource: {
+      datasetId: "companies-imported",
+      defaultCountryCode: "FR",
+      fieldMapping: { domain: "website", name: "company_name" },
+      kind: "dataset",
+    },
+    planning: {
+      ...base.planning,
+      query: {
+        ...(base.planning.query as Readonly<Record<string, unknown>>),
+        organization_source: {
+          dataset_id: "companies-imported",
+          default_country_code: "FR",
+          field_mapping: { domain: "website", name: "company_name" },
+          kind: "dataset",
+        },
+      },
+    },
+  } as DiscoverContactsRequest;
+  let generationLoads = 0;
+  let planned: PlanDatasetGenerationRequest | undefined;
+  const result = await makeDiscoverContacts(
+    makeDependencies({
+      loadImportedOrganizations: () =>
+        Promise.resolve(
+          succeed({
+            lineage: {
+              accepted: 1,
+              contentHash: hash,
+              datasetId: "companies-imported",
+              defaultCountryCode: "FR",
+              duplicates: 0,
+              fieldMapping: { domain: "website", name: "company_name" },
+              inspected: 1,
+              kind: "dataset",
+              materializationId: "materialization-imported",
+              rejected: 0,
+              sourceRecordCount: 1,
+              truncated: false,
+            },
+            organizations: [
+              {
+                company_id: "company-imported",
+                country_code: "FR",
+                domain: "petfood.example",
+                name: "Petfood Retail",
+              },
+            ],
+          })
+        ),
+      loadOrganizations: () => {
+        generationLoads += 1;
+        return Promise.resolve(parentResult());
+      },
+      planGeneration: (input) => {
+        planned = structuredClone(input);
+        return Promise.resolve(
+          fail({
+            code: "snapshot-unavailable" as const,
+            message: "Synthetic stop after dataset projection.",
+          })
+        );
+      },
+    })
+  )(datasetRequest);
+
+  assert.equal(result.ok, false);
+  assert.equal(generationLoads, 0);
+  assert.deepEqual(
+    (planned?.query as Readonly<Record<string, unknown>>).organization_source,
+    {
+      accepted: 1,
+      content_hash: hash,
+      dataset_id: "companies-imported",
+      default_country_code: "FR",
+      duplicates: 0,
+      field_mapping: { domain: "website", name: "company_name" },
+      inspected: 1,
+      kind: "dataset",
+      materialization_id: "materialization-imported",
+      rejected: 0,
+      source_record_count: 1,
+      truncated: false,
+    }
+  );
 });
 
 test("masks unavailable parent generations before privacy and planning", async () => {
@@ -405,6 +495,12 @@ test("default OSS privacy admission accepts only a bounded server snapshot", asy
               country_code: "DE",
               domain: "three.example",
               name: "Company Three",
+            },
+            {
+              company_id: "company-4",
+              country_code: "IT",
+              domain: "four.example",
+              name: "Company Four",
             },
           ],
         },

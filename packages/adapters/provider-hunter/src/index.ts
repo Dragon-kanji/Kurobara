@@ -40,7 +40,7 @@ const CATALOG_VERSION = "0.12.0";
 // Build-time admission binding. The contracts workspace remains outside the
 // runtime provider boundary; refresh this after canonical contract generation.
 export const HUNTER_CATALOG_FINGERPRINT =
-  "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd";
+  "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4";
 const DATASET_GENERATION_PAGE_INPUT_SCHEMA_FINGERPRINT =
   "sha256:40153b13ed33d9bf086dcfde537ce1e17946b0e82b6e0461683c42c24a382a55";
 const DATASET_GENERATION_PAGE_INPUT_SCHEMA_ID =
@@ -87,7 +87,7 @@ export const HUNTER_COMPANY_DISCOVERY_CONTRACTS = Object.freeze({
 
 export const HUNTER_WORK_EMAIL_CONTRACTS = HUNTER_COMPANY_DISCOVERY_CONTRACTS;
 
-export const HUNTER_INDUSTRY_MAPPING_VERSION = "kurobara-v1-hunter-1";
+export const HUNTER_INDUSTRY_MAPPING_VERSION = "kurobara-v1-hunter-2";
 
 const INDUSTRY_LABELS = Object.freeze({
   gaming: "Computer Games",
@@ -755,10 +755,14 @@ const exactHeadcountBuckets = (
 };
 
 type ParsedQuery = Readonly<{
+  fallbackKeywords: readonly string[];
   headcount: readonly (typeof HEADCOUNT_BUCKETS)[number]["label"][];
   hunterIndustries: readonly string[];
   value: OrganizationDiscoveryQueryValue;
 }>;
+
+const industryKeyword = (industryCode: string): string =>
+  industryCode.replace(/[._-]+/gu, " ");
 
 const parseQuery = (value: unknown): ParsedQuery | undefined => {
   if (!plainRecord(value)) {
@@ -786,9 +790,6 @@ const parseQuery = (value: unknown): ParsedQuery | undefined => {
       maximumLength: 128,
       pattern: INDUSTRY_CODE_PATTERN,
     }) ||
-    !value.industry_codes.every((code) =>
-      Object.hasOwn(INDUSTRY_LABELS, code)
-    ) ||
     (value.keywords !== undefined &&
       !uniqueStrings(value.keywords, {
         maximumCount: 32,
@@ -802,10 +803,15 @@ const parseQuery = (value: unknown): ParsedQuery | undefined => {
     return;
   }
   return {
+    fallbackKeywords: value.industry_codes
+      .filter((code) => !Object.hasOwn(INDUSTRY_LABELS, code))
+      .map(industryKeyword)
+      .sort(),
     headcount,
-    hunterIndustries: value.industry_codes.map(
-      (code) => INDUSTRY_LABELS[code as keyof typeof INDUSTRY_LABELS]
-    ),
+    hunterIndustries: value.industry_codes
+      .filter((code) => Object.hasOwn(INDUSTRY_LABELS, code))
+      .map((code) => INDUSTRY_LABELS[code as keyof typeof INDUSTRY_LABELS])
+      .sort(),
     value: value as unknown as OrganizationDiscoveryQueryValue,
   };
 };
@@ -1120,28 +1126,36 @@ const parseWorkEmailInput = (
   };
 };
 
-const requestBody = (input: ParsedInput): JsonRecord => ({
-  headquarters_location: {
-    include: input.query.value.country_codes.map((country) => ({ country })),
-  },
-  industry: { include: input.query.hunterIndustries },
-  ...(input.query.headcount.length === 0
-    ? {}
-    : { headcount: input.query.headcount }),
-  ...(input.query.value.keywords === undefined
-    ? {}
-    : {
-        keywords: {
-          include: input.query.value.keywords,
-          match: "all",
-        },
-      }),
-  ...(input.offset === 0 ? {} : { offset: input.offset }),
-  // Hunter reserves custom page sizes for eligible plans. Requesting the
-  // documented default keeps the first page portable; pageOutput still
-  // truncates before any record crosses the operator's immutable cap.
-  limit: HUNTER_PAGE_SIZE,
-});
+const requestBody = (input: ParsedInput): JsonRecord => {
+  const keywords = [
+    ...(input.query.value.keywords ?? []),
+    ...input.query.fallbackKeywords,
+  ].filter((value, index, values) => values.indexOf(value) === index);
+  return {
+    headquarters_location: {
+      include: input.query.value.country_codes.map((country) => ({ country })),
+    },
+    ...(input.query.hunterIndustries.length === 0
+      ? {}
+      : { industry: { include: input.query.hunterIndustries } }),
+    ...(input.query.headcount.length === 0
+      ? {}
+      : { headcount: input.query.headcount }),
+    ...(keywords.length === 0
+      ? {}
+      : {
+          keywords: {
+            include: keywords,
+            match: input.query.fallbackKeywords.length === 0 ? "all" : "any",
+          },
+        }),
+    ...(input.offset === 0 ? {} : { offset: input.offset }),
+    // Hunter reserves custom page sizes for eligible plans. Requesting the
+    // documented default keeps the first page portable; pageOutput still
+    // truncates before any record crosses the operator's immutable cap.
+    limit: HUNTER_PAGE_SIZE,
+  };
+};
 
 const responseJson = async (
   response: Response,

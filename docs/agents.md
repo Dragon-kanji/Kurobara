@@ -96,7 +96,7 @@ reconcile it first.
 | Discover companies | `company search` |
 | Watch or read a generation | `company watch`, `company results` |
 | Cancel a generation | `company cancel` |
-| Discover and read contacts | `contact search`, `contact results` |
+| Discover contacts from a company generation or imported domain dataset | `contact search`, `contact results` |
 | Reveal selected identities | `contact reveal-identity` |
 | Resolve selected work emails | `contact enrich-email` |
 | Verify selected work emails | `contact verify-email` |

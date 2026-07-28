@@ -8,7 +8,7 @@
   "required": [
     "company_headquarters_country_codes",
     "departments",
-    "organization_generation_id",
+    "organization_source",
     "organizations",
     "person_country_codes",
     "result_kind",
@@ -38,11 +38,8 @@
         "pattern": "^[a-z][a-z0-9._-]*$"
       }
     },
-    "organization_generation_id": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 255,
-      "pattern": "\\S"
+    "organization_source": {
+      "$ref": "https://schemas.kurobara.invalid/schemas/contacts/organization-source-lineage/1.0.0"
     },
     "organizations": {
       "type": "array",

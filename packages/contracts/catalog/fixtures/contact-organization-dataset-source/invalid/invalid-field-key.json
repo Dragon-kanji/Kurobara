@@ -1,0 +1,7 @@
+{
+  "dataset_id": "companies-imported-synthetic",
+  "default_country_code": "FR",
+  "field_mapping": {
+    "domain": "Website URL"
+  }
+}

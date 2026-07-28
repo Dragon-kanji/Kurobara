@@ -78,6 +78,12 @@ import contactDiscoveryQuerySchema from "@kurobara/contracts/schemas/contact-dis
 import contactIdentityExecutionQuerySchema from "@kurobara/contracts/schemas/contact-identity-execution-query.json" with {
   type: "json",
 };
+import contactOrganizationDatasetSourceSchema from "@kurobara/contracts/schemas/contact-organization-dataset-source.json" with {
+  type: "json",
+};
+import contactOrganizationSourceLineageSchema from "@kurobara/contracts/schemas/contact-organization-source-lineage.json" with {
+  type: "json",
+};
 import contactPrivacyRestrictRequestSchema from "@kurobara/contracts/schemas/contact-privacy-restrict-request.json" with {
   type: "json",
 };
@@ -488,6 +494,8 @@ ajv.addSchema(datasetSchema);
 ajv.addSchema(enrichmentRecipeSchema);
 ajv.addSchema(fieldSchema);
 ajv.addSchema(contactDiscoveryQuerySchema);
+ajv.addSchema(contactOrganizationDatasetSourceSchema);
+ajv.addSchema(contactOrganizationSourceLineageSchema);
 ajv.addSchema(contactCandidateSchema);
 ajv.addSchema(organizationDiscoveryQuerySchema);
 ajv.addSchema(companyCandidateSchema);
@@ -1402,6 +1410,62 @@ const contactDiscoverRequestFromBody = (
   type WorkspaceId = DiscoveryRequest["planning"]["workspaceId"];
   const datasetId = request.dataset_id as DatasetId;
   const workspaceId = actor.workspaceId as WorkspaceId;
+  const organizationSource =
+    request.organization_dataset === undefined
+      ? {
+          generationId: request.organization_generation_id as string,
+          kind: "generation" as const,
+        }
+      : {
+          datasetId: request.organization_dataset.dataset_id,
+          ...(request.organization_dataset.default_country_code === undefined
+            ? {}
+            : {
+                defaultCountryCode:
+                  request.organization_dataset.default_country_code,
+              }),
+          fieldMapping: {
+            ...(request.organization_dataset.field_mapping.country_code ===
+            undefined
+              ? {}
+              : {
+                  countryCode:
+                    request.organization_dataset.field_mapping.country_code,
+                }),
+            domain: request.organization_dataset.field_mapping.domain,
+            ...(request.organization_dataset.field_mapping.name === undefined
+              ? {}
+              : { name: request.organization_dataset.field_mapping.name }),
+          },
+          kind: "dataset" as const,
+        };
+  const organizationSourceQuery = (
+    organizationSource.kind === "generation"
+      ? {
+          generation_id: organizationSource.generationId,
+          kind: "generation" as const,
+        }
+      : {
+          dataset_id: organizationSource.datasetId,
+          ...(organizationSource.defaultCountryCode === undefined
+            ? {}
+            : {
+                default_country_code: organizationSource.defaultCountryCode,
+              }),
+          field_mapping: {
+            ...(organizationSource.fieldMapping.countryCode === undefined
+              ? {}
+              : {
+                  country_code: organizationSource.fieldMapping.countryCode,
+                }),
+            domain: organizationSource.fieldMapping.domain,
+            ...(organizationSource.fieldMapping.name === undefined
+              ? {}
+              : { name: organizationSource.fieldMapping.name }),
+          },
+          kind: "dataset" as const,
+        }
+  ) as DiscoveryRequest["planning"]["query"];
   return {
     execution: {
       actorId: actor.actorId,
@@ -1411,7 +1475,7 @@ const contactDiscoverRequestFromBody = (
       workspaceId,
     },
     mode: request.mode === "dry-run" ? "dry_run" : "start",
-    organizationGenerationId: request.organization_generation_id,
+    organizationSource,
     planning: {
       actorId: actor.actorId,
       authorityEnvelopeId: request.authority_envelope_id,
@@ -1440,7 +1504,7 @@ const contactDiscoverRequestFromBody = (
       },
       query: {
         ...structuredClone(request.query),
-        organization_generation_id: request.organization_generation_id,
+        organization_source: organizationSourceQuery,
       },
       requestedBudget: {
         limit: request.budget.limit,
@@ -1460,6 +1524,42 @@ const contactDiscoverResponse = (
   const plan = value.plan;
   const generation =
     value.mode === "start" ? value.creation.generation : undefined;
+  const organizationSource =
+    value.organizationSource.kind === "generation"
+      ? {
+          generation_id: value.organizationSource.generationId,
+          kind: "generation" as const,
+        }
+      : {
+          accepted: value.organizationSource.accepted,
+          content_hash: value.organizationSource.contentHash,
+          dataset_id: value.organizationSource.datasetId,
+          ...(value.organizationSource.defaultCountryCode === undefined
+            ? {}
+            : {
+                default_country_code:
+                  value.organizationSource.defaultCountryCode,
+              }),
+          duplicates: value.organizationSource.duplicates,
+          field_mapping: {
+            ...(value.organizationSource.fieldMapping.countryCode === undefined
+              ? {}
+              : {
+                  country_code:
+                    value.organizationSource.fieldMapping.countryCode,
+                }),
+            domain: value.organizationSource.fieldMapping.domain,
+            ...(value.organizationSource.fieldMapping.name === undefined
+              ? {}
+              : { name: value.organizationSource.fieldMapping.name }),
+          },
+          inspected: value.organizationSource.inspected,
+          kind: "dataset" as const,
+          materialization_id: value.organizationSource.materializationId,
+          rejected: value.organizationSource.rejected,
+          source_record_count: value.organizationSource.sourceRecordCount,
+          truncated: value.organizationSource.truncated,
+        };
   return {
     dataset_id: plan.requestIntent.targetDataset.datasetId,
     ...(generation === undefined
@@ -1467,7 +1567,12 @@ const contactDiscoverResponse = (
       : { generation_id: generation.generationId }),
     generation_plan_id: plan.generationPlanId,
     mode: value.mode === "dry_run" ? "dry-run" : "start",
-    organization_generation_id: value.organizationGenerationId,
+    ...(value.organizationSource.kind === "generation"
+      ? {
+          organization_generation_id: value.organizationSource.generationId,
+        }
+      : {}),
+    organization_source: organizationSource,
     plan_hash: plan.planHash,
     query_hash: plan.queryHash,
     quote: {

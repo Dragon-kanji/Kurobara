@@ -13,6 +13,8 @@ and machine-readable outputs.
 ## What it does today
 
 - Imports CSV or JSONL datasets.
+- Uses imported organization domains directly as the source of a contact
+  shortlist, with explicit field mapping and deterministic diagnostics.
 - Finds companies from country, industry, keyword, and employee-count filters.
 - Builds an obfuscated contact shortlist from selected companies.
 - Reveals professional identities and resolves work emails for an explicit

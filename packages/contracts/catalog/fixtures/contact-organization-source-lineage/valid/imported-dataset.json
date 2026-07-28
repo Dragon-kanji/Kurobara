@@ -1,0 +1,17 @@
+{
+  "accepted": 2,
+  "content_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "dataset_id": "companies-imported-synthetic",
+  "default_country_code": "FR",
+  "duplicates": 1,
+  "field_mapping": {
+    "domain": "website",
+    "name": "company_name"
+  },
+  "inspected": 4,
+  "kind": "dataset",
+  "materialization_id": "materialization-imported-synthetic",
+  "rejected": 1,
+  "source_record_count": 4,
+  "truncated": false
+}

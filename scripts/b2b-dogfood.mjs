@@ -25,6 +25,7 @@ const MAX_DOGFOOD_CONTACTS = 3;
 const COMMAND_TERMINATION_GRACE_MS = 2000;
 const COMMAND_FORCE_SETTLEMENT_GRACE_MS = 1000;
 const COUNTRY_PATTERN = /^[A-Z]{2}$/u;
+const INDUSTRY_CODE_PATTERN = /^[a-z0-9][a-z0-9._-]{0,127}$/u;
 const ENV_LINE_PATTERN = /^(?:export\s+)?([A-Z][A-Z0-9_]*)=(.*)$/u;
 const FORBIDDEN_ENV_LITERAL_PATTERN = /[\s`$\\'"]/u;
 const NEWLINE_PATTERN = /\r?\n/u;
@@ -71,7 +72,7 @@ Commands:
 Run options:
   --confirm-provider-calls  Required. Authorizes at most four provider requests.
   --country <ISO-2>         Company country (default: ES).
-  --industry <value>        Hunter-compatible industry: gaming or software (default: software).
+  --industry <value>        Bounded kurobara-v1 industry code (default: software).
   --title <value>           Optional exact contact title filter (default: none).
   --timeout-ms <value>      Whole live run deadline, 60000..900000 (default: 600000).
 
@@ -574,8 +575,10 @@ const validateRunOptions = (parsed) => {
   if (!COUNTRY_PATTERN.test(parsed.country)) {
     throw usageError("--country must be an uppercase ISO alpha-2 code.");
   }
-  if (parsed.industry !== "gaming" && parsed.industry !== "software") {
-    throw usageError("--industry must be gaming or software.");
+  if (!INDUSTRY_CODE_PATTERN.test(parsed.industry)) {
+    throw usageError(
+      "--industry must be a bounded lowercase kurobara-v1 industry code."
+    );
   }
   if (
     parsed.title !== undefined &&
@@ -1024,10 +1027,16 @@ const composeRuntimeEnvironments = (
   providerEnvironment
 ) => {
   const {
+    KUROBARA_CONTACT_EXPORT_POLICY_JSON: contactExportPolicy,
     KUROBARA_CONTACT_PRIVACY_HMAC_SECRET: privacySecret,
     KUROBARA_CONTACT_PRIVACY_HMAC_SECRET_VERSION: privacySecretVersion,
     ...nonSecretRuntimeEnvironment
   } = runtimeEnvironment;
+  const contactExportPolicyEnvironment = {
+    ...(contactExportPolicy === undefined
+      ? {}
+      : { KUROBARA_CONTACT_EXPORT_POLICY_JSON: contactExportPolicy }),
+  };
   const privacyEnvironment = {
     ...(privacySecret === undefined
       ? {}
@@ -1047,6 +1056,7 @@ const composeRuntimeEnvironments = (
   return Object.freeze({
     api: Object.freeze({
       ...nonSecretRuntimeEnvironment,
+      ...contactExportPolicyEnvironment,
       ...privacyEnvironment,
       ...providerPresenceEnvironment,
     }),
@@ -1268,6 +1278,25 @@ const runDogfood = async (options, preflightResult) => {
       const privacySecret = randomBytes(48).toString("base64url");
       const runtimeEnvironment = {
         ...baseEnvironment(),
+        KUROBARA_CONTACT_EXPORT_POLICY_JSON: JSON.stringify({
+          max_retention_ms: {
+            "contact-identity": 86_400_000,
+            employment: 86_400_000,
+            "professional-email": 86_400_000,
+            "professional-social-profile": 86_400_000,
+          },
+          policy_ttl_ms: 3_600_000,
+          policy_version: "bounded-dogfood-v1",
+          provider_rights: {
+            "prospeo-person-search": {
+              mode: "operator-authorized-byok",
+              ttl_ms: 3_600_000,
+              version: "bounded-dogfood-prospeo-v1",
+            },
+          },
+          purpose_ref: "bounded-b2b-dogfood",
+          territory: options.country,
+        }),
         KUROBARA_CONTACT_PRIVACY_HMAC_SECRET: privacySecret,
         KUROBARA_CONTACT_PRIVACY_HMAC_SECRET_VERSION: "v1",
         KUROBARA_DATABASE_URL: databaseUrl,

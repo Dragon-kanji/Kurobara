@@ -63,7 +63,7 @@ test("parses only an explicit bounded live run", () => {
       "--country",
       "FR",
       "--industry",
-      "gaming",
+      "pet-food",
       "--title",
       "VP Sales",
       "--timeout-ms",
@@ -73,7 +73,7 @@ test("parses only an explicit bounded live run", () => {
       command: "run",
       confirmProviderCalls: true,
       country: "FR",
-      industry: "gaming",
+      industry: "pet-food",
       timeoutMs: 60_000,
       title: "VP Sales",
     }
@@ -152,6 +152,7 @@ test("keeps interrupt handlers installed until explicit cleanup disposal", () =>
 
 test("keeps real provider credentials in the worker environment only", () => {
   const runtime = Object.freeze({
+    KUROBARA_CONTACT_EXPORT_POLICY_JSON: '{"policy":"synthetic"}',
     KUROBARA_CONTACT_PRIVACY_HMAC_SECRET: "privacy-secret",
     KUROBARA_CONTACT_PRIVACY_HMAC_SECRET_VERSION: "v1",
     KUROBARA_DATABASE_URL: "postgres://local-only",
@@ -170,6 +171,18 @@ test("keeps real provider credentials in the worker environment only", () => {
   assert.equal(
     environments.api.KUROBARA_CONTACT_PRIVACY_HMAC_SECRET,
     "privacy-secret"
+  );
+  assert.equal(
+    environments.api.KUROBARA_CONTACT_EXPORT_POLICY_JSON,
+    '{"policy":"synthetic"}'
+  );
+  assert.equal(
+    environments.bootstrap.KUROBARA_CONTACT_EXPORT_POLICY_JSON,
+    undefined
+  );
+  assert.equal(
+    environments.worker.KUROBARA_CONTACT_EXPORT_POLICY_JSON,
+    undefined
   );
   assert.equal(environments.api.HUNTER_API_KEY, "configured-in-worker");
   assert.equal(environments.api.PROSPEO_API_KEY, "configured-in-worker");

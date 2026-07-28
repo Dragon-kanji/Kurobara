@@ -79,7 +79,7 @@ test("creates distinct opaque identifiers for each durable identity", async () =
   assert.match(values[7] ?? "", GENERATION_PLAN_ID_PATTERN);
 });
 
-test("normalizes only exact company discovery queries supported by the admitted mapping", () => {
+test("normalizes arbitrary bounded industry codes without provider coupling", () => {
   const normalizer = createCompanyDiscoveryQueryNormalizer({
     contract: QUERY_CONTRACT,
   });
@@ -92,7 +92,7 @@ test("normalizes only exact company discovery queries supported by the admitted 
       country_codes: ["FR"],
       country_scope: "headquarters",
       employee_count: { maximum: 200, minimum: 11 },
-      industry_codes: ["software", "gaming"],
+      industry_codes: ["software", "petfood-retail"],
       industry_taxonomy: "kurobara-v1",
       keywords: ["platform", "game"],
       result_kind: "company",
@@ -109,7 +109,7 @@ test("normalizes only exact company discovery queries supported by the admitted 
       country_codes: ["FR"],
       country_scope: "headquarters",
       employee_count: { maximum: 200, minimum: 11 },
-      industry_codes: ["gaming", "software"],
+      industry_codes: ["petfood-retail", "software"],
       industry_taxonomy: "kurobara-v1",
       keywords: ["game", "platform"],
       result_kind: "company",
@@ -128,13 +128,6 @@ test("normalizes only exact company discovery queries supported by the admitted 
       country_codes: ["FR", "ES"],
       country_scope: "headquarters",
       industry_codes: ["software"],
-      industry_taxonomy: "kurobara-v1",
-      result_kind: "company",
-    },
-    {
-      country_codes: ["FR"],
-      country_scope: "headquarters",
-      industry_codes: ["unmapped"],
       industry_taxonomy: "kurobara-v1",
       result_kind: "company",
     },
@@ -181,7 +174,10 @@ test("normalizes an exact bounded contact execution query without contact detail
     query: {
       company_headquarters_country_codes: ["ES"],
       departments: ["sales"],
-      organization_generation_id: "generation-organizations",
+      organization_source: {
+        generation_id: "generation-organizations",
+        kind: "generation",
+      },
       organizations: [
         {
           company_id: "company-1",
@@ -210,7 +206,10 @@ test("normalizes an exact bounded contact execution query without contact detail
     assert.deepEqual(accepted.value, {
       company_headquarters_country_codes: ["ES"],
       departments: ["sales"],
-      organization_generation_id: "generation-organizations",
+      organization_source: {
+        generation_id: "generation-organizations",
+        kind: "generation",
+      },
       organizations: [
         {
           company_id: "company-1",
@@ -237,7 +236,10 @@ test("normalizes an exact bounded contact execution query without contact detail
       company_headquarters_country_codes: ["ES"],
       departments: ["sales"],
       email: "blocked@example.com",
-      organization_generation_id: "generation-organizations",
+      organization_source: {
+        generation_id: "generation-organizations",
+        kind: "generation",
+      },
       organizations: [
         {
           company_id: "company-1",
@@ -254,7 +256,10 @@ test("normalizes an exact bounded contact execution query without contact detail
     {
       company_headquarters_country_codes: ["ES"],
       departments: ["sales"],
-      organization_generation_id: "generation-organizations",
+      organization_source: {
+        generation_id: "generation-organizations",
+        kind: "generation",
+      },
       organizations: [],
       person_country_codes: [],
       result_kind: "contact",
@@ -264,7 +269,10 @@ test("normalizes an exact bounded contact execution query without contact detail
     {
       company_headquarters_country_codes: ["ES"],
       departments: ["sales"],
-      organization_generation_id: "generation-organizations",
+      organization_source: {
+        generation_id: "generation-organizations",
+        kind: "generation",
+      },
       organizations: [
         {
           company_id: "company-1",

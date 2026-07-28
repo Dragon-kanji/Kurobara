@@ -3,6 +3,10 @@
   "generation_plan_id": "contact-plan-synthetic",
   "mode": "dry-run",
   "organization_generation_id": "organization-generation-synthetic",
+  "organization_source": {
+    "generation_id": "organization-generation-synthetic",
+    "kind": "generation"
+  },
   "plan_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "query_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   "quote": {

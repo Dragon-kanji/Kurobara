@@ -2367,6 +2367,10 @@ test("contact search sends lineage and strict shortlist caps", async () => {
     generation_plan_id: "generation-plan-cli-contacts",
     mode: "dry-run",
     organization_generation_id: "generation-cli-companies",
+    organization_source: {
+      generation_id: "generation-cli-companies",
+      kind: "generation",
+    },
     plan_hash: `sha256:${"e".repeat(64)}`,
     query_hash: `sha256:${"f".repeat(64)}`,
     quote: {
@@ -2439,6 +2443,112 @@ test("contact search sends lineage and strict shortlist caps", async () => {
     stdin: Readable.from([]),
     stdout: stdout.target,
   });
+  assert.equal(exitCode, 0);
+  assert.equal(stderr.value(), "");
+  assert.deepEqual(JSON.parse(stdout.value()), responseBody);
+});
+
+test("contact search accepts an imported organization dataset mapping", async () => {
+  const stdout = capture();
+  const stderr = capture();
+  const responseBody = {
+    dataset_id: "dataset-cli-contacts",
+    generation_plan_id: "generation-plan-cli-contacts",
+    mode: "dry-run",
+    organization_source: {
+      accepted: 3,
+      content_hash: `sha256:${"a".repeat(64)}`,
+      dataset_id: "dataset-cli-companies",
+      default_country_code: "FR",
+      duplicates: 0,
+      field_mapping: {
+        domain: "website",
+        name: "company_name",
+      },
+      inspected: 3,
+      kind: "dataset",
+      materialization_id: "materialization-cli-companies",
+      rejected: 0,
+      source_record_count: 3,
+      truncated: false,
+    },
+    plan_hash: `sha256:${"e".repeat(64)}`,
+    query_hash: `sha256:${"f".repeat(64)}`,
+    quote: {
+      expires_at_ms: 1_752_700_030_000,
+      guarantee: "hard",
+      unit: "credits",
+      upper_bound: 2,
+    },
+    replayed: false,
+    state: "planned",
+    workspace_id: "workspace-cli-test",
+  } as const;
+  const exitCode = await runCli({
+    argv: [
+      "contact",
+      "search",
+      "--authority-envelope-id",
+      "authority-cli-test",
+      "--budget-limit",
+      "2",
+      "--budget-unit",
+      "credits",
+      "--dataset-id",
+      "dataset-cli-contacts",
+      "--dataset-name",
+      "Synthetic contacts",
+      "--deadline-ms",
+      "1752700060000",
+      "--default-company-country",
+      "FR",
+      "--department",
+      "purchasing",
+      "--discovery-id",
+      "contact-discovery-cli-dataset",
+      "--domain-field",
+      "website",
+      "--endpoint",
+      TEST_ENDPOINT,
+      "--max-calls",
+      "2",
+      "--max-companies",
+      "3",
+      "--max-contacts-per-company",
+      "1",
+      "--max-contacts-total",
+      "3",
+      "--max-pages",
+      "2",
+      "--mode",
+      "dry-run",
+      "--name-field",
+      "company_name",
+      "--organization-dataset-id",
+      "dataset-cli-companies",
+      "--seniority",
+      "manager",
+    ],
+    environment: { KUROBARA_API_KEY: "synthetic-api-key" },
+    fetch: fetchFrom(async (request) => {
+      assert.equal(new URL(request.url).pathname, "/v1/contact-discoveries");
+      const body = (await request.json()) as Record<string, unknown>;
+      assert.deepEqual(body.organization_dataset, {
+        dataset_id: "dataset-cli-companies",
+        default_country_code: "FR",
+        field_mapping: {
+          domain: "website",
+          name: "company_name",
+        },
+      });
+      assert.equal("organization_generation_id" in body, false);
+      return jsonResponse(responseBody);
+    }),
+    stderr: stderr.target,
+    stdin: Readable.from([]),
+    stdout: stdout.target,
+  });
+
   assert.equal(exitCode, 0);
   assert.equal(stderr.value(), "");
   assert.deepEqual(JSON.parse(stdout.value()), responseBody);

@@ -61,7 +61,7 @@
     "workflows": [
       {
         "allowedCapabilities": ["organizations.website.resolve"],
-        "catalogFingerprint": "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd",
+        "catalogFingerprint": "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4",
         "catalogVersion": "0.12.0",
         "compilationLimits": {
           "maxDepth": 2,
@@ -70,14 +70,14 @@
         },
         "compilerVersion": "1.0.0",
         "inputContract": {
-          "catalogFingerprint": "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd",
+          "catalogFingerprint": "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4",
           "catalogVersion": "0.12.0",
           "schemaFingerprint": "sha256:c40a6d60340e2fcc29415f4594b5b3f951da7a798d41a245bb63cecd1600eccd",
           "schemaId": "https://schemas.kurobara.invalid/schemas/recipes/cell-input/1.0.0",
           "schemaVersion": "1.0.0"
         },
         "outputContract": {
-          "catalogFingerprint": "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd",
+          "catalogFingerprint": "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4",
           "catalogVersion": "0.12.0",
           "schemaFingerprint": "sha256:a131ddf91ef2314dbaf7af91f3ba56eec4adf766d557a70185b0bbc320d13e9d",
           "schemaId": "https://schemas.kurobara.invalid/schemas/recipes/cell-output/1.0.0",

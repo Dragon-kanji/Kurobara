@@ -286,7 +286,10 @@ const discoveredOrganizations = {
 
 const discoveredContacts = {
   ...discoveredOrganizations,
-  organizationGenerationId: "organization-generation-synthetic",
+  organizationSource: {
+    generationId: "organization-generation-synthetic",
+    kind: "generation",
+  },
   plan: {
     ...discoveredOrganizations.plan,
     requestIntent: { targetDataset: { datasetId: "contacts-synthetic" } },
@@ -926,6 +929,10 @@ test("projects bounded contact discovery and exact work-email selection", async 
     discoveryBody.organization_generation_id,
     "organization-generation-synthetic"
   );
+  assert.deepEqual(discoveryBody.organization_source, {
+    generation_id: "organization-generation-synthetic",
+    kind: "generation",
+  });
   const emailResponse = await app.request(
     "/v1/contact-work-email-resolutions",
     {

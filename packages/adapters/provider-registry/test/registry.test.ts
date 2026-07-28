@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import providerRegistry from "@kurobara/contracts/provider-registry.json" with {
+  type: "json",
+};
+
 import {
   createConfiguredDeterministicFixtureRoutes,
   createConfiguredOfficialProviderRoutes,
@@ -17,6 +21,25 @@ const HUNTER_SECRET = "synthetic-hunter-secret";
 const PROSPEO_SECRET = "synthetic-prospeo-secret";
 const PDL_SECRET = "synthetic-pdl-secret";
 const PRIVACY_SECRET = "synthetic-contact-privacy-secret-32-bytes";
+
+test("declares Hunter industry exact mappings and keyword fallback", () => {
+  const hunter = providerRegistry.providers.find(
+    (provider) => provider.key === "hunter"
+  );
+  assert.ok(hunter !== undefined && "filter_support" in hunter);
+  assert.deepEqual(hunter.filter_support, {
+    "organizations.discover": {
+      industry_codes: {
+        exact: {
+          gaming: "Computer Games",
+          software: "Software Development",
+        },
+        fallback: "keyword_any",
+        mapping_version: "kurobara-v1-hunter-2",
+      },
+    },
+  });
+});
 
 test("admits the deterministic fixture route only through an exact opt-in", () => {
   const disabled = createConfiguredDeterministicFixtureRoutes({});

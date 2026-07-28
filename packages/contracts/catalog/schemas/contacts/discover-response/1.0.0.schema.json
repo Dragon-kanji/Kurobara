@@ -9,7 +9,7 @@
     "dataset_id",
     "generation_plan_id",
     "mode",
-    "organization_generation_id",
+    "organization_source",
     "plan_hash",
     "query_hash",
     "quote",
@@ -42,6 +42,9 @@
       "minLength": 1,
       "maxLength": 255,
       "pattern": "\\S"
+    },
+    "organization_source": {
+      "$ref": "https://schemas.kurobara.invalid/schemas/contacts/organization-source-lineage/1.0.0"
     },
     "plan_hash": {
       "type": "string",

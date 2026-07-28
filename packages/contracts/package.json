@@ -70,6 +70,8 @@
     "./schemas/contacts-candidates-list-response.json": "./catalog/schemas/contacts/candidates-list-response/1.0.0.schema.json",
     "./schemas/contact-discovery-query.json": "./catalog/schemas/contacts/discovery-query/1.0.0.schema.json",
     "./schemas/contact-discovery-execution-query.json": "./catalog/schemas/contacts/discovery-execution-query/1.0.0.schema.json",
+    "./schemas/contact-organization-dataset-source.json": "./catalog/schemas/contacts/organization-dataset-source/1.0.0.schema.json",
+    "./schemas/contact-organization-source-lineage.json": "./catalog/schemas/contacts/organization-source-lineage/1.0.0.schema.json",
     "./schemas/contact-identity-execution-query.json": "./catalog/schemas/contacts/identity-execution-query/1.0.0.schema.json",
     "./schemas/contacts-discover-request.json": "./catalog/schemas/contacts/discover-request/1.0.0.schema.json",
     "./schemas/contacts-discover-response.json": "./catalog/schemas/contacts/discover-response/1.0.0.schema.json",

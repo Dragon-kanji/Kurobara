@@ -17,6 +17,13 @@ import type {
   CreateDatasetGenerationResult,
 } from "./create-dataset-generation.ts";
 import type {
+  LoadImportedCompanyCandidatesRequest,
+  LoadImportedCompanyCandidatesResult,
+  OrganizationSnapshotCandidate,
+  OrganizationSource,
+  OrganizationSourceLineage,
+} from "./load-imported-company-candidates.ts";
+import type {
   LoadReadyCompanyCandidatesRequest,
   LoadReadyCompanyCandidatesResult,
 } from "./load-ready-company-candidates.ts";
@@ -28,14 +35,14 @@ import type {
 export type DiscoverContactsRequest = Readonly<{
   execution: Omit<AuthorizeDatasetGenerationPageRequest, "generationId">;
   mode: "dry_run" | "start";
-  organizationGenerationId: string;
+  organizationSource: OrganizationSource;
   planning: PlanDatasetGenerationRequest;
 }>;
 
 export type DiscoverContactsSuccess =
   | Readonly<{
       mode: "dry_run";
-      organizationGenerationId: string;
+      organizationSource: OrganizationSourceLineage;
       plan: DatasetGenerationPlan;
       replayed: boolean;
       status: "planned";
@@ -43,7 +50,7 @@ export type DiscoverContactsSuccess =
   | Readonly<{
       creation: DatasetGenerationCreation;
       mode: "start";
-      organizationGenerationId: string;
+      organizationSource: OrganizationSourceLineage;
       page?: DatasetGenerationPage;
       plan: DatasetGenerationPlan;
       replayed: boolean;
@@ -79,6 +86,9 @@ export type DiscoverContactsDependencies = Readonly<{
   loadOrganizations: (
     request: LoadReadyCompanyCandidatesRequest
   ) => Promise<LoadReadyCompanyCandidatesResult>;
+  loadImportedOrganizations: (
+    request: LoadImportedCompanyCandidatesRequest
+  ) => Promise<LoadImportedCompanyCandidatesResult>;
   planGeneration: (
     request: PlanDatasetGenerationRequest
   ) => Promise<PlanDatasetGenerationResult>;
@@ -94,6 +104,9 @@ const ORGANIZATION_SNAPSHOT_KEYS = new Set([
   "domain",
   "name",
 ]);
+
+type PreparedDiscoverContactsRequest = DiscoverContactsRequest &
+  Readonly<{ organizationSourceLineage: OrganizationSourceLineage }>;
 
 const boundedNonEmptyString = (value: unknown, maximum: number): boolean =>
   typeof value === "string" &&
@@ -135,6 +148,54 @@ const organizationSnapshotIsBounded = (
     );
   });
 
+const organizationSourceQuery = (
+  source: OrganizationSource | OrganizationSourceLineage
+): import("@kurobara/kernel").DatasetGenerationQueryValue => {
+  if (source.kind === "generation") {
+    return {
+      generation_id: source.generationId,
+      kind: "generation",
+    };
+  }
+  const lineage: Readonly<
+    Record<string, import("@kurobara/kernel").DatasetGenerationQueryValue>
+  > =
+    "contentHash" in source
+      ? {
+          accepted: source.accepted,
+          content_hash: source.contentHash,
+          duplicates: source.duplicates,
+          inspected: source.inspected,
+          materialization_id: source.materializationId,
+          rejected: source.rejected,
+          source_record_count: source.sourceRecordCount,
+          truncated: source.truncated,
+        }
+      : {};
+  return {
+    dataset_id: source.datasetId,
+    ...(source.defaultCountryCode === undefined
+      ? {}
+      : { default_country_code: source.defaultCountryCode }),
+    field_mapping: {
+      ...(source.fieldMapping.countryCode === undefined
+        ? {}
+        : { country_code: source.fieldMapping.countryCode }),
+      domain: source.fieldMapping.domain,
+      ...(source.fieldMapping.name === undefined
+        ? {}
+        : { name: source.fieldMapping.name }),
+    },
+    kind: "dataset",
+    ...lineage,
+  } as import("@kurobara/kernel").DatasetGenerationQueryValue;
+};
+
+const queryValuesEqual = (
+  left: import("@kurobara/kernel").DatasetGenerationQueryValue,
+  right: import("@kurobara/kernel").DatasetGenerationQueryValue
+): boolean => JSON.stringify(left) === JSON.stringify(right);
+
 const requestIsBounded = (
   request: DiscoverContactsRequest,
   organizationSnapshotExpectation: OrganizationSnapshotExpectation
@@ -148,11 +209,6 @@ const requestIsBounded = (
     maxCompanies === undefined ||
     maxContactsPerCompany === undefined ||
     maxContactsTotal === undefined ||
-    typeof request.organizationGenerationId !== "string" ||
-    request.organizationGenerationId.trim() !==
-      request.organizationGenerationId ||
-    request.organizationGenerationId.length === 0 ||
-    request.organizationGenerationId.length > 255 ||
     typeof query !== "object" ||
     query === null ||
     Array.isArray(query)
@@ -179,8 +235,11 @@ const requestIsBounded = (
     limits.maxEnrichments === 0 &&
     limits.maxPhones === 0 &&
     queryRecord.result_kind === "contact" &&
-    queryRecord.organization_generation_id ===
-      request.organizationGenerationId &&
+    queryRecord.organization_source !== undefined &&
+    queryValuesEqual(
+      queryRecord.organization_source,
+      organizationSourceQuery(request.organizationSource)
+    ) &&
     organizationSnapshotMatches &&
     !("email" in queryRecord) &&
     !("phone" in queryRecord)
@@ -222,7 +281,9 @@ export const authorizePrivacySafeContactDiscovery = (
 const attachReadyOrganizationSnapshot = async (
   dependencies: DiscoverContactsDependencies,
   request: DiscoverContactsRequest
-): Promise<DomainResult<DiscoverContactsRequest, DiscoverContactsFailure>> => {
+): Promise<
+  DomainResult<PreparedDiscoverContactsRequest, DiscoverContactsFailure>
+> => {
   const maxCompanies = request.planning.limits.maxCompanies;
   if (maxCompanies === undefined) {
     return fail({
@@ -231,44 +292,80 @@ const attachReadyOrganizationSnapshot = async (
       stage: "planning",
     });
   }
-  const organizations = await dependencies.loadOrganizations({
-    afterOrdinal: 0,
-    generationId: datasetGenerationId(request.organizationGenerationId),
-    limit: maxCompanies,
-    workspaceId: request.planning.workspaceId,
-  });
-  if (!organizations.ok) {
-    return fail({
-      code: "organization-generation-unavailable",
-      message:
-        "The organization generation is unavailable for contact discovery.",
-      stage: "parent",
+  let organizationSnapshot: readonly OrganizationSnapshotCandidate[];
+  let organizationSourceLineage: OrganizationSourceLineage;
+  if (request.organizationSource.kind === "dataset") {
+    const imported = await dependencies.loadImportedOrganizations({
+      limit: maxCompanies,
+      source: request.organizationSource,
+      workspaceId: request.planning.workspaceId,
     });
-  }
-  if (organizations.value.items.length === 0) {
-    return fail({
-      code: "organization-generation-empty",
-      message:
-        "Contact discovery requires at least one ready organization candidate.",
-      stage: "parent",
+    if (!imported.ok) {
+      return fail({
+        code: imported.error.code,
+        message: imported.error.message,
+        stage: "parent",
+      });
+    }
+    organizationSnapshot = imported.value.organizations;
+    organizationSourceLineage = imported.value.lineage;
+  } else {
+    const organizations = await dependencies.loadOrganizations({
+      afterOrdinal: 0,
+      generationId: datasetGenerationId(
+        request.organizationSource.generationId
+      ),
+      limit: maxCompanies,
+      workspaceId: request.planning.workspaceId,
     });
+    if (!organizations.ok) {
+      return fail({
+        code: "organization-generation-unavailable",
+        message:
+          "The organization generation is unavailable for contact discovery.",
+        stage: "parent",
+      });
+    }
+    if (organizations.value.items.length === 0) {
+      return fail({
+        code: "organization-generation-empty",
+        message:
+          "Contact discovery requires at least one ready organization candidate.",
+        stage: "parent",
+      });
+    }
+    organizationSnapshot = organizations.value.items.flatMap(({ candidate }) =>
+      candidate.domain === null
+        ? []
+        : [
+            {
+              company_id: candidate.companyId,
+              country_code: candidate.countryCode,
+              domain: candidate.domain,
+              name: candidate.name,
+            },
+          ]
+    );
+    if (organizationSnapshot.length === 0) {
+      return fail({
+        code: "organization-generation-empty",
+        message:
+          "Contact discovery requires at least one organization with a domain.",
+        stage: "parent",
+      });
+    }
+    organizationSourceLineage = request.organizationSource;
   }
-  const organizationSnapshot = organizations.value.items.map(
-    ({ candidate }) => ({
-      company_id: candidate.companyId,
-      country_code: candidate.countryCode,
-      domain: candidate.domain,
-      name: candidate.name,
-    })
-  );
   return succeed({
     ...request,
+    organizationSourceLineage,
     planning: {
       ...request.planning,
       query: {
         ...(structuredClone(request.planning.query) as Readonly<{
           [key: string]: import("@kurobara/kernel").DatasetGenerationQueryValue;
         }>),
+        organization_source: organizationSourceQuery(organizationSourceLineage),
         organizations: organizationSnapshot,
       },
     },
@@ -308,7 +405,7 @@ export const makeDiscoverContacts =
     if (request.mode === "dry_run") {
       return succeed({
         mode: "dry_run",
-        organizationGenerationId: request.organizationGenerationId,
+        organizationSource: effectiveRequest.organizationSourceLineage,
         plan: planned.value.plan,
         replayed: planned.value.replayed,
         status: "planned",
@@ -325,7 +422,7 @@ export const makeDiscoverContacts =
       return succeed({
         creation: created.value.creation,
         mode: "start",
-        organizationGenerationId: request.organizationGenerationId,
+        organizationSource: effectiveRequest.organizationSourceLineage,
         plan: planned.value.plan,
         replayed: true,
         status: "ready",
@@ -338,7 +435,7 @@ export const makeDiscoverContacts =
       return succeed({
         creation: created.value.creation,
         mode: "start",
-        organizationGenerationId: request.organizationGenerationId,
+        organizationSource: effectiveRequest.organizationSourceLineage,
         plan: planned.value.plan,
         replayed: true,
         status: "running",
@@ -354,7 +451,7 @@ export const makeDiscoverContacts =
     return succeed({
       creation: created.value.creation,
       mode: "start",
-      organizationGenerationId: request.organizationGenerationId,
+      organizationSource: effectiveRequest.organizationSourceLineage,
       page: authorized.value.page,
       plan: planned.value.plan,
       replayed:
