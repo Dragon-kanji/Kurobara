@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/contacts/organization-source-lineage/1.0.0",
+  "title": "ContactOrganizationSourceLineage",
+  "description": "Provider-neutral lineage for the immutable organization snapshot used by contact discovery.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "accepted": { "type": "integer", "minimum": 1, "maximum": 10 },
+    "content_hash": {
+      "type": "string",
+      "minLength": 71,
+      "maxLength": 71,
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "default_country_code": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 2,
+      "pattern": "^[A-Z]{2}$"
+    },
+    "duplicates": { "type": "integer", "minimum": 0, "maximum": 1000 },
+    "field_mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["domain"],
+      "properties": {
+        "country_code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "domain": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-z][a-z0-9_]*$"
+        }
+      }
+    },
+    "generation_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "inspected": { "type": "integer", "minimum": 1, "maximum": 1000 },
+    "kind": { "type": "string", "enum": ["dataset", "generation"] },
+    "materialization_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "rejected": { "type": "integer", "minimum": 0, "maximum": 1000 },
+    "source_record_count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "truncated": { "type": "boolean" }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["generation_id", "kind"],
+      "properties": {
+        "accepted": false,
+        "content_hash": false,
+        "dataset_id": false,
+        "default_country_code": false,
+        "duplicates": false,
+        "field_mapping": false,
+        "generation_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "inspected": false,
+        "kind": { "const": "generation" },
+        "materialization_id": false,
+        "rejected": false,
+        "source_record_count": false,
+        "truncated": false
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "accepted",
+        "content_hash",
+        "dataset_id",
+        "duplicates",
+        "field_mapping",
+        "inspected",
+        "kind",
+        "materialization_id",
+        "rejected",
+        "source_record_count",
+        "truncated"
+      ],
+      "properties": {
+        "accepted": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "content_hash": {
+          "type": "string",
+          "minLength": 71,
+          "maxLength": 71,
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "dataset_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "default_country_code": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2,
+          "pattern": "^[A-Z]{2}$"
+        },
+        "duplicates": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "field_mapping": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["domain"],
+          "properties": {
+            "country_code": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[a-z][a-z0-9_]*$"
+            },
+            "domain": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[a-z][a-z0-9_]*$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[a-z][a-z0-9_]*$"
+            }
+          }
+        },
+        "generation_id": false,
+        "inspected": { "type": "integer", "minimum": 1, "maximum": 1000 },
+        "kind": { "const": "dataset" },
+        "materialization_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "rejected": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "source_record_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "truncated": { "type": "boolean" }
+      }
+    }
+  ],
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.contacts",
+  "x-kurobara-data-classification": "confidential",
+  "x-kurobara-publication-status": "local-development-only"
+}

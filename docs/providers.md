@@ -8,7 +8,7 @@ credits, contract rights, or permission to redistribute provider data.
 
 | Provider | Environment | Current role | Qualification |
 | --- | --- | --- | --- |
-| Hunter | `HUNTER_API_KEY` | Company discovery; optional work-email resolution and verification | Company discovery qualified live; remaining mappings covered offline |
+| Hunter | `HUNTER_API_KEY` | Company discovery; optional work-email resolution and verification | Exact `gaming`/`software` industry mappings plus declared keyword fallback for other bounded codes |
 | Prospeo | `PROSPEO_API_KEY` | Contact shortlist, identity reveal, and work-email resolution | Main contact path qualified live |
 | Tavily | `TAVILY_API_KEY` | Organization website resolution | Maintained adapter; explicit route only |
 | Exa | `EXA_API_KEY` plus `KUROBARA_EXA_DATA_RIGHTS_CONFIRMED=true` | Organization website resolution | Explicit route only; fails closed without rights attestation |
@@ -17,6 +17,12 @@ credits, contract rights, or permission to redistribute provider data.
 
 The default contact order is `prospeo,hunter`. Tavily, Exa, Apollo, and PDL are
 never enabled merely because an adapter package exists.
+
+Provider filter support is machine-readable in the canonical
+[`provider registry`](../packages/contracts/catalog/providers/registry/1.0.0.registry.json).
+The core accepts arbitrary bounded `kurobara-v1` industry codes. Each adapter
+must declare whether a filter is exact, translated, unsupported, or handled by
+a visible fallback.
 
 ## Provider order
 

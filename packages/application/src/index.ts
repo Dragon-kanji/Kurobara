@@ -368,6 +368,24 @@ export type {
 } from "./list-contact-candidates.ts";
 export { makeListContactCandidates } from "./list-contact-candidates.ts";
 export type {
+  LoadImportedCompanyCandidatesDependencies,
+  LoadImportedCompanyCandidatesFailure,
+  LoadImportedCompanyCandidatesRequest,
+  LoadImportedCompanyCandidatesResult,
+  LoadImportedCompanyCandidatesSuccess,
+  OrganizationDatasetFieldMapping,
+  OrganizationDatasetSource,
+  OrganizationGenerationSource,
+  OrganizationSnapshotCandidate,
+  OrganizationSource,
+  OrganizationSourceLineage,
+} from "./load-imported-company-candidates.ts";
+export {
+  MAX_IMPORTED_COMPANY_RECORDS_INSPECTED,
+  makeLoadImportedCompanyCandidates,
+  normalizeOrganizationDomain,
+} from "./load-imported-company-candidates.ts";
+export type {
   LoadReadyCompanyCandidatesDependencies,
   LoadReadyCompanyCandidatesRequest,
   LoadReadyCompanyCandidatesResult,

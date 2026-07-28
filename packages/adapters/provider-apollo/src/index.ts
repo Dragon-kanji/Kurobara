@@ -37,7 +37,7 @@ const CATALOG_VERSION = "0.12.0";
 // Build-time bindings to the canonical dataset-generation page contracts.
 // They intentionally avoid a runtime dependency on the contracts workspace.
 export const APOLLO_CATALOG_FINGERPRINT =
-  "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd";
+  "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4";
 const DATASET_GENERATION_PAGE_INPUT_SCHEMA_FINGERPRINT =
   "sha256:40153b13ed33d9bf086dcfde537ce1e17946b0e82b6e0461683c42c24a382a55";
 const DATASET_GENERATION_PAGE_INPUT_SCHEMA_ID =
@@ -155,7 +155,7 @@ const FIELD_KEYS = Object.freeze([
 const QUERY_KEYS = Object.freeze([
   "company_headquarters_country_codes",
   "departments",
-  "organization_generation_id",
+  "organization_source",
   "organizations",
   "person_country_codes",
   "result_kind",
@@ -299,7 +299,7 @@ type ContactSeniority =
 type ContactDiscoveryQuery = Readonly<{
   company_headquarters_country_codes: readonly string[];
   departments: readonly string[];
-  organization_generation_id: string;
+  organization_source: JsonRecord;
   organizations: readonly ContactOrganization[];
   person_country_codes: readonly string[];
   result_kind: "contact";
@@ -708,7 +708,14 @@ const parseQuery = (
   );
   if (
     organizations === undefined ||
-    !boundedText(value.organization_generation_id, 255) ||
+    !(
+      plainRecord(value.organization_source) &&
+      ((value.organization_source.kind === "generation" &&
+        boundedText(value.organization_source.generation_id, 255)) ||
+        (value.organization_source.kind === "dataset" &&
+          boundedText(value.organization_source.dataset_id, 255) &&
+          boundedText(value.organization_source.materialization_id, 255)))
+    ) ||
     value.result_kind !== "contact" ||
     !uniqueStrings(value.company_headquarters_country_codes, {
       maximumCount: MAX_FILTER_VALUES,
@@ -743,7 +750,7 @@ const parseQuery = (
     company_headquarters_country_codes:
       value.company_headquarters_country_codes,
     departments: value.departments,
-    organization_generation_id: value.organization_generation_id,
+    organization_source: value.organization_source,
     organizations,
     person_country_codes: value.person_country_codes,
     result_kind: "contact",

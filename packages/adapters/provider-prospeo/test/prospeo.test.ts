@@ -121,7 +121,10 @@ const discoveryInput = (
   normalizedQuery: {
     company_headquarters_country_codes: ["ES"],
     departments: ["sales"],
-    organization_generation_id: "organization-generation",
+    organization_source: {
+      generation_id: "organization-generation",
+      kind: "generation",
+    },
     organizations: [
       organization(
         "company-synthetic",

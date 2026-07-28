@@ -171,7 +171,10 @@ const pageInput = (
   normalizedQuery: {
     company_headquarters_country_codes: ["ES"],
     departments: [],
-    organization_generation_id: "organization-generation",
+    organization_source: {
+      generation_id: "organization-generation",
+      kind: "generation",
+    },
     organizations: [
       organization(
         "company-synthetic",
@@ -505,7 +508,10 @@ test("uses exactly one bounded search per durable company page", async () => {
     normalizedQuery: {
       company_headquarters_country_codes: [],
       departments: [],
-      organization_generation_id: "organization-generation",
+      organization_source: {
+        generation_id: "organization-generation",
+        kind: "generation",
+      },
       organizations: [
         organization("company-one", "one.example", "Company One"),
         organization("company-two", "two.example", "Company Two"),
@@ -605,7 +611,10 @@ test("quotes and executes zero calls when every parent company lacks a domain", 
     normalizedQuery: {
       company_headquarters_country_codes: [],
       departments: [],
-      organization_generation_id: "organization-generation",
+      organization_source: {
+        generation_id: "organization-generation",
+        kind: "generation",
+      },
       organizations: [
         organization("company-without-domain", null, "No Domain Company"),
       ],

@@ -187,7 +187,10 @@ const requestFor = (
       ? {
           company_headquarters_country_codes: ["ES"],
           departments: [],
-          organization_generation_id: `organization-generation-${marker}`,
+          organization_source: {
+            generation_id: `organization-generation-${marker}`,
+            kind: "generation",
+          },
           organizations: [
             {
               company_id: `company-${marker}`,

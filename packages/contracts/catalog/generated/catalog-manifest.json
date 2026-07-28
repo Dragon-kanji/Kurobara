@@ -70,7 +70,7 @@
       "version": "1.0.0"
     },
     {
-      "fingerprint": "sha256:78323b1bee2bcc1c1291d85fd7417ccc61370e339267c4cd99704e923fcb3890",
+      "fingerprint": "sha256:000959e192ecf81deb0f69f6fb1982fcadaa7837a562004ef74c3bcc20c11118",
       "id": "https://schemas.kurobara.invalid/schemas/contacts/discover-request/1.0.0",
       "media_type": "application/schema+json",
       "role": "schema",
@@ -78,7 +78,7 @@
       "version": "1.0.0"
     },
     {
-      "fingerprint": "sha256:3fc818e0014d182c4056f55bfe72e4183358a2b096db4e634ed2a0dc37b807c8",
+      "fingerprint": "sha256:45c98eb09e679f21777165c59960e7a33543e60001215e78190e6d04f3478d6f",
       "id": "https://schemas.kurobara.invalid/schemas/contacts/discover-response/1.0.0",
       "media_type": "application/schema+json",
       "role": "schema",
@@ -86,7 +86,7 @@
       "version": "1.0.0"
     },
     {
-      "fingerprint": "sha256:cb354d3cae3c64fa6d6a447c7e8cb1294e49acdafc3cbb23d0f5f3ed93e2290c",
+      "fingerprint": "sha256:d583d6eff0e1ce3665f9d2d5ffd1f34f72def414c972741560d9b92d53838add",
       "id": "https://schemas.kurobara.invalid/schemas/contacts/discovery-execution-query/1.0.0",
       "media_type": "application/schema+json",
       "role": "schema",
@@ -107,6 +107,22 @@
       "media_type": "application/schema+json",
       "role": "schema",
       "source": "catalog/schemas/contacts/identity-execution-query/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:43963735e2461868aa5f4d9bb85d18fd49356772cdce7f106dcc2301f9cc4e7e",
+      "id": "https://schemas.kurobara.invalid/schemas/contacts/organization-dataset-source/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/contacts/organization-dataset-source/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:7923839c29cdbd358e040af48a3d7a59c841e54cfdc83b893bf76ca65216a7c2",
+      "id": "https://schemas.kurobara.invalid/schemas/contacts/organization-source-lineage/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/contacts/organization-source-lineage/1.0.0.schema.json",
       "version": "1.0.0"
     },
     {
@@ -959,5 +975,5 @@
     }
   ],
   "publication_status": "local-development-only",
-  "catalog_fingerprint": "sha256:e71489cc76d8e5cd9de5fbf57913402e4310431786ca4dd53bc5b2e069c87afd"
+  "catalog_fingerprint": "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4"
 }

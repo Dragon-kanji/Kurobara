@@ -623,7 +623,10 @@ test("proves the fixture-only V1 business vertical from company filters to deter
       normalizedQuery: {
         company_headquarters_country_codes: [companyValues.country_code],
         departments: [],
-        organization_generation_id: "generation-company-discovery",
+        organization_source: {
+          generation_id: "generation-company-discovery",
+          kind: "generation",
+        },
         organizations: [
           {
             company_id: company.record.recordId,

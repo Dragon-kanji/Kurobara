@@ -31,7 +31,10 @@
   "normalizedQuery": {
     "company_headquarters_country_codes": ["FR"],
     "departments": ["executive"],
-    "organization_generation_id": "generation-synthetic-organizations",
+    "organization_source": {
+      "generation_id": "generation-synthetic-organizations",
+      "kind": "generation"
+    },
     "organizations": [
       {
         "company_id": "company-synthetic",

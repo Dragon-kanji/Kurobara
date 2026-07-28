@@ -1,14 +1,15 @@
 # Build B2B lists
 
-Kurobara can start from search criteria, so a CSV is optional. The current
-provider-backed workflow discovers companies, creates an obfuscated contact
-shortlist, enriches only selected contacts, and exports the final dataset.
+Kurobara can start from search criteria or from an imported CSV/JSONL dataset.
+Both paths create the same bounded organization snapshot before contact
+discovery. The workflow then creates an obfuscated shortlist, enriches only
+selected contacts, and exports the final dataset.
 
 ## Current workflow
 
 ```text
-country + industry + size filters
-  -> company generation
+search criteria OR imported organization domains
+  -> bounded organization snapshot
   -> company candidates
   -> contact shortlist
   -> selected identities
@@ -78,9 +79,11 @@ npm run kurobara -- company search \
   --mode dry-run
 ```
 
-The current Hunter adapter accepts one ISO alpha-2 country and the normalized
-industries `gaming` or `software`. Employee bounds are optional but must be
-provided together.
+The Hunter adapter accepts one ISO alpha-2 country. `gaming` and `software`
+have exact Hunter mappings. Other bounded `kurobara-v1` industry codes, such as
+`pet-food`, use Hunter's declared keyword fallback and remain visible in the
+provider registry; Kurobara does not relabel them. Employee bounds are optional
+but must be provided together.
 
 Inspect the JSON quote. To start the exact same intent before it expires,
 repeat the command with the same IDs and values and change only:
@@ -112,7 +115,12 @@ Do not continue until the generation is `ready`.
 
 ### 3. Build a contact shortlist
 
-`contact search` requires a ready company generation and explicit caps:
+Choose exactly one organization source:
+
+- a ready company generation using `--organization-generation-id`; or
+- a completed imported dataset using `--organization-dataset-id`.
+
+With a ready company generation:
 
 ```sh
 deadline_ms="$(( $(date +%s) * 1000 + 300000 ))"
@@ -139,6 +147,44 @@ npm run kurobara -- contact search \
   --max-pages 2 \
   --mode dry-run
 ```
+
+With an imported dataset, map the domain column and optionally the company
+name and country columns. If no country column exists, provide an explicit
+default:
+
+```sh
+npm run kurobara -- contact search \
+  --endpoint http://127.0.0.1:3000 \
+  --api-key-file .local/api-key \
+  --authority-envelope-id authority-contact-local \
+  --budget-limit 2 \
+  --budget-unit requests \
+  --organization-dataset-id "<imported-company-dataset-id>" \
+  --domain-field website \
+  --name-field company_name \
+  --default-company-country FR \
+  --title "Category Manager" \
+  --seniority manager \
+  --dataset-id "contacts-${run_id}" \
+  --dataset-name "Petfood category managers" \
+  --deadline-ms "${deadline_ms}" \
+  --discovery-id "contact-search-import-${run_id}" \
+  --max-calls 2 \
+  --max-companies 3 \
+  --max-contacts-per-company 1 \
+  --max-contacts-total 3 \
+  --max-pages 2 \
+  --mode dry-run
+```
+
+Accepted domain inputs may be hostnames or HTTP(S) URLs. Kurobara lowercases
+and IDNA-normalizes them, strips ports and URL paths, preserves subdomains, and
+rejects credentials, IP addresses, local/single-label hosts, and malformed
+labels. It performs no DNS request and does not collapse domains.
+
+The JSON response includes `organization_source` with the imported dataset and
+materialization IDs, content hash, mapping, and accepted, rejected, duplicate,
+and truncated counts. This lineage is part of the immutable plan.
 
 Review the quote, repeat with `--mode start`, wait with `company watch`, then
 read the shortlist:

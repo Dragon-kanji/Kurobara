@@ -1257,6 +1257,43 @@ test("declares the owner-key Hunter boundary and normalizes one company page", a
   assert.equal(normalized.status, "normalized");
 });
 
+test("falls back from arbitrary industry codes to explicit Hunter keywords", async () => {
+  let body: Record<string, unknown> | undefined;
+  const adapter = createHunterProviderAdapter({
+    apiKey: "synthetic-hunter-key",
+    clock: { now: () => 1000 },
+    fetch: (_input, init) => {
+      body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      return Promise.resolve(
+        jsonResponse({
+          data: [],
+          meta: { filters: {}, limit: 100, offset: 0, params: {}, results: 0 },
+        })
+      );
+    },
+  });
+  const input = {
+    ...value,
+    normalizedQuery: {
+      ...value.normalizedQuery,
+      industry_codes: ["pet-food"],
+    },
+  };
+
+  const result = await adapter.execute(requestFor(input));
+
+  assert.equal(result.status, "succeeded");
+  assert.deepEqual(body, {
+    headcount: ["11-50", "51-200"],
+    headquarters_location: { include: [{ country: "FR" }] },
+    keywords: {
+      include: ["agentic", "automation", "pet food"],
+      match: "any",
+    },
+    limit: 100,
+  });
+});
+
 test("emits an opaque bounded cursor and consumes it on the next page", async () => {
   const companies = Array.from({ length: 100 }, (_, index) => ({
     domain: `company-${index}.example`,

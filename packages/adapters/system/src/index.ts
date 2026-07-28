@@ -82,7 +82,6 @@ const ISO_3166_ALPHA_2 = new Set(
   )
 );
 
-const SUPPORTED_INDUSTRY_CODES = new Set(["gaming", "software"]);
 const INDUSTRY_CODE_PATTERN = /^[a-z0-9][a-z0-9._-]{0,127}$/u;
 const NON_WHITESPACE_PATTERN = /\S/u;
 const QUERY_REQUIRED_KEYS = Object.freeze([
@@ -178,13 +177,8 @@ const normalizeOrganizationDiscoveryQuery = (
     !isUniqueStringList(value.country_codes, 1, 2, (country) =>
       ISO_3166_ALPHA_2.has(country)
     ) ||
-    !isUniqueStringList(
-      value.industry_codes,
-      64,
-      128,
-      (industry) =>
-        INDUSTRY_CODE_PATTERN.test(industry) &&
-        SUPPORTED_INDUSTRY_CODES.has(industry)
+    !isUniqueStringList(value.industry_codes, 64, 128, (industry) =>
+      INDUSTRY_CODE_PATTERN.test(industry)
     ) ||
     (value.keywords !== undefined &&
       !isUniqueStringList(value.keywords, 32, 128, (keyword) =>
@@ -252,13 +246,13 @@ export const createCompanyDiscoveryQueryNormalizer = ({
       return normalized === undefined
         ? {
             reason:
-              "The organization discovery query contains an unsupported country, industry, headcount range, or field.",
+              "The organization discovery query contains an invalid country, industry code, headcount range, or field.",
             status: "rejected",
           }
         : {
             capability: ORGANIZATIONS_DISCOVER,
             contract: exactContract,
-            normalizerVersion: "kurobara-v1-hunter-1",
+            normalizerVersion: "kurobara-v1-organization-2",
             status: "accepted",
             value: normalized,
           };
@@ -269,7 +263,7 @@ export const createCompanyDiscoveryQueryNormalizer = ({
 const CONTACT_QUERY_KEYS = Object.freeze([
   "company_headquarters_country_codes",
   "departments",
-  "organization_generation_id",
+  "organization_source",
   "organizations",
   "person_country_codes",
   "result_kind",
@@ -287,6 +281,8 @@ const CONTACT_SENIORITIES = new Set([
 ]);
 const CONTACT_TAXONOMY_PATTERN = /^[a-z][a-z0-9._-]{0,127}$/u;
 const DOMAIN_LABEL_PATTERN = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/u;
+const CONTENT_HASH_PATTERN = /^sha256:[0-9a-f]{64}$/u;
+const FIELD_KEY_PATTERN = /^[a-z][a-z0-9_]{0,127}$/u;
 
 type ContactOrganizationSnapshot = Readonly<{
   company_id: string;
@@ -358,6 +354,121 @@ const contactOrganizationSnapshot = (
   });
 };
 
+const contactOrganizationSource = (
+  value: unknown
+): DatasetGenerationQueryValue | undefined => {
+  if (!isPlainRecord(value)) {
+    return;
+  }
+  if (
+    value.kind === "generation" &&
+    exactKeys(value, ["generation_id", "kind"]) &&
+    boundedText(value.generation_id, 255)
+  ) {
+    return Object.freeze({
+      generation_id: value.generation_id,
+      kind: "generation",
+    });
+  }
+  const allowedKeys = new Set([
+    "accepted",
+    "content_hash",
+    "dataset_id",
+    "default_country_code",
+    "duplicates",
+    "field_mapping",
+    "inspected",
+    "kind",
+    "materialization_id",
+    "rejected",
+    "source_record_count",
+    "truncated",
+  ]);
+  if (
+    value.kind !== "dataset" ||
+    Object.keys(value).some((key) => !allowedKeys.has(key)) ||
+    ![
+      "accepted",
+      "content_hash",
+      "dataset_id",
+      "duplicates",
+      "field_mapping",
+      "inspected",
+      "kind",
+      "materialization_id",
+      "rejected",
+      "source_record_count",
+      "truncated",
+    ].every((key) => Object.hasOwn(value, key)) ||
+    !boundedText(value.dataset_id, 255) ||
+    !boundedText(value.materialization_id, 255) ||
+    typeof value.content_hash !== "string" ||
+    !CONTENT_HASH_PATTERN.test(value.content_hash) ||
+    !Number.isSafeInteger(value.accepted) ||
+    !Number.isSafeInteger(value.duplicates) ||
+    !Number.isSafeInteger(value.inspected) ||
+    !Number.isSafeInteger(value.rejected) ||
+    !Number.isSafeInteger(value.source_record_count) ||
+    (value.accepted as number) < 1 ||
+    (value.accepted as number) > 10 ||
+    (value.duplicates as number) < 0 ||
+    (value.inspected as number) < (value.accepted as number) ||
+    (value.inspected as number) > 1000 ||
+    (value.rejected as number) < 0 ||
+    (value.source_record_count as number) < (value.inspected as number) ||
+    typeof value.truncated !== "boolean" ||
+    !isPlainRecord(value.field_mapping)
+  ) {
+    return;
+  }
+  const fieldMapping = value.field_mapping;
+  const mappingKeys = new Set(["country_code", "domain", "name"]);
+  if (
+    Object.keys(fieldMapping).some((key) => !mappingKeys.has(key)) ||
+    !boundedText(fieldMapping.domain, 128) ||
+    !FIELD_KEY_PATTERN.test(fieldMapping.domain) ||
+    (fieldMapping.country_code !== undefined &&
+      !(
+        boundedText(fieldMapping.country_code, 128) &&
+        FIELD_KEY_PATTERN.test(fieldMapping.country_code)
+      )) ||
+    (fieldMapping.name !== undefined &&
+      !(
+        boundedText(fieldMapping.name, 128) &&
+        FIELD_KEY_PATTERN.test(fieldMapping.name)
+      )) ||
+    (value.default_country_code !== undefined &&
+      (typeof value.default_country_code !== "string" ||
+        !ISO_3166_ALPHA_2.has(value.default_country_code))) ||
+    (fieldMapping.country_code === undefined &&
+      value.default_country_code === undefined)
+  ) {
+    return;
+  }
+  return Object.freeze({
+    accepted: value.accepted as number,
+    content_hash: value.content_hash,
+    dataset_id: value.dataset_id,
+    ...(value.default_country_code === undefined
+      ? {}
+      : { default_country_code: value.default_country_code }),
+    duplicates: value.duplicates as number,
+    field_mapping: Object.freeze({
+      ...(fieldMapping.country_code === undefined
+        ? {}
+        : { country_code: fieldMapping.country_code }),
+      domain: fieldMapping.domain,
+      ...(fieldMapping.name === undefined ? {} : { name: fieldMapping.name }),
+    }),
+    inspected: value.inspected as number,
+    kind: "dataset",
+    materialization_id: value.materialization_id,
+    rejected: value.rejected as number,
+    source_record_count: value.source_record_count as number,
+    truncated: value.truncated,
+  });
+};
+
 const contactFilterList = (
   value: unknown,
   maximumCount: number,
@@ -381,7 +492,6 @@ const normalizeContactDiscoveryExecutionQuery = (
   if (
     !(isPlainRecord(value) && exactKeys(value, CONTACT_QUERY_KEYS)) ||
     value.result_kind !== "contact" ||
-    !boundedText(value.organization_generation_id, 255) ||
     !contactFilterList(
       value.company_headquarters_country_codes,
       32,
@@ -405,6 +515,12 @@ const normalizeContactDiscoveryExecutionQuery = (
   ) {
     return;
   }
+  const organizationSource = contactOrganizationSource(
+    value.organization_source
+  );
+  if (organizationSource === undefined) {
+    return;
+  }
   const organizations = value.organizations.map(contactOrganizationSnapshot);
   if (
     organizations.some((organization) => organization === undefined) ||
@@ -418,7 +534,7 @@ const normalizeContactDiscoveryExecutionQuery = (
       [...value.company_headquarters_country_codes].sort()
     ),
     departments: Object.freeze([...value.departments].sort()),
-    organization_generation_id: value.organization_generation_id,
+    organization_source: organizationSource,
     organizations: Object.freeze(organizations),
     person_country_codes: Object.freeze([...value.person_country_codes].sort()),
     result_kind: "contact",

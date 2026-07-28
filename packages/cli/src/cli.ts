@@ -46,6 +46,8 @@ const MAX_EXPORT_BYTES = 1024 * 1024 * 1024 * 1024;
 const MAX_EXPORT_TIMEOUT_MS = 86_400_000;
 const MIN_WATCH_POLL_INTERVAL_MS = 100;
 const SHA256_PATTERN = /^sha256:[0-9a-f]{64}$/u;
+const COMPANY_COUNTRY_CODE_PATTERN = /^[A-Z]{2}$/u;
+const DATASET_FIELD_KEY_PATTERN = /^[a-z][a-z0-9_]{0,127}$/u;
 const UNSIGNED_INTEGER_PATTERN = /^(0|[1-9][0-9]*)$/u;
 const TRAILING_NEWLINE_PATTERN = /\r?\n$/u;
 const WHITESPACE_PATTERN = /\s/u;
@@ -304,7 +306,18 @@ type ContactSearchArguments = Readonly<{
   maxContactsTotal: number;
   maxPages: number;
   mode: "dry-run" | "start";
-  organizationGenerationId: string;
+  organizationSource:
+    | Readonly<{ generationId: string; kind: "generation" }>
+    | Readonly<{
+        datasetId: string;
+        defaultCountryCode?: string;
+        fieldMapping: Readonly<{
+          countryCode?: string;
+          domain: string;
+          name?: string;
+        }>;
+        kind: "dataset";
+      }>;
   personCountries: readonly string[];
   seniorities: readonly string[];
   titles: readonly string[];
@@ -554,6 +567,56 @@ const parsePositiveAmount = (
   return parsed;
 };
 
+const parseContactOrganizationSource = (
+  values: ReadonlyMap<string, string>
+): ContactSearchArguments["organizationSource"] => {
+  const generationId = values.get("--organization-generation-id");
+  const datasetId = values.get("--organization-dataset-id");
+  const domain = values.get("--domain-field");
+  const name = values.get("--name-field");
+  const countryCode = values.get("--country-field");
+  const defaultCountryCode = values.get("--default-company-country");
+  const hasGeneration = generationId !== undefined && generationId.length > 0;
+  const hasDataset = datasetId !== undefined && datasetId.length > 0;
+  const datasetFieldsInvalid =
+    domain === undefined ||
+    !DATASET_FIELD_KEY_PATTERN.test(domain) ||
+    (name !== undefined && !DATASET_FIELD_KEY_PATTERN.test(name)) ||
+    (countryCode !== undefined &&
+      !DATASET_FIELD_KEY_PATTERN.test(countryCode)) ||
+    (defaultCountryCode !== undefined &&
+      !COMPANY_COUNTRY_CODE_PATTERN.test(defaultCountryCode)) ||
+    (countryCode === undefined && defaultCountryCode === undefined);
+  const generationHasDatasetFields =
+    domain !== undefined ||
+    name !== undefined ||
+    countryCode !== undefined ||
+    defaultCountryCode !== undefined;
+  if (
+    hasGeneration === hasDataset ||
+    (hasDataset && datasetFieldsInvalid) ||
+    (hasGeneration && generationHasDatasetFields)
+  ) {
+    throw new CliInputError(
+      "cli-usage-error",
+      "Contact search requires exactly one source: --organization-generation-id, or --organization-dataset-id with --domain-field and a country field/default."
+    );
+  }
+  if (hasGeneration) {
+    return { generationId: generationId as string, kind: "generation" };
+  }
+  return {
+    datasetId: datasetId as string,
+    ...(defaultCountryCode === undefined ? {} : { defaultCountryCode }),
+    fieldMapping: {
+      ...(countryCode === undefined ? {} : { countryCode }),
+      domain: domain as string,
+      ...(name === undefined ? {} : { name }),
+    },
+    kind: "dataset",
+  };
+};
+
 const parseContactSearchArguments = (
   argv: readonly string[],
   environment: Readonly<Record<string, string | undefined>>
@@ -566,11 +629,14 @@ const parseContactSearchArguments = (
       "--budget-limit",
       "--budget-unit",
       "--company-country",
+      "--country-field",
       "--dataset-id",
       "--dataset-name",
+      "--default-company-country",
       "--deadline-ms",
       "--department",
       "--discovery-id",
+      "--domain-field",
       "--endpoint",
       "--max-calls",
       "--max-companies",
@@ -578,6 +644,8 @@ const parseContactSearchArguments = (
       "--max-contacts-total",
       "--max-pages",
       "--mode",
+      "--name-field",
+      "--organization-dataset-id",
       "--organization-generation-id",
       "--person-country",
       "--seniority",
@@ -597,7 +665,6 @@ const parseContactSearchArguments = (
   const datasetId = values.get("--dataset-id");
   const datasetName = values.get("--dataset-name");
   const discoveryId = values.get("--discovery-id");
-  const organizationGenerationId = values.get("--organization-generation-id");
   const mode = values.get("--mode");
   if (
     authorityEnvelopeId === undefined ||
@@ -610,8 +677,6 @@ const parseContactSearchArguments = (
     datasetName.length === 0 ||
     discoveryId === undefined ||
     discoveryId.length === 0 ||
-    organizationGenerationId === undefined ||
-    organizationGenerationId.length === 0 ||
     (mode !== "dry-run" && mode !== "start")
   ) {
     throw new CliInputError(
@@ -619,6 +684,7 @@ const parseContactSearchArguments = (
       "Contact search requires organization lineage, identity, mode, deadline, cost and cardinality bounds."
     );
   }
+  const organizationSource = parseContactOrganizationSource(values);
   const maxCompanies = parseBoundedInteger(
     values.get("--max-companies"),
     1,
@@ -679,7 +745,7 @@ const parseContactSearchArguments = (
       "Contact search --max-pages is invalid."
     ),
     mode,
-    organizationGenerationId,
+    organizationSource,
     personCountries: repeated.get("--person-country") ?? [],
     seniorities: repeated.get("--seniority") ?? [],
     titles: repeated.get("--title") ?? [],
@@ -2801,6 +2867,69 @@ const executeContactPrivacyRestriction = async (
   );
 };
 
+const executeContactDiscovery = (
+  parsed: ContactSearchArguments,
+  client: ReturnType<typeof createKurobaraClient>,
+  signal?: AbortSignal
+): Promise<unknown> => {
+  const organizationSource =
+    parsed.organizationSource.kind === "generation"
+      ? {
+          organization_generation_id: parsed.organizationSource.generationId,
+        }
+      : {
+          organization_dataset: {
+            dataset_id: parsed.organizationSource.datasetId,
+            ...(parsed.organizationSource.defaultCountryCode === undefined
+              ? {}
+              : {
+                  default_country_code:
+                    parsed.organizationSource.defaultCountryCode,
+                }),
+            field_mapping: {
+              ...(parsed.organizationSource.fieldMapping.countryCode ===
+              undefined
+                ? {}
+                : {
+                    country_code:
+                      parsed.organizationSource.fieldMapping.countryCode,
+                  }),
+              domain: parsed.organizationSource.fieldMapping.domain,
+              ...(parsed.organizationSource.fieldMapping.name === undefined
+                ? {}
+                : { name: parsed.organizationSource.fieldMapping.name }),
+            },
+          },
+        };
+  const request: ContactDiscoverRequest = {
+    authority_envelope_id: parsed.authorityEnvelopeId,
+    budget: { limit: parsed.budgetLimit, unit: parsed.budgetUnit },
+    dataset_id: parsed.datasetId,
+    dataset_name: parsed.datasetName,
+    deadline_ms: parsed.deadlineMs,
+    discovery_id: parsed.discoveryId,
+    limits: {
+      max_calls: parsed.maxCalls,
+      max_companies: parsed.maxCompanies,
+      max_contacts_per_company: parsed.maxContactsPerCompany,
+      max_contacts_total: parsed.maxContactsTotal,
+      max_pages: parsed.maxPages,
+    },
+    mode: parsed.mode,
+    ...organizationSource,
+    query: {
+      company_headquarters_country_codes: parsed.companyCountries,
+      departments: parsed.departments,
+      person_country_codes: parsed.personCountries,
+      result_kind: "contact",
+      seniorities:
+        parsed.seniorities as ContactDiscoverRequest["query"]["seniorities"],
+      titles: parsed.titles,
+    },
+  };
+  return client.contacts.discover(request, requestOptions(signal));
+};
+
 const executeCommand = async (
   parsed: CliArguments,
   client: ReturnType<typeof createKurobaraClient>,
@@ -2817,36 +2946,7 @@ const executeCommand = async (
     );
   }
   if (parsed.command === "contacts.discover") {
-    const request: ContactDiscoverRequest = {
-      authority_envelope_id: parsed.authorityEnvelopeId,
-      budget: { limit: parsed.budgetLimit, unit: parsed.budgetUnit },
-      dataset_id: parsed.datasetId,
-      dataset_name: parsed.datasetName,
-      deadline_ms: parsed.deadlineMs,
-      discovery_id: parsed.discoveryId,
-      limits: {
-        max_calls: parsed.maxCalls,
-        max_companies: parsed.maxCompanies,
-        max_contacts_per_company: parsed.maxContactsPerCompany,
-        max_contacts_total: parsed.maxContactsTotal,
-        max_pages: parsed.maxPages,
-      },
-      mode: parsed.mode,
-      organization_generation_id: parsed.organizationGenerationId,
-      query: {
-        company_headquarters_country_codes: parsed.companyCountries,
-        departments: parsed.departments,
-        person_country_codes: parsed.personCountries,
-        result_kind: "contact",
-        seniorities:
-          parsed.seniorities as ContactDiscoverRequest["query"]["seniorities"],
-        titles: parsed.titles,
-      },
-    };
-    return client.contacts.discover(
-      request,
-      requestOptions(watchRuntime.signal)
-    );
+    return executeContactDiscovery(parsed, client, watchRuntime.signal);
   }
   if (isContactDerivation(parsed)) {
     return executeContactDerivation(parsed, client, watchRuntime.signal);

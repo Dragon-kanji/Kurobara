@@ -268,6 +268,10 @@ const contactDiscoverResponse = {
   generation_plan_id: "contact-generation-plan-client-test",
   mode: "dry-run",
   organization_generation_id: "generation-client-test",
+  organization_source: {
+    generation_id: "generation-client-test",
+    kind: "generation",
+  },
   plan_hash: `sha256:${"e".repeat(64)}`,
   query_hash: `sha256:${"f".repeat(64)}`,
   quote: {

@@ -97,6 +97,12 @@ import contactCandidateSchema from "@kurobara/contracts/schemas/contact-candidat
 import contactDiscoveryQuerySchema from "@kurobara/contracts/schemas/contact-discovery-query.json" with {
   type: "json",
 };
+import contactOrganizationDatasetSourceSchema from "@kurobara/contracts/schemas/contact-organization-dataset-source.json" with {
+  type: "json",
+};
+import contactOrganizationSourceLineageSchema from "@kurobara/contracts/schemas/contact-organization-source-lineage.json" with {
+  type: "json",
+};
 import contactPrivacyRestrictRequestSchema from "@kurobara/contracts/schemas/contact-privacy-restrict-request.json" with {
   type: "json",
 };
@@ -285,6 +291,8 @@ ajv.addSchema(datasetSchema);
 ajv.addSchema(enrichmentRecipeSchema);
 ajv.addSchema(fieldSchema);
 ajv.addSchema(contactDiscoveryQuerySchema);
+ajv.addSchema(contactOrganizationDatasetSourceSchema);
+ajv.addSchema(contactOrganizationSourceLineageSchema);
 ajv.addSchema(contactCandidateSchema);
 ajv.addSchema(organizationDiscoveryQuerySchema);
 ajv.addSchema(companyCandidateSchema);
@@ -2097,10 +2105,22 @@ export const createKurobaraClient = (
       response,
       maxResponseBytes
     );
+    const sourceMatches =
+      validated.organization_dataset === undefined
+        ? parsed.organization_source.kind === "generation" &&
+          parsed.organization_source.generation_id ===
+            validated.organization_generation_id
+        : parsed.organization_source.kind === "dataset" &&
+          parsed.organization_source.dataset_id ===
+            validated.organization_dataset.dataset_id &&
+          JSON.stringify(parsed.organization_source.field_mapping) ===
+            JSON.stringify(validated.organization_dataset.field_mapping) &&
+          parsed.organization_source.default_country_code ===
+            validated.organization_dataset.default_country_code;
     if (
       parsed.dataset_id !== validated.dataset_id ||
       parsed.mode !== validated.mode ||
-      parsed.organization_generation_id !== validated.organization_generation_id
+      !sourceMatches
     ) {
       throw new KurobaraTransportError(
         "invalid-response",

@@ -35,6 +35,18 @@
         "contacts.work-email.resolve",
         "contacts.work-email.verify"
       ],
+      "filter_support": {
+        "organizations.discover": {
+          "industry_codes": {
+            "exact": {
+              "gaming": "Computer Games",
+              "software": "Software Development"
+            },
+            "fallback": "keyword_any",
+            "mapping_version": "kurobara-v1-hunter-2"
+          }
+        }
+      },
       "admission": "default",
       "default_order": 20,
       "probe": "none",

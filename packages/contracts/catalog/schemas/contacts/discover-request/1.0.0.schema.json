@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.kurobara.invalid/schemas/contacts/discover-request/1.0.0",
   "title": "ContactsDiscoverRequest",
-  "description": "Zero-effect dry-run or bounded start command for a contact shortlist linked to one organization generation.",
+  "description": "Zero-effect dry-run or bounded start command for a contact shortlist linked to one organization generation or imported dataset.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -14,7 +14,6 @@
     "discovery_id",
     "limits",
     "mode",
-    "organization_generation_id",
     "query"
   ],
   "properties": {
@@ -92,6 +91,9 @@
       }
     },
     "mode": { "type": "string", "enum": ["dry-run", "start"] },
+    "organization_dataset": {
+      "$ref": "https://schemas.kurobara.invalid/schemas/contacts/organization-dataset-source/1.0.0"
+    },
     "organization_generation_id": {
       "type": "string",
       "minLength": 1,
@@ -102,6 +104,31 @@
       "$ref": "https://schemas.kurobara.invalid/schemas/contacts/discovery-query/1.0.0"
     }
   },
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["organization_generation_id"],
+      "properties": {
+        "organization_generation_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "organization_dataset": false
+      }
+    },
+    {
+      "type": "object",
+      "required": ["organization_dataset"],
+      "properties": {
+        "organization_dataset": {
+          "$ref": "https://schemas.kurobara.invalid/schemas/contacts/organization-dataset-source/1.0.0"
+        },
+        "organization_generation_id": false
+      }
+    }
+  ],
   "x-kurobara-schema-version": "1.0.0",
   "x-kurobara-owner": "application.contacts",
   "x-kurobara-data-classification": "confidential",
