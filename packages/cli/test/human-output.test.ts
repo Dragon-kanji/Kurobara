@@ -8,6 +8,13 @@ import {
   renderHumanPlayRunProgress,
 } from "../src/human-output.ts";
 
+const BOLD = "\u001b[1m";
+const GREEN = "\u001b[38;5;34m";
+const PINK = "\u001b[38;5;198m";
+const RESET = "\u001b[0m";
+const styled = (sequence: string, value: string): string =>
+  `${sequence}${value}${RESET}`;
+
 const capture = (columns = 112) => {
   const chunks: string[] = [];
   const target: HumanOutputTarget = {
@@ -156,15 +163,28 @@ test("play run receipt makes status, constraints, and stages scannable", () => {
 
   const rendered = output.value();
   assert.ok(contains(rendered, "KUROBARA ◆ PLAY RUN"));
-  assert.ok(contains(rendered, "STATUS\n─"));
+  assert.ok(contains(rendered, "──[ STATUS ]"));
   assert.ok(contains(rendered, "◆ PAUSED  Review boundary reached"));
-  assert.ok(contains(rendered, "CONSTRAINTS\n─"));
+  assert.ok(contains(rendered, "──[ CONSTRAINTS ]"));
   assert.ok(contains(rendered, "12.4 credits · hard limit 18"));
   assert.ok(contains(rendered, "provider_spend, reveal"));
   assert.ok(contains(rendered, "no_send"));
-  assert.ok(contains(rendered, "EXECUTION PLAN  2 stages\n─"));
-  assert.ok(contains(rendered, "01 ─ organizations.discover\n     │"));
+  assert.ok(contains(rendered, "──[ EXECUTION PLAN ] 2 stages"));
+  assert.ok(contains(rendered, "01 ─ organizations.discover\n     ┃"));
   assert.equal(rendered.includes("\u001b["), false);
+});
+
+test("colored play run receipt carries the Kurobara terminal identity", () => {
+  const output = capture();
+
+  renderHumanCommandResult(output.target, "play-runs.get", playRun, true);
+
+  const rendered = output.value();
+  assert.ok(contains(rendered, styled(`${BOLD}${PINK}`, "◆ PLAY RUN")));
+  assert.ok(contains(rendered, styled(`${BOLD}${PINK}`, "···●····●···")));
+  assert.ok(contains(rendered, styled(`${BOLD}${PINK}`, "[ STATUS ]")));
+  assert.ok(contains(rendered, styled(`${BOLD}${PINK}`, "◆ PAUSED")));
+  assert.ok(contains(rendered, styled(`${BOLD}${PINK}`, "01")));
 });
 
 test("workbook receipt separates rows and surfaces review evidence", () => {
@@ -174,7 +194,7 @@ test("workbook receipt separates rows and surfaces review evidence", () => {
 
   const rendered = output.value();
   assert.ok(contains(rendered, "France SaaS outbound review"));
-  assert.ok(contains(rendered, "ROWS  2 shown\n─"));
+  assert.ok(contains(rendered, "──[ ROWS ] 2 shown"));
   assert.ok(contains(rendered, "1  northstar.invalid"));
   assert.ok(contains(rendered, "ari@northstar.invalid"));
   assert.ok(contains(rendered, "✓ READY"));
@@ -190,9 +210,21 @@ test("workbook receipt separates rows and surfaces review evidence", () => {
   assert.ok(contains(rendered, "2  cedarstack.invalid"));
   assert.ok(contains(rendered, "[redacted]"));
   assert.ok(contains(rendered, "○ PENDING"));
-  assert.ok(contains(rendered, "REVIEW STATE\n─"));
+  assert.ok(contains(rendered, "──[ REVIEW STATE ]"));
   assert.ok(contains(rendered, "1 selected  ·  0 decisions  ·  0 annotations"));
   assert.ok(contains(rendered, "More rows available after ordinal 2"));
+});
+
+test("colored workbook receipt reserves green for success", () => {
+  const output = capture();
+
+  renderHumanCommandResult(output.target, "workbooks.get", workbook, true);
+
+  const rendered = output.value();
+  assert.ok(contains(rendered, styled(`${BOLD}${PINK}`, "◆ WORKBOOK")));
+  assert.ok(contains(rendered, styled(`${BOLD}${PINK}`, "[ ROWS ]")));
+  assert.ok(contains(rendered, styled(`${BOLD}${PINK}`, "◆ SELECTED")));
+  assert.ok(contains(rendered, `${BOLD}${GREEN}✓ READY`));
 });
 
 test("workbook decisions name the action and emphasize the latest decision", () => {

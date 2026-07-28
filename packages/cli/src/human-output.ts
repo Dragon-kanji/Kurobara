@@ -36,7 +36,7 @@ const line = (target: HumanOutputTarget, value = ""): void => {
 
 const text = (value: unknown): string => {
   if (value === null || value === undefined) {
-    return "—";
+    return "-";
   }
   if (Array.isArray(value)) {
     return value.map(text).join(", ");
@@ -65,6 +65,9 @@ const styled = (value: string, sequence: string, color: boolean): string =>
 const dimmed = (value: string, color: boolean): string =>
   styled(value, DIM, color);
 
+const white = (value: string, color: boolean): string =>
+  styled(value, WHITE, color);
+
 const emphasized = (value: string, color: boolean): string =>
   styled(value, `${BOLD}${WHITE}`, color);
 
@@ -84,7 +87,7 @@ const header = (
 ): void => {
   line(
     target,
-    `${emphasized("KUROBARA", color)} ${pink("◆", color)} ${emphasized(title.toUpperCase(), color)}`
+    `${emphasized("KUROBARA", color)} ${pink(`◆ ${title.toUpperCase()}`, color)}`
   );
   const remainingWidth = Math.max(
     12,
@@ -92,7 +95,7 @@ const header = (
   );
   line(
     target,
-    `${dimmed("──────", color)}${pink(BRAND_MARKER, color)}${dimmed(repeat("─", remainingWidth), color)}`
+    `${pink("━━━━━━", color)}${pink(BRAND_MARKER, color)}${dimmed(repeat("─", remainingWidth), color)}`
   );
   line(target);
 };
@@ -103,25 +106,49 @@ const section = (
   color: boolean,
   detail?: string
 ): void => {
-  const suffix = detail === undefined ? "" : `  ${dimmed(detail, color)}`;
-  line(target, `${emphasized(title.toUpperCase(), color)}${suffix}`);
-  line(target, dimmed(repeat("─", terminalWidth(target)), color));
+  const label = `[ ${title.toUpperCase()} ]`;
+  const suffix = detail === undefined ? "" : ` ${detail}`;
+  const consumedWidth = 2 + label.length + suffix.length + 1;
+  const railWidth = Math.max(4, terminalWidth(target) - consumedWidth);
+  line(
+    target,
+    `${dimmed("──", color)}${pink(label, color)}${dimmed(suffix, color)} ${dimmed(repeat("─", railWidth), color)}`
+  );
 };
 
 const gap = (target: HumanOutputTarget): void => {
   line(target);
 };
 
+type ValueTone = "default" | "dim" | "green" | "pink";
+
+const toned = (value: string, tone: ValueTone, color: boolean): string => {
+  if (tone === "pink") {
+    return pink(value, color);
+  }
+  if (tone === "green") {
+    return green(value, color);
+  }
+  if (tone === "dim") {
+    return dimmed(value, color);
+  }
+  return white(value, color);
+};
+
+const pinkTag = (value: string, color: boolean): string =>
+  pink(`[ ${value.toUpperCase()} ]`, color);
+
 const keyValue = (
   target: HumanOutputTarget,
   label: string,
   value: unknown,
   color: boolean,
-  labelWidth = 12
+  labelWidth = 12,
+  valueTone: ValueTone = "default"
 ): void => {
   line(
     target,
-    `  ${dimmed(label.padEnd(labelWidth), color)}${TABLE_GAP}${text(value)}`
+    `  ${dimmed(label.padEnd(labelWidth), color)}${TABLE_GAP}${toned(text(value), valueTone, color)}`
   );
 };
 
@@ -240,7 +267,7 @@ const formatConfidence = (value: unknown): string => {
 
 const formatCost = (value: unknown): string => {
   if (!isObject(value)) {
-    return "—";
+    return "-";
   }
   return `${text(value.amount)} ${text(value.unit)} · ${text(value.basis)}`;
 };
@@ -274,7 +301,7 @@ const renderQuestionnaire = (
     const identifier = `${String(index + 1).padStart(2, "0")}  ${text(candidate.question_id)}`;
     line(
       target,
-      `  ${humanGate ? pink("◆ HUMAN", color) : dimmed("· DRAFTABLE", color)}  ${emphasized(identifier, color)}`
+      `  ${humanGate ? pinkTag("human gate", color) : dimmed("[ DRAFTABLE ]", color)}  ${emphasized(identifier, color)}`
     );
     line(target, `      ${text(candidate.prompt)}`);
     if (isObject(candidate.ask_if)) {
@@ -392,7 +419,7 @@ const renderPlayConstraints = (
       compilation.budget.limit === undefined
         ? ""
         : ` · hard limit ${text(compilation.budget.limit)}`;
-    keyValue(target, "Quote", `${quote}${limit}`, color);
+    keyValue(target, "Quote", `${quote}${limit}`, color, 12, "pink");
   }
   if (isObject(compilation.authority)) {
     const gates = Array.isArray(compilation.authority.human_gates)
@@ -402,11 +429,20 @@ const renderPlayConstraints = (
       target,
       "Human gates",
       gates.length === 0 ? "none" : gates.join(", "),
-      color
+      color,
+      12,
+      gates.length === 0 ? "dim" : "pink"
     );
   }
   if (play !== undefined && isObject(play.delivery)) {
-    keyValue(target, "Delivery", play.delivery.mode, color);
+    keyValue(
+      target,
+      "Delivery",
+      play.delivery.mode,
+      color,
+      12,
+      play.delivery.mode === "no_send" ? "green" : "pink"
+    );
   }
 };
 
@@ -424,7 +460,7 @@ const renderStages = (
       `  ${pink(ordinal, color)} ${dimmed("─", color)} ${emphasized(text(stage.operation_id), color)}`
     );
     if (index < stages.length - 1) {
-      line(target, `     ${dimmed("│", color)}`);
+      line(target, `     ${pink("┃", color)}`);
     }
   }
   if (stages.length === 0) {
@@ -467,7 +503,7 @@ const workbookCellValue = (
   cell: Record<string, unknown> | undefined
 ): string => {
   if (cell === undefined) {
-    return "—";
+    return "-";
   }
   return cell.redacted === true ? "[redacted]" : clipped(cell.value);
 };
@@ -497,8 +533,11 @@ const renderWorkbookEvidence = (
   target: HumanOutputTarget,
   cells: readonly Record<string, unknown>[],
   labelByField: ReadonlyMap<string, string>,
-  color: boolean
+  color: boolean,
+  selected: boolean
 ): void => {
+  const evidencePrefix = selected ? `${pink("┃", color)}     ` : "      ";
+  const metadataPrefix = selected ? `${pink("┃", color)}       ` : "        ";
   for (const cell of cells.filter(workbookCellHasEvidence)) {
     const fieldId = text(cell.field_id);
     const label = labelByField.get(fieldId) ?? fieldId;
@@ -511,7 +550,7 @@ const renderWorkbookEvidence = (
     }
     line(
       target,
-      `      ${pink("↳", color)} ${emphasized(label, color)}${facts.length === 0 ? "" : ` · ${facts.join(" · ")}`}`
+      `${evidencePrefix}${pink("↳", color)} ${emphasized(label, color)}${facts.length === 0 ? "" : ` · ${facts.join(" · ")}`}`
     );
     if (isObject(cell.freshness)) {
       const expiry =
@@ -520,19 +559,19 @@ const renderWorkbookEvidence = (
           : `expires ${formatTimestamp(cell.freshness.expires_at_ms)}`;
       line(
         target,
-        `        ${dimmed(`observed ${formatTimestamp(cell.freshness.observed_at_ms)} · ${expiry}`, color)}`
+        `${metadataPrefix}${dimmed(`observed ${formatTimestamp(cell.freshness.observed_at_ms)} · ${expiry}`, color)}`
       );
     }
     if (Array.isArray(cell.provenance) && cell.provenance.length > 0) {
       line(
         target,
-        `        ${dimmed("source", color)} ${cell.provenance.map(text).join(", ")}`
+        `${metadataPrefix}${dimmed("source", color)} ${cell.provenance.map(text).join(", ")}`
       );
     }
     if (isObject(cell.error)) {
       line(
         target,
-        `        ${pink("!", color)} ${text(cell.error.code)} · ${text(cell.error.message)}`
+        `${metadataPrefix}${pink("!", color)} ${text(cell.error.code)} · ${text(cell.error.message)}`
       );
     }
   }
@@ -616,6 +655,10 @@ const renderWorkbookTable = (
 
   for (const [recordIndex, record] of records.entries()) {
     const cells = objects(record.cells);
+    const selectionReasons = Array.isArray(record.selection_reasons)
+      ? record.selection_reasons
+      : [];
+    const selected = selectionReasons.length > 0;
     const cellByField = new Map(
       cells.map((cell) => [text(cell.field_id), cell])
     );
@@ -630,21 +673,22 @@ const renderWorkbookTable = (
       ),
       statusTone(state, stateCell, color),
     ];
-    line(target, `  ${row.join(TABLE_GAP)}`);
-    if (
-      Array.isArray(record.selection_reasons) &&
-      record.selection_reasons.length > 0
-    ) {
+    line(
+      target,
+      `${selected ? `${pink("┃", color)} ` : "  "}${row.join(TABLE_GAP)}`
+    );
+    if (selected) {
       line(
         target,
-        `      ${pink("◆ SELECTED", color)} · ${record.selection_reasons.map(text).join(", ")}`
+        `${pink("┃", color)}     ${pink("◆ SELECTED", color)} · ${selectionReasons.map(text).join(", ")}`
       );
     }
-    renderWorkbookEvidence(target, cells, labelByField, color);
+    renderWorkbookEvidence(target, cells, labelByField, color, selected);
     if (recordIndex < records.length - 1) {
+      const separatorWidth = Math.min(terminalWidth(target) - 2, 88);
       line(
         target,
-        `  ${dimmed(repeat("┄", Math.min(terminalWidth(target) - 2, 88)), color)}`
+        `  ${dimmed(repeat("┄", 8), color)}${pink("◆", color)}${dimmed(repeat("┄", Math.max(4, separatorWidth - 9)), color)}`
       );
     }
   }

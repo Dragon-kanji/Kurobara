@@ -2973,7 +2973,98 @@ test("agent reads the canonical GTM questionnaire as stable JSON without prompti
 
   assert.equal(exitCode, 0);
   assert.equal(stderr.value(), "");
+  assert.equal(stdout.value().includes("\u001b["), false);
   assert.deepEqual(JSON.parse(stdout.value()), response);
+});
+
+test("human color stays TTY-only and respects terminal color guards", async () => {
+  const response = {
+    profile: "agentic_outbound_play",
+    questionnaire_version: "1.0.0",
+    questions: [
+      {
+        answer_schema: { type: "boolean" },
+        prompt: "Have provider rights been confirmed?",
+        question_id: "policy.provider_rights_confirmed",
+        required_for: ["agentic_outbound_play"],
+        requires_human_confirmation: true,
+        section: "policy",
+        sensitivity: "policy",
+      },
+    ],
+  } as const;
+  const cases = [
+    {
+      environment: { KUROBARA_API_KEY: "synthetic-api-key" },
+      expectsColor: true,
+      expectsJson: false,
+      name: "colored TTY",
+      tty: true,
+    },
+    {
+      environment: {
+        KUROBARA_API_KEY: "synthetic-api-key",
+        NO_COLOR: "1",
+      },
+      expectsColor: false,
+      expectsJson: false,
+      name: "NO_COLOR TTY",
+      tty: true,
+    },
+    {
+      environment: {
+        KUROBARA_API_KEY: "synthetic-api-key",
+        TERM: "dumb",
+      },
+      expectsColor: false,
+      expectsJson: false,
+      name: "dumb terminal",
+      tty: true,
+    },
+    {
+      environment: { KUROBARA_API_KEY: "synthetic-api-key" },
+      expectsColor: false,
+      expectsJson: true,
+      name: "non-TTY",
+      tty: false,
+    },
+  ] as const;
+
+  for (const candidate of cases) {
+    const stdout = capture(candidate.tty);
+    const stderr = capture();
+    const exitCode = await runCli({
+      argv: [
+        "context",
+        "questions",
+        "--profile",
+        "agentic_outbound_play",
+        "--endpoint",
+        TEST_ENDPOINT,
+      ],
+      environment: candidate.environment,
+      fetch: fetchFrom(() => jsonResponse(response)),
+      stderr: stderr.target,
+      stdin: Readable.from([]),
+      stdout: stdout.target,
+    });
+
+    assert.equal(exitCode, 0, candidate.name);
+    assert.equal(stderr.value(), "", candidate.name);
+    assert.equal(
+      stdout.value().includes("\u001b["),
+      candidate.expectsColor,
+      candidate.name
+    );
+    if (candidate.expectsJson) {
+      assert.deepEqual(JSON.parse(stdout.value()), response, candidate.name);
+    } else {
+      assert.ok(
+        stdout.value().includes("GTM CONTEXT QUESTIONS"),
+        candidate.name
+      );
+    }
+  }
 });
 
 test("workbook review aliases use the same versioned update contract", async () => {
@@ -3112,6 +3203,7 @@ test("workbook review aliases keep their action in human TTY receipts", async ()
     assert.ok(
       stdout.value().includes("✓ SAVED  Versioned review state persisted")
     );
+    assert.equal(stdout.value().includes("\u001b["), false);
   }
 });
 
@@ -3206,6 +3298,7 @@ test("play run polls until the run reaches a review boundary", async () => {
   assert.equal(exitCode, 0);
   assert.equal(calls, 2);
   assert.equal(stderr.value(), "");
+  assert.equal(stdout.value().includes("\u001b["), false);
   assert.deepEqual(JSON.parse(stdout.value()), completed);
 });
 
@@ -3262,7 +3355,7 @@ test("human play run watch shows bounded progress before the final receipt", asy
   assert.ok(stdout.value().includes("\r···●····●···  ● RUNNING  poll 1"));
   assert.ok(stdout.value().includes("KUROBARA ◆ PLAY RUN"));
   assert.ok(stdout.value().includes("✓ COMPLETED"));
-  assert.ok(stdout.value().includes("EXECUTION PLAN  1 stage"));
+  assert.ok(stdout.value().includes("[ EXECUTION PLAN ] 1 stage"));
 });
 
 test("human play run watch suppresses replaceable progress in CI", async () => {
@@ -3318,5 +3411,6 @@ test("human play run watch suppresses replaceable progress in CI", async () => {
   assert.equal(exitCode, 0);
   assert.equal(stderr.value(), "");
   assert.equal(stdout.value().includes("\r"), false);
+  assert.equal(stdout.value().includes("\u001b["), false);
   assert.ok(stdout.value().includes("KUROBARA ◆ PLAY RUN"));
 });
