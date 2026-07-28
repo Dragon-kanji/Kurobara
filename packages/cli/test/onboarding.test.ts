@@ -333,6 +333,30 @@ test("doctor diagnoses healthy and unavailable runtime without exposing auth", a
   assert.ok(unavailableResult.blocked_steps.includes("client_authentication"));
 });
 
+test("update check is explicit, read-only, and machine-readable", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "kurobara-onboarding-"));
+  const current = await invoke(root, ["update", "check", "--json"], {
+    fetch: () =>
+      Promise.resolve(
+        new Response(JSON.stringify([{ tag_name: "v0.1.0-rc.7" }]), {
+          headers: { "content-type": "application/json" },
+          status: 200,
+        })
+      ),
+  });
+  assert.equal(current.exitCode, 0);
+  assert.equal(JSON.parse(current.stdout).update_available, false);
+
+  const unavailable = await invoke(root, ["update", "check", "--json"], {
+    fetch: () => Promise.reject(new Error("offline")),
+  });
+  assert.equal(unavailable.exitCode, 75);
+  assert.equal(
+    JSON.parse(unavailable.stderr).problem.code,
+    "update-check-unavailable"
+  );
+});
+
 test("agent mode never prompts and live execution requires explicit bounded approval", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "kurobara-onboarding-"));
   const noTty = await invoke(root, ["setup", "--non-interactive", "--json"]);
@@ -355,16 +379,54 @@ test("offline first run returns a structured zero-credit receipt", async () => {
       return Promise.resolve({
         code: 0,
         stderr: "",
-        stdout: "synthetic harness output",
+        stdout: `${JSON.stringify({
+          application_id: "application_demo_org_website_v1",
+          dataset_id: "dataset_demo_orgs",
+          export: {
+            byte_count: 128,
+            format: "jsonl",
+            retained: false,
+            sha256: `sha256:${"a".repeat(64)}`,
+          },
+          ok: true,
+          schema_version: "1.0.0",
+        })}\n`,
       });
     },
   });
   assert.equal(result.exitCode, 0);
   const receipt = JSON.parse(result.stdout);
   assert.equal(receipt.cost.amount, 0);
+  assert.equal(receipt.ids.dataset_id, "dataset_demo_orgs");
+  assert.equal(receipt.files[0].byte_count, 128);
   assert.equal(receipt.receipt.provider_calls, 0);
   assert.equal(request?.command, "bash");
   assert.deepEqual(request?.args, ["deploy/self-host/harness.sh"]);
+});
+
+test("offline first run reports an exact failed stage and a resumable argv", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "kurobara-onboarding-"));
+  const result = await invoke(root, ["first-run", "--offline", "--json"], {
+    processRunner: () =>
+      Promise.resolve({
+        code: 1,
+        stderr: `${JSON.stringify({
+          ok: false,
+          schema_version: "1.0.0",
+          stage: "dataset_export",
+        })}\n`,
+        stdout: "",
+      }),
+  });
+  assert.equal(result.exitCode, 75);
+  const problem = JSON.parse(result.stderr);
+  assert.deepEqual(problem.blocked_steps, ["first_run:dataset_export"]);
+  assert.deepEqual(problem.next_actions[0].argv, [
+    "kurobara",
+    "first-run",
+    "--offline",
+    "--json",
+  ]);
 });
 
 test("runtime exec injects referenced values only into the child environment", async () => {

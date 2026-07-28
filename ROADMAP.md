@@ -14,6 +14,8 @@ agents. This roadmap describes outcomes, not dates or support commitments.
 - Explicit work-email verification.
 - Contact export receipts, expiry, revocation, and subject restriction.
 - REST, TypeScript SDK, and non-interactive CLI projections.
+- Resumable human and agent CLI onboarding, secure BYOK references, typed
+  diagnostics, and a source-preview launcher.
 - BYOK provider adapters with bounded budgets and provenance.
 - Deterministic self-host smoke, backup/restore, release manifests, SBOMs, and
   clean-room qualification.
@@ -32,7 +34,7 @@ agents. This roadmap describes outcomes, not dates or support commitments.
    - clearer per-provider quote and credit reporting.
 
 3. **Agent ergonomics**
-   - complete CLI help and command schemas;
+   - generated operation-specific CLI help;
    - stable machine documentation generated from canonical contracts;
    - MCP projection after CLI and REST contracts stabilize;
    - stricter delegated authority and multi-agent run graphs.

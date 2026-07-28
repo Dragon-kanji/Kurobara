@@ -17,19 +17,31 @@
     "setup inspect",
     "setup migrate",
     "setup plan",
-    "setup status"
+    "setup status",
+    "update check"
   ],
-  "setup_phases": [
-    "detect",
-    "plan",
-    "confirm",
-    "apply",
-    "verify"
+  "product_commands": [
+    "contact restrict",
+    "contact results",
+    "contact search",
+    "contact reveal-identity",
+    "contact enrich-email",
+    "contact verify-email",
+    "company cancel",
+    "company watch",
+    "company results",
+    "company search",
+    "dataset export",
+    "dataset import",
+    "dataset export-status",
+    "dataset export-revoke",
+    "recipe export",
+    "recipe watch",
+    "recipe apply",
+    "run cancel"
   ],
-  "profiles": [
-    "local",
-    "remote"
-  ],
+  "setup_phases": ["detect", "plan", "confirm", "apply", "verify"],
+  "profiles": ["local", "remote"],
   "machine_result_fields": [
     "schema_version",
     "ok",

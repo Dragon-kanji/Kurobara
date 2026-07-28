@@ -11,10 +11,35 @@ same operations.
 
 There is no MCP server in the current preview.
 
+The repository includes a concise
+[`kurobara-cli` companion skill](../.codex/skills/kurobara-cli/SKILL.md) for
+Codex-compatible agents. Other agents can follow the same commands directly.
+
+## Onboard from a clean shell
+
+```sh
+kurobara setup inspect --json
+kurobara setup plan \
+  --profile local \
+  --output ./kurobara-setup-plan.json \
+  --json
+kurobara setup apply \
+  --file ./kurobara-setup-plan.json \
+  --non-interactive \
+  --json
+kurobara doctor --json
+kurobara first-run --offline --json
+```
+
+Do not edit the plan. Parse `blocked_steps`, `warnings`,
+`requires_confirmation`, and `next_actions[].argv`; never derive a shell
+command from prose.
+
 ## Machine contract
 
 - Successful CLI output is JSON on stdout.
-- Errors use a bounded Problem Details JSON shape and a non-zero exit code.
+- Errors use a bounded Problem Details JSON shape on stderr and a non-zero exit
+  code; stdout stays empty.
 - The default API endpoint is `http://127.0.0.1:3000`.
 - Override it with `KUROBARA_API_URL` or `--endpoint`.
 - Authenticate with `KUROBARA_API_KEY` or `--api-key-file`, never both.
@@ -23,6 +48,10 @@ There is no MCP server in the current preview.
 
 Do not let an agent read PostgreSQL directly. IDs, status, provenance, cost,
 and results are available through the supported interfaces.
+
+For setup credentials, prefer `secret set --from-env <NAME>` or `--stdin`.
+Values are forbidden in argv. A remote profile can store only the client
+Kurobara key, never a server-side provider key.
 
 ## Canonical references
 

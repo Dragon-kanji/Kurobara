@@ -1,6 +1,5 @@
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
-
 import onboardingContract from "@kurobara/contracts/cli-onboarding.json" with {
   type: "json",
 };
@@ -32,6 +31,7 @@ const PINK = "\u001b[38;5;198m";
 const WHITE = "\u001b[97m";
 const DIM = "\u001b[2m";
 const RESET = "\u001b[0m";
+const LINE_BREAK_PATTERN = /\r?\n/u;
 const TRAILING_NEWLINE_PATTERN = /\r?\n$/u;
 
 export type OnboardingWritable = Readonly<{
@@ -114,6 +114,7 @@ type MachineProblem = Readonly<{
 }>;
 
 class OnboardingCliError extends Error {
+  readonly blockedSteps: readonly string[];
   readonly code: string;
   readonly exitCode: number;
   readonly nextActions: readonly NextAction[];
@@ -124,9 +125,11 @@ class OnboardingCliError extends Error {
     message: string,
     exitCode: number,
     nextActions: readonly NextAction[] = [],
-    retryable = false
+    retryable = false,
+    blockedSteps: readonly string[] = [code]
   ) {
     super(message);
+    this.blockedSteps = blockedSteps;
     this.code = code;
     this.exitCode = exitCode;
     this.name = "OnboardingCliError";
@@ -234,6 +237,24 @@ const renderHumanResult = (
   const title =
     typeof result.summary === "string" ? result.summary : result.command;
   writeLine(target, `${color ? PINK : ""}${title}${color ? RESET : ""}`);
+  if (
+    result.command === "help" &&
+    Array.isArray(result.commands) &&
+    Array.isArray(result.product_commands)
+  ) {
+    writeLine(target);
+    writeLine(target, "ONBOARD & OPERATE");
+    for (const command of result.commands) {
+      writeLine(target, `  kurobara ${String(command)}`);
+    }
+    writeLine(target);
+    writeLine(target, "BUILD LISTS");
+    for (const command of result.product_commands) {
+      writeLine(target, `  kurobara ${String(command)}`);
+    }
+    writeLine(target);
+    writeLine(target, "Add --json for a deterministic machine response.");
+  }
   for (const warning of result.warnings) {
     writeLine(target, `! ${warning}`);
   }
@@ -1252,6 +1273,146 @@ const doctor = async (
   });
 };
 
+const updateCheck = async (
+  invocation: OnboardingInvocation
+): Promise<MachineResult> => {
+  const timeout = AbortSignal.timeout(3000);
+  const requestSignal =
+    invocation.signal === undefined
+      ? timeout
+      : AbortSignal.any([invocation.signal, timeout]);
+  let response: Response;
+  try {
+    response = await (invocation.fetch ?? fetch)(
+      "https://api.github.com/repos/Dragon-kanji/Kurobara/releases?per_page=1",
+      {
+        headers: {
+          accept: "application/vnd.github+json",
+          "user-agent": `kurobara-cli/${packageManifest.version}`,
+        },
+        signal: requestSignal,
+      }
+    );
+  } catch {
+    throw new OnboardingCliError(
+      "update-check-unavailable",
+      "The explicit GitHub release check is unavailable.",
+      75,
+      [],
+      true
+    );
+  }
+  if (!response.ok) {
+    throw new OnboardingCliError(
+      "update-check-unavailable",
+      `The explicit GitHub release check returned HTTP ${response.status}.`,
+      75,
+      [],
+      true
+    );
+  }
+  const releases = (await response.json()) as unknown;
+  const candidate = Array.isArray(releases) ? releases[0] : undefined;
+  if (
+    typeof candidate !== "object" ||
+    candidate === null ||
+    !Object.hasOwn(candidate, "tag_name") ||
+    typeof (candidate as { tag_name?: unknown }).tag_name !== "string"
+  ) {
+    throw new OnboardingCliError(
+      "update-check-invalid",
+      "GitHub returned an invalid release document.",
+      70
+    );
+  }
+  const latest = (candidate as { tag_name: string }).tag_name;
+  const current = `v${packageManifest.version}`;
+  return success("update.check", {
+    current,
+    latest,
+    next_actions:
+      current === latest
+        ? []
+        : [
+            action("upgrade", "Pull the source preview and reinstall", [
+              "git",
+              "pull",
+              "--ff-only",
+            ]),
+          ],
+    summary:
+      current === latest
+        ? "This checkout matches the latest published preview."
+        : `A different published preview is available: ${latest}.`,
+    update_available: current !== latest,
+  });
+};
+
+type OfflineFirstRunReceipt = Readonly<{
+  application_id: string;
+  dataset_id: string;
+  export: Readonly<{
+    byte_count: number;
+    format: string;
+    retained: boolean;
+    sha256: string;
+  }>;
+}>;
+
+const jsonValuesFromOutput = (output: string): readonly unknown[] => {
+  const values: unknown[] = [];
+  for (const line of output.split(LINE_BREAK_PATTERN)) {
+    try {
+      values.push(JSON.parse(line) as unknown);
+    } catch {
+      // Non-JSON build and runtime lines are intentionally ignored.
+    }
+  }
+  return values;
+};
+
+const firstRunFailureStage = (stderr: string): string => {
+  const envelope = [...jsonValuesFromOutput(stderr)]
+    .reverse()
+    .find(
+      (value) =>
+        typeof value === "object" &&
+        value !== null &&
+        Object.hasOwn(value, "stage") &&
+        typeof (value as { stage?: unknown }).stage === "string"
+    );
+  return envelope === undefined
+    ? "unknown"
+    : (envelope as { stage: string }).stage;
+};
+
+const offlineFirstRunReceipt = (stdout: string): OfflineFirstRunReceipt => {
+  const candidate = [...jsonValuesFromOutput(stdout)]
+    .reverse()
+    .find(
+      (value) =>
+        typeof value === "object" &&
+        value !== null &&
+        (value as { ok?: unknown }).ok === true
+    );
+  if (
+    typeof candidate !== "object" ||
+    candidate === null ||
+    typeof (candidate as { application_id?: unknown }).application_id !==
+      "string" ||
+    typeof (candidate as { dataset_id?: unknown }).dataset_id !== "string" ||
+    typeof (candidate as { export?: unknown }).export !== "object" ||
+    (candidate as { export?: unknown }).export === null
+  ) {
+    throw new OnboardingCliError(
+      "first-run-contract-invalid",
+      "The offline harness succeeded without a valid final receipt.",
+      70
+    );
+  }
+  return candidate as OfflineFirstRunReceipt;
+};
+
 const firstRun = async (
   invocation: OnboardingInvocation,
   argv: readonly string[]
@@ -1326,22 +1487,40 @@ const firstRun = async (
     environment,
   });
   if (result.code !== 0) {
+    const failedStage = firstRunFailureStage(result.stderr);
     throw new OnboardingCliError(
       "first-run-failed",
       live
-        ? "The bounded live first run failed. Inspect provider admission and retry with the same bounds."
-        : "The offline first run failed. The self-host harness cleaned up its temporary stack.",
+        ? `The bounded live first run failed at ${failedStage}. Inspect provider admission and retry with the same bounds.`
+        : `The offline first run failed at ${failedStage}. The self-host harness cleaned up its temporary stack and the same command can resume safely.`,
       75,
       [
-        action("doctor", "Diagnose the failed stage", [
-          "kurobara",
-          "doctor",
-          "--json",
-        ]),
+        action(
+          "resume",
+          "Resume the bounded first run",
+          live
+            ? [
+                "kurobara",
+                "first-run",
+                "--live",
+                "--max-companies",
+                "1",
+                "--max-contacts",
+                "1",
+                "--confirm-provider-credits",
+                "--json",
+              ]
+            : ["kurobara", "first-run", "--offline", "--json"],
+          live
+        ),
       ],
-      true
+      true,
+      [`first_run:${failedStage}`]
     );
   }
+  const offlineReceipt = live
+    ? undefined
+    : offlineFirstRunReceipt(result.stdout);
   return success("first-run", {
     completed_steps: [
       "import",
@@ -1355,6 +1534,22 @@ const firstRun = async (
       ? { bounded: true, unit: "provider_requests" }
       : { amount: 0, unit: "provider_credits" },
     mode: live ? "live" : "offline",
+    ...(offlineReceipt === undefined
+      ? {}
+      : {
+          files: [
+            {
+              byte_count: offlineReceipt.export.byte_count,
+              format: offlineReceipt.export.format,
+              retained: offlineReceipt.export.retained,
+              sha256: offlineReceipt.export.sha256,
+            },
+          ],
+          ids: {
+            application_id: offlineReceipt.application_id,
+            dataset_id: offlineReceipt.dataset_id,
+          },
+        }),
     next_actions: [
       action("company-search", "Build the first bounded company list", [
         "kurobara",
@@ -1458,6 +1653,7 @@ const helpResult = (): MachineResult =>
       ]),
       action("setup", "Start human setup", ["kurobara", "setup"]),
     ],
+    product_commands: onboardingContract.product_commands,
     summary: "Open-source B2B list building for humans and coding agents.",
     version: packageManifest.version,
   });
@@ -1591,6 +1787,11 @@ const dispatch = (
       return dispatchSecret(invocation, verb, subject, rest);
     case "setup":
       return dispatchSetup(invocation, verb, subject, rest, presentation);
+    case "update":
+      if (verb === "check" && subject === undefined) {
+        return updateCheck(invocation);
+      }
+      break;
     default:
       break;
   }
@@ -1613,6 +1814,7 @@ const ONBOARDING_GROUPS = new Set([
   "runtime",
   "secret",
   "setup",
+  "update",
   "version",
 ]);
 
@@ -1657,7 +1859,7 @@ export const runOnboardingCli = async (
       );
     }
     const problem: MachineProblem = {
-      blocked_steps: [error.code],
+      blocked_steps: error.blockedSteps,
       command,
       completed_steps: [],
       next_actions: error.nextActions,

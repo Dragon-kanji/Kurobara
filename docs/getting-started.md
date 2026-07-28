@@ -1,7 +1,7 @@
 # Getting started
 
-Use this path to verify Kurobara locally without creating a provider account or
-spending provider credits.
+This path reaches a real Kurobara export without a provider account or provider
+credits.
 
 ## Requirements
 
@@ -10,144 +10,130 @@ spending provider credits.
 - Node.js `24.14.0`
 - npm `10.9.4`
 
-The versions are pinned because the preview artifacts and checks are qualified
-against that exact toolchain.
-
-## Clone and run
+## Install the source preview
 
 ```sh
 git clone https://github.com/Dragon-kanji/Kurobara.git
 cd Kurobara
 npm ci
-npm run self-host:smoke
+npm run install:cli -- --prefix "$HOME/.local"
+export PATH="$HOME/.local/bin:$PATH"
 ```
 
-The smoke test:
+Verify the command from any directory:
 
-1. builds the API, worker, and CLI;
-2. starts loopback-only PostgreSQL, Hatchet, API, and worker services;
-3. creates a synthetic workspace and API key;
-4. imports a synthetic dataset;
-5. applies a deterministic enrichment recipe;
-6. verifies the result after a PostgreSQL restart;
-7. performs a real dump/restore and verifies the result again;
-8. removes its temporary stack, volumes, key, and dump.
+```sh
+command -v kurobara
+kurobara --help
+kurobara doctor --json
+```
 
-No external provider or LLM is called.
+The doctor can report the API and runtime as unavailable before a persistent
+stack is running. It still diagnoses the installation, configuration, client
+credential, and provider admission.
 
-## What success proves
+The launcher is tied to this checkout. Kurobara does not currently publish an
+npm package or binary.
 
-A successful run proves the local path:
+## Human onboarding
+
+```sh
+kurobara setup
+kurobara setup status
+kurobara first-run --offline --json
+```
+
+The TTY uses a concise black, white, and pink identity. It automatically
+disables color or motion for `NO_COLOR`, `TERM=dumb`, CI, JSON, and
+non-interactive execution.
+
+The offline first run proves:
 
 ```text
 CLI -> HTTP API -> PostgreSQL -> Hatchet -> worker -> durable result -> export
 ```
 
-It also proves that the checked-out revision can survive an application
-database restart and a backup/restore cycle. It does not prove production
-hardening, Internet exposure, or the validity of any provider account.
+It imports synthetic data, applies a deterministic recipe, verifies restart
+and backup/restore behavior, exports the result, and removes its temporary
+stack. It makes no external provider or LLM call.
 
-## Run a persistent deterministic stack
+## Agent onboarding
 
-Copy the tracked example and replace both placeholder passwords:
-
-```sh
-cp deploy/self-host/.env.example deploy/self-host/.env
-chmod 600 deploy/self-host/.env
-
-docker compose \
-  --env-file deploy/self-host/.env \
-  -f deploy/self-host/compose.yaml \
-  up --detach --build --wait
-```
-
-Check the API:
+Agents must inspect, plan, and apply explicitly:
 
 ```sh
-curl --fail http://127.0.0.1:3000/healthz
-curl --fail http://127.0.0.1:3000/readyz
+kurobara setup inspect --json
+
+kurobara setup plan \
+  --profile local \
+  --output ./kurobara-setup-plan.json \
+  --json
+
+kurobara setup apply \
+  --file ./kurobara-setup-plan.json \
+  --non-interactive \
+  --json
+
+kurobara setup status --json
+kurobara first-run --offline --json
 ```
 
-Bootstrap the deterministic planning bundle:
+Do not edit the plan. Its fingerprint binds all steps and secret references.
+Machine results expose `completed_steps`, `blocked_steps`, `warnings`,
+`requires_confirmation`, and structured `next_actions[].argv`.
+
+## Credentials
+
+Use the system keychain when available. Linux falls back to a private file
+outside the repository when `secret-tool` is unavailable; that file must
+remain mode `0600`.
+
+Never put a credential value in command arguments:
 
 ```sh
-docker compose \
-  --env-file deploy/self-host/.env \
-  -f deploy/self-host/compose.yaml \
-  --profile tools run --rm bootstrap-planning
+kurobara secret set kurobara --from-env KUROBARA_API_KEY --json
+
+printf '%s' "$PROSPEO_API_KEY" |
+  kurobara provider configure prospeo --stdin --enable --json
 ```
 
-Create a local API key. The command prints the key once, so redirect it to a
-private file rather than copying it into shell history:
+`kurobara` is the client API key. Provider keys are server-side and can be
+stored only for a local profile. The CLI reports presence and backend metadata,
+never secret values.
+
+No provider is enabled merely because a key exists. Exa and PDL retain their
+explicit rights gates; PDL remains unavailable in this preview.
+
+## Upgrade or remove
+
+Kurobara performs no background update check. Ask explicitly:
 
 ```sh
-umask 077
-mkdir -p .local
-
-docker compose \
-  --env-file deploy/self-host/.env \
-  -f deploy/self-host/compose.yaml \
-  --profile tools run --rm bootstrap-api-key |
-node -e '
-  let input = "";
-  process.stdin.setEncoding("utf8");
-  process.stdin.on("data", (chunk) => { input += chunk; });
-  process.stdin.on("end", () => {
-    const value = JSON.parse(input);
-    if (typeof value.presented_key !== "string") process.exit(1);
-    process.stdout.write(`${value.presented_key}\n`);
-  });
-' > .local/api-key
-
-chmod 600 .local/api-key
+kurobara --version
+kurobara update check --json
+git pull --ff-only
+npm ci
+npm run install:cli -- --prefix "$HOME/.local"
 ```
 
-`.local/` is ignored by Git. Never commit the key.
-
-## Exercise the CLI
-
-Import the example dataset:
+Reinstall is idempotent. Supported older configuration is migrated only by an
+explicit command:
 
 ```sh
-npm run kurobara -- dataset import \
-  --endpoint http://127.0.0.1:3000 \
-  --api-key-file .local/api-key \
-  --metadata examples/dataset-import/metadata.json \
-  --source examples/dataset-import/source.jsonl
+kurobara setup migrate --json
 ```
 
-Apply and watch the example recipe:
+Remove only the launcher created by this checkout:
 
 ```sh
-npm run kurobara -- recipe apply \
-  --endpoint http://127.0.0.1:3000 \
-  --api-key-file .local/api-key \
-  --request examples/recipe-apply/request.example.json
-
-npm run kurobara -- recipe watch \
-  --endpoint http://127.0.0.1:3000 \
-  --api-key-file .local/api-key \
-  --application-id application_demo_org_website_v1 \
-  --timeout-ms 120000
+npm run uninstall:cli -- --prefix "$HOME/.local"
 ```
 
-All successful CLI responses are JSON. Use the returned IDs rather than
-guessing server state.
-
-## Stop the stack
-
-```sh
-docker compose \
-  --env-file deploy/self-host/.env \
-  -f deploy/self-host/compose.yaml \
-  down
-```
-
-This preserves volumes. Read [Operations and privacy](./operations.md) before
-deleting data or restoring a backup.
+The uninstaller refuses to remove an unrelated executable.
 
 ## Next
 
-- Use provider keys: [Build B2B lists](./b2b-lists.md)
-- Automate the CLI: [Agent integration](./agents.md)
-- Understand BYOK behavior: [Providers](./providers.md)
+- Build a real list: [B2B list workflow](./b2b-lists.md)
+- Automate safely: [Agent integration](./agents.md)
+- Configure providers: [Providers](./providers.md)
+- Run a persistent stack: [Operations and privacy](./operations.md)

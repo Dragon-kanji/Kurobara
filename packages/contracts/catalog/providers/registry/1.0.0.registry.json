@@ -44,12 +44,8 @@
       "key": "tavily",
       "display_name": "Tavily",
       "credential_environment_variable": "TAVILY_API_KEY",
-      "roles": [
-        "organization website resolution"
-      ],
-      "capabilities": [
-        "organizations.website.resolve"
-      ],
+      "roles": ["organization website resolution"],
+      "capabilities": ["organizations.website.resolve"],
       "admission": "opt_in",
       "default_order": null,
       "probe": "none",
@@ -60,12 +56,8 @@
       "display_name": "Exa",
       "credential_environment_variable": "EXA_API_KEY",
       "rights_attestation_environment_variable": "KUROBARA_EXA_DATA_RIGHTS_CONFIRMED",
-      "roles": [
-        "organization website resolution"
-      ],
-      "capabilities": [
-        "organizations.website.resolve"
-      ],
+      "roles": ["organization website resolution"],
+      "capabilities": ["organizations.website.resolve"],
       "admission": "rights_required",
       "default_order": null,
       "probe": "none",
@@ -75,14 +67,8 @@
       "key": "apollo",
       "display_name": "Apollo",
       "credential_environment_variable": "APOLLO_API_KEY",
-      "roles": [
-        "optional contact discovery",
-        "optional identity reveal"
-      ],
-      "capabilities": [
-        "contacts.discover",
-        "contacts.identity.reveal"
-      ],
+      "roles": ["optional contact discovery", "optional identity reveal"],
+      "capabilities": ["contacts.discover", "contacts.identity.reveal"],
       "admission": "opt_in",
       "default_order": null,
       "probe": "none",
@@ -93,12 +79,8 @@
       "display_name": "People Data Labs",
       "credential_environment_variable": "PDL_API_KEY",
       "rights_attestation_environment_variable": "KUROBARA_PDL_DATA_RIGHTS_CONFIRMED",
-      "roles": [
-        "candidate contact discovery"
-      ],
-      "capabilities": [
-        "contacts.discover"
-      ],
+      "roles": ["candidate contact discovery"],
+      "capabilities": ["contacts.discover"],
       "admission": "candidate_rights_required",
       "default_order": null,
       "probe": "none",

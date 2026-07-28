@@ -80,7 +80,7 @@ packages/contracts        canonical public contracts
 packages/adapters         infrastructure implementations
 packages/adapters/provider-* in-tree provider adapters
 packages/plugin-*         external plugin SDK, host, and conformance
-packages/cli              non-interactive CLI
+packages/cli              human and machine-readable CLI
 packages/sdk-ts           TypeScript client
 deploy/self-host          local deterministic Compose profile
 test                      release, business, and architecture gates

@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-
+import cliCommands from "@kurobara/contracts/cli-commands.json" with {
+  type: "json",
+};
 import onboarding from "@kurobara/contracts/cli-onboarding.json" with {
   type: "json",
 };
@@ -22,6 +24,16 @@ test("publishes one versioned onboarding contract for human and agent projection
   assert.ok(onboarding.commands.includes("setup apply"));
   assert.ok(onboarding.commands.includes("setup status"));
   assert.ok(onboarding.commands.includes("doctor"));
+  assert.ok(onboarding.commands.includes("update check"));
+  const projectedCommands = new Set(
+    cliCommands.commands.map(({ command }) => command)
+  );
+  assert.equal(
+    onboarding.product_commands.every((command) =>
+      projectedCommands.has(command)
+    ),
+    true
+  );
   assert.equal(onboarding.secret_rules.argv_values_forbidden, true);
   assert.equal(onboarding.secret_rules.provider_keys_server_side_only, true);
 });
