@@ -412,7 +412,7 @@ test("persists owner-scoped immutable delivery proofs, replay, completion, and r
     );
     assert.equal(
       readback[0]?.latest_migration,
-      "0030_contact_export_delivery_lifecycle.sql"
+      "0031_gtm_context_play_workbook.sql"
     );
     assert.equal(readback[0]?.request_count, "4");
     assert.equal(readback[0]?.manifest_text.includes("subject-one"), false);
@@ -681,7 +681,7 @@ test("rolls an existing v1 delivery forward without rewriting its immutable mani
       `;
     assert.deepEqual(readback[0], {
       effective_expires_at: new Date(5000),
-      latest_migration: "0030_contact_export_delivery_lifecycle.sql",
+      latest_migration: "0031_gtm_context_play_workbook.sql",
       manifest_text: serializedBefore,
       manifest_version: "1.0.0",
       source_kind: "recipe-application",
