@@ -25,6 +25,9 @@ and machine-readable outputs.
   assertion provenance and human-only policy confirmations.
 - Compiles versioned, provider-neutral Plays from an exact Context revision,
   with bounded previews, budgets, authority gates, and `no_send` delivery.
+- Executes approved Plays through fenced PostgreSQL claims and restart-safe
+  stage checkpoints, then returns the exact result dataset, materialization,
+  Workbook, settled cost, provider-call count, and export readiness.
 - Projects datasets through bounded Workbooks with cell status, provenance,
   freshness, confidence, cost, errors, redaction, selection reasons, and
   append-only human approvals.
@@ -116,6 +119,12 @@ keys:
 npm run b2b:dogfood:preflight
 npm run b2b:dogfood -- run --confirm-provider-calls
 ```
+
+The live harness uses the same agent-first Context, Play, run, Workbook review,
+and private export surfaces as an external coding agent. It interrupts client
+polling once and resumes the same durable Play run. The default qualification
+is capped at three companies, three contacts, and four provider requests; use
+the documented environment caps to reduce those bounds.
 
 Read the [B2B list workflow](./docs/b2b-lists.md) before confirming calls.
 

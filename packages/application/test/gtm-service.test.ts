@@ -26,6 +26,9 @@ import type {
   GtmPlayDefinition,
   GtmPlayRevisionWrite,
   GtmPlayRevisionWriteResult,
+  GtmPlayRunClaim,
+  GtmPlayRunUpdate,
+  GtmPlayRunUpdateResult,
   GtmPlayRunWrite,
   GtmPlayRunWriteResult,
   GtmWorkbookView,
@@ -81,15 +84,41 @@ class MemoryGtmPersistence implements GtmPersistencePort {
       compilation: input.compilation,
       createdAtMs: input.createdAtMs,
       definition: input.definition,
+      execution: input.execution,
+      executionActor: input.executionActor,
       idempotencyKey: input.idempotencyKey,
       playId: input.playId,
       playRevision: input.playRevision,
+      revision: 1,
       runId: input.runId,
       state: "queued",
+      updatedAtMs: input.createdAtMs,
       workspaceId: scope.workspaceId,
     };
     this.runs.set(`${scope.workspaceId}:${input.runId}`, run);
     return Promise.resolve({ run, status: "created" });
+  }
+
+  claimNextPlayRun(
+    workerId: string,
+    claimToken: string,
+    nowMs: number,
+    leaseMs: number
+  ): Promise<GtmPlayRunClaim | undefined> {
+    const run = [...this.runs.values()].find(
+      (candidate) =>
+        candidate.state === "queued" || candidate.state === "running"
+    );
+    return Promise.resolve(
+      run === undefined
+        ? undefined
+        : {
+            claimExpiresAtMs: nowMs + leaseMs,
+            claimToken,
+            run,
+            workerId,
+          }
+    );
   }
 
   getActiveContext(
@@ -266,6 +295,29 @@ class MemoryGtmPersistence implements GtmPersistencePort {
       view,
     });
   }
+
+  updatePlayRun(
+    scope: WorkspaceScope,
+    input: GtmPlayRunUpdate
+  ): Promise<GtmPlayRunUpdateResult> {
+    const key = `${scope.workspaceId}:${input.runId}`;
+    const current = this.runs.get(key);
+    if (current === undefined) {
+      return Promise.resolve({ status: "not_found" });
+    }
+    if (current.revision !== input.expectedRevision) {
+      return Promise.resolve({ status: "conflict" });
+    }
+    const run: StoredGtmPlayRun = {
+      ...current,
+      execution: input.execution,
+      revision: current.revision + 1,
+      state: input.state,
+      updatedAtMs: input.updatedAtMs,
+    };
+    this.runs.set(key, run);
+    return Promise.resolve({ run, status: "updated" });
+  }
 }
 
 const persistence = new MemoryGtmPersistence();
@@ -304,6 +356,8 @@ const playActor = (workspace: string): VerifiedApiKey =>
     "recipes:apply",
     "recipes:register",
     "steps:execute",
+    "workbooks:read",
+    "workbooks:write",
   ]);
 
 const answerValue = (
@@ -353,6 +407,7 @@ const readyPlay = (
     providerSpend: true,
     reveal: true,
   },
+  authorityEnvelopeId: "authority-envelope-test",
   audience: {
     companyCountries: ["FR"],
     departments: ["sales"],
@@ -374,15 +429,15 @@ const readyPlay = (
   },
   playId: `play-${source.kind}`,
   preview: {
-    maxCompanies: 10,
-    maxContactsPerCompany: 2,
-    maxContactsTotal: 20,
-    maxProviderCalls: 20,
-    sampleSize: 5,
+    maxCompanies: 1,
+    maxContactsPerCompany: 1,
+    maxContactsTotal: 1,
+    maxProviderCalls: 4,
+    sampleSize: 1,
   },
   selection: {
-    minimumScore: 70,
-    requiredSignals: ["role_match", "company_match"],
+    minimumScore: 0,
+    requiredSignals: [],
   },
   source,
   stopConditions: ["budget_exhausted", "deadline_elapsed"],
@@ -610,14 +665,34 @@ test("compiles both Play sources to canonical bounded primitives", async () => {
     [
       "organizations.discover",
       "contacts.discover",
+      "contacts.identity.reveal",
       "contacts.work-email.resolve",
-      "recipes.apply",
-      "plans.quote",
-      "runs.create",
+      "workbooks.project",
     ]
   );
   assert.equal(organizationPreview.lifecycle, "awaiting_approval");
   assert.equal(organizationPreview.issues.length, 0);
+  const requestBudgetPreview = await service.previewPlay(
+    playActor(organizationWorkspace),
+    {
+      ...organizationPlay,
+      budget: { limit: 4, unit: "requests" },
+    }
+  );
+  assert.equal(requestBudgetPreview.compilation.budget.quotedUpperBound, 4);
+  const underfundedRequestPreview = await service.previewPlay(
+    playActor(organizationWorkspace),
+    {
+      ...organizationPlay,
+      budget: { limit: 3, unit: "requests" },
+    }
+  );
+  assert.equal(
+    underfundedRequestPreview.issues.some(
+      (issue) => issue.code === "play-invalid"
+    ),
+    true
+  );
   assert.deepEqual(
     await service.previewPlay(
       playActor(organizationWorkspace),
@@ -645,10 +720,9 @@ test("compiles both Play sources to canonical bounded primitives", async () => {
     importedPreview.compilation.stages.map((stage) => stage.operationId),
     [
       "contacts.discover",
+      "contacts.identity.reveal",
       "contacts.work-email.resolve",
-      "recipes.apply",
-      "plans.quote",
-      "runs.create",
+      "workbooks.project",
     ]
   );
   assert.equal(importedPreview.issues.length, 0);

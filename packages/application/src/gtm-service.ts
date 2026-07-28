@@ -685,13 +685,42 @@ const planContext = (
   };
 };
 
+const effectiveEnrichmentStageCount = (
+  definition: GtmPlayDefinition
+): number => {
+  const requested = new Set(definition.capabilities);
+  if (
+    requested.has("contacts.work-email.resolve") ||
+    requested.has("contacts.work-email.verify")
+  ) {
+    requested.add("contacts.identity.reveal");
+  }
+  if (requested.has("contacts.work-email.verify")) {
+    requested.add("contacts.work-email.resolve");
+  }
+  return [
+    "contacts.identity.reveal",
+    "contacts.work-email.resolve",
+    "contacts.work-email.verify",
+  ].filter((capability) => requested.has(capability)).length;
+};
+
+const requiredProviderCallsFor = (definition: GtmPlayDefinition): number =>
+  (definition.source.kind === "organization_search" ? 1 : 0) +
+  1 +
+  definition.preview.maxContactsTotal *
+    effectiveEnrichmentStageCount(definition);
+
 const validatePlayDefinition = (
   definition: GtmPlayDefinition
 ): readonly GtmValidationIssue[] => {
   const issues: GtmValidationIssue[] = [];
+  const effectiveEnrichmentStages = effectiveEnrichmentStageCount(definition);
+  const requiredProviderCalls = requiredProviderCallsFor(definition);
   if (
     !(
       IDENTIFIER_PATTERN.test(definition.playId) &&
+      IDENTIFIER_PATTERN.test(definition.authorityEnvelopeId) &&
       IDENTIFIER_PATTERN.test(definition.contextRef.contextId) &&
       HASH_PATTERN.test(definition.contextRef.fingerprint) &&
       Number.isSafeInteger(definition.contextRef.revision)
@@ -722,13 +751,20 @@ const validatePlayDefinition = (
     definition.preview.maxContactsTotal > 1000 ||
     definition.preview.maxProviderCalls < 0 ||
     definition.preview.maxProviderCalls > 1000 ||
+    definition.preview.maxProviderCalls < requiredProviderCalls ||
+    (definition.budget.unit === "requests" &&
+      definition.budget.limit < requiredProviderCalls) ||
+    (effectiveEnrichmentStages > 0 &&
+      definition.preview.maxContactsTotal > 3) ||
     definition.selection.minimumScore < 0 ||
-    definition.selection.minimumScore > 100
+    definition.selection.minimumScore > 100 ||
+    definition.selection.minimumScore !== 0 ||
+    definition.selection.requiredSignals.length > 0
   ) {
     issues.push({
       code: "play-invalid",
       message:
-        "The Play violates an identity, objective, capability, budget, deadline, no-send, preview, or selection bound.",
+        "The Play violates an identity, authority, objective, capability, budget, deadline, no-send, provider-call, preview, or selection bound.",
     });
   }
   if (
@@ -788,24 +824,33 @@ const permissionsForCapability = (capability: string): readonly string[] => {
 };
 
 const compilePlay = (definition: GtmPlayDefinition): GtmPlayCompilation => {
+  const requiredProviderCalls = requiredProviderCallsFor(definition);
   const sourceOperation =
     definition.source.kind === "organization_search"
       ? "organizations.discover"
       : "contacts.discover";
+  const requestedCapabilities = new Set(definition.capabilities);
+  if (
+    requestedCapabilities.has("contacts.work-email.resolve") ||
+    requestedCapabilities.has("contacts.work-email.verify")
+  ) {
+    requestedCapabilities.add("contacts.identity.reveal");
+  }
+  if (requestedCapabilities.has("contacts.work-email.verify")) {
+    requestedCapabilities.add("contacts.work-email.resolve");
+  }
+  const enrichmentOperationIds = [
+    "contacts.identity.reveal",
+    "contacts.work-email.resolve",
+    "contacts.work-email.verify",
+  ].filter((operationId) => requestedCapabilities.has(operationId));
   const operationIds = [
     sourceOperation,
     ...(definition.source.kind === "organization_search"
       ? ["contacts.discover"]
       : []),
-    ...definition.capabilities.filter(
-      (capability) => capability !== "contacts.discover"
-    ),
-    "recipes.apply",
-    "plans.quote",
-    "runs.create",
-    ...(definition.delivery.privateExport
-      ? ["recipe-applications.export"]
-      : []),
+    ...enrichmentOperationIds,
+    "workbooks.project",
   ];
   const stages = operationIds.map((operationId, index) => ({
     ...(operationId.startsWith("contacts.") ? { capability: operationId } : {}),
@@ -828,9 +873,11 @@ const compilePlay = (definition: GtmPlayDefinition): GtmPlayCompilation => {
         : ["datasets:read"]),
       ...definition.capabilities.flatMap(permissionsForCapability),
       "plays:execute",
-      "recipes:apply",
-      "recipes:register",
-      ...(definition.delivery.privateExport ? ["recipes:export"] : []),
+      "workbooks:read",
+      "workbooks:write",
+      ...(definition.delivery.privateExport
+        ? ["contacts:export", "datasets:export"]
+        : []),
     ]),
   ].sort();
   const humanGates = [
@@ -847,7 +894,9 @@ const compilePlay = (definition: GtmPlayDefinition): GtmPlayCompilation => {
   return {
     assumptions: [
       "Provider routes are selected only from the admitted capability catalog at execution time.",
-      "Quoted upper bound is the Play budget cap, not a provider promise.",
+      definition.budget.unit === "requests"
+        ? "The preview upper bound is the exact provider-request ceiling implied by the approved cardinality and capability chain."
+        : "The preview upper bound is the human-approved budget cap because no provider-free conversion from requests to this unit is available; each execution stage records its admitted quote and settled cost.",
       definition.broadening === "forbidden"
         ? "Audience broadening is forbidden."
         : "Audience broadening requires a new human approval.",
@@ -855,7 +904,10 @@ const compilePlay = (definition: GtmPlayDefinition): GtmPlayCompilation => {
     authority: { humanGates, permissions },
     budget: {
       limit: definition.budget.limit,
-      quotedUpperBound: definition.budget.limit,
+      quotedUpperBound:
+        definition.budget.unit === "requests"
+          ? requiredProviderCalls
+          : definition.budget.limit,
       unit: definition.budget.unit,
     },
     deadlineMs: definition.deadlineMs,
@@ -880,6 +932,32 @@ const playGateIsApproved = (
   }
   return false;
 };
+
+const initialPlayRunExecution = (
+  definition: GtmPlayDefinition,
+  compilation: GtmPlayCompilation
+): import("@kurobara/ports").GtmPlayRunExecution => ({
+  cost: {
+    reserved: 0,
+    spent: 0,
+    unit: definition.budget.unit,
+  },
+  providerCalls: 0,
+  provenance: [],
+  selectedRecordIds: [],
+  selectionReasons: [],
+  stages: compilation.stages.map((stage) => ({
+    cost: {
+      reserved: 0,
+      spent: 0,
+      unit: definition.budget.unit,
+    },
+    operationId: stage.operationId,
+    ordinal: stage.ordinal,
+    providerCalls: 0,
+    state: "pending",
+  })),
+});
 
 const previewFingerprint = (
   definition: GtmPlayDefinition,
@@ -1258,6 +1336,15 @@ export const createGtmService = (dependencies: GtmServiceDependencies) => {
         compilation: preview.compilation,
         createdAtMs,
         definition: input.definition,
+        execution: initialPlayRunExecution(
+          input.definition,
+          preview.compilation
+        ),
+        executionActor: {
+          actorId: actor.actorId,
+          authenticationMode: actor.authenticationMode,
+          permissions: actor.permissions,
+        },
         idempotencyKey: input.idempotencyKey,
         playId: input.definition.playId,
         playRevision: revisionResult.revision.revision,

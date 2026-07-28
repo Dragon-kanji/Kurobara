@@ -313,8 +313,8 @@ test("rolls populated 0019 storage into no-effect dataset generations", async ()
       dataset: legacyDataset,
       generation_plan_count: "0",
       import_intent_hash: hash("f"),
-      migration_count: "31",
-      migration_name: "0031_gtm_context_play_workbook.sql",
+      migration_count: "32",
+      migration_name: "0032_gtm_play_execution.sql",
     });
 
     const workspaceA = workspaceId("workspace-generation-a");

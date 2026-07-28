@@ -23,6 +23,30 @@
       ]
     },
     "created_at_ms": 1,
+    "execution": {
+      "cost": {
+        "reserved": 0,
+        "spent": 0,
+        "unit": "credits"
+      },
+      "provider_calls": 0,
+      "provenance": [],
+      "selected_record_ids": [],
+      "selection_reasons": [],
+      "stages": [
+        {
+          "cost": {
+            "reserved": 0,
+            "spent": 0,
+            "unit": "credits"
+          },
+          "operation_id": "workbooks.project",
+          "ordinal": 1,
+          "provider_calls": 0,
+          "state": "pending"
+        }
+      ]
+    },
     "idempotency_key": "play-start-1",
     "play": {
       "approvals": {
@@ -30,6 +54,7 @@
         "provider_spend": false,
         "reveal": false
       },
+      "authority_envelope_id": "authority-synthetic-play",
       "audience": {
         "company_countries": ["FR"],
         "departments": [],
@@ -81,8 +106,10 @@
     },
     "play_id": "synthetic-play",
     "play_revision": 1,
+    "revision": 1,
     "run_id": "play-run-1",
     "state": "queued",
+    "updated_at_ms": 1,
     "workspace_id": "synthetic-workspace"
   }
 }

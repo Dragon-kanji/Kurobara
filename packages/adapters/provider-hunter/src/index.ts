@@ -40,7 +40,7 @@ const CATALOG_VERSION = "0.13.0";
 // Build-time admission binding. The contracts workspace remains outside the
 // runtime provider boundary; refresh this after canonical contract generation.
 export const HUNTER_CATALOG_FINGERPRINT =
-  "sha256:26211b3954f9c88b24608746d744f15a870330809df021cd6fcd56499591d921";
+  "sha256:1466e9c9bff8bc3c3f3c5e330a5770cb57429cb03bd9a75cc0701c9a71c9744e";
 const DATASET_GENERATION_PAGE_INPUT_SCHEMA_FINGERPRINT =
   "sha256:40153b13ed33d9bf086dcfde537ce1e17946b0e82b6e0461683c42c24a382a55";
 const DATASET_GENERATION_PAGE_INPUT_SCHEMA_ID =

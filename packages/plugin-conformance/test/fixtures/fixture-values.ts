@@ -6,7 +6,7 @@ import type {
 const hash = (character: string): string => `sha256:${character.repeat(64)}`;
 
 export const FIXTURE_CATALOG_FINGERPRINT =
-  "sha256:26211b3954f9c88b24608746d744f15a870330809df021cd6fcd56499591d921";
+  "sha256:1466e9c9bff8bc3c3f3c5e330a5770cb57429cb03bd9a75cc0701c9a71c9744e";
 export const FIXTURE_OPERATION_KEY = "operation:conformance:exact";
 const FIXTURE_RECORD_SCHEMA_FINGERPRINT =
   "sha256:9c1fed09cc7cc924ac5e824ea07fcefc738fd78265075c7c37e5bd935b2c5d78";

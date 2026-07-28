@@ -398,7 +398,7 @@
       "version": "1.0.0"
     },
     {
-      "fingerprint": "sha256:11e7420684d1cd35189990b92a902003be78aa073acc16fd71dc3ef6bf640846",
+      "fingerprint": "sha256:a5e050ac54cacb1bb2776f609123346ac2cabee09c048368075d677f826abe1c",
       "id": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0",
       "media_type": "application/schema+json",
       "role": "schema",
@@ -406,7 +406,7 @@
       "version": "1.0.0"
     },
     {
-      "fingerprint": "sha256:a061471d95e1476e24634f73dfe05594a1d9eb6c6b3d3285230ebe903ffe24a2",
+      "fingerprint": "sha256:1c1bd6be595a21b82a3b30409b22980d3449f80db3611a2052c54ea3b2b171c8",
       "id": "https://schemas.kurobara.invalid/schemas/plays/command-response/1.0.0",
       "media_type": "application/schema+json",
       "role": "schema",
@@ -1175,5 +1175,5 @@
     }
   ],
   "publication_status": "local-development-only",
-  "catalog_fingerprint": "sha256:26211b3954f9c88b24608746d744f15a870330809df021cd6fcd56499591d921"
+  "catalog_fingerprint": "sha256:1466e9c9bff8bc3c3f3c5e330a5770cb57429cb03bd9a75cc0701c9a71c9744e"
 }

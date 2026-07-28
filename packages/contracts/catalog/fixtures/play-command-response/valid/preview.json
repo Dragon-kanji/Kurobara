@@ -32,6 +32,7 @@
       "provider_spend": false,
       "reveal": false
     },
+    "authority_envelope_id": "authority-synthetic-play",
     "audience": {
       "company_countries": ["FR"],
       "departments": [],
@@ -70,8 +71,8 @@
       "sample_size": 3
     },
     "selection": {
-      "minimum_score": 70,
-      "required_signals": ["role_match"]
+      "minimum_score": 0,
+      "required_signals": []
     },
     "source": {
       "countries": ["FR"],

@@ -1860,6 +1860,57 @@ type OfflineFirstRunReceipt = Readonly<{
   }>;
 }>;
 
+type LiveFirstRunReceipt = Readonly<{
+  bounds: Readonly<{
+    companies: number;
+    contacts: number;
+    max_provider_requests: number;
+  }>;
+  cleanup: string;
+  command: string;
+  proof: Readonly<{
+    api: string;
+    export: string;
+    hatchet: string;
+    interruption_resume: string;
+    play_run: string;
+    postgres: string;
+    providers: readonly string[];
+    workbook: string;
+    work_email: string;
+  }>;
+  status: string;
+}>;
+
+const LIVE_FIRST_RUN_PROOF = Object.freeze({
+  api: "ready",
+  export: "private-csv-verified",
+  hatchet: "executed",
+  interruption_resume: "verified",
+  play_run: "completed",
+  postgres: "durable-during-run",
+  workbook: "inspected-and-approved",
+  work_email: "found-and-valid",
+});
+
+const isLiveFirstRunProof = (
+  candidate: unknown
+): candidate is LiveFirstRunReceipt["proof"] => {
+  if (typeof candidate !== "object" || candidate === null) {
+    return false;
+  }
+  const proof = candidate as Readonly<Record<string, unknown>>;
+  return (
+    Object.entries(LIVE_FIRST_RUN_PROOF).every(
+      ([key, value]) => proof[key] === value
+    ) &&
+    Array.isArray(proof.providers) &&
+    proof.providers.length === 2 &&
+    proof.providers.includes("hunter") &&
+    proof.providers.includes("prospeo")
+  );
+};
+
 const jsonValuesFromOutput = (output: string): readonly unknown[] => {
   const values: unknown[] = [];
   for (const line of output.split(LINE_BREAK_PATTERN)) {
@@ -1914,6 +1965,91 @@ const offlineFirstRunReceipt = (stdout: string): OfflineFirstRunReceipt => {
   return candidate as OfflineFirstRunReceipt;
 };
 
+const liveFirstRunReceipt = (stdout: string): LiveFirstRunReceipt => {
+  const candidate = [...jsonValuesFromOutput(stdout)]
+    .reverse()
+    .find(
+      (value) =>
+        typeof value === "object" &&
+        value !== null &&
+        (value as { command?: unknown }).command === "run"
+    );
+  if (
+    typeof candidate !== "object" ||
+    candidate === null ||
+    (candidate as { status?: unknown }).status !== "passed" ||
+    (candidate as { cleanup?: unknown }).cleanup !== "completed" ||
+    typeof (candidate as { bounds?: unknown }).bounds !== "object" ||
+    (candidate as { bounds?: unknown }).bounds === null ||
+    (candidate as { bounds: { companies?: unknown } }).bounds.companies !== 1 ||
+    (candidate as { bounds: { contacts?: unknown } }).bounds.contacts !== 1 ||
+    (candidate as { bounds: { max_provider_requests?: unknown } }).bounds
+      .max_provider_requests !== 4 ||
+    !isLiveFirstRunProof((candidate as { proof?: unknown }).proof)
+  ) {
+    throw new OnboardingCliError(
+      "first-run-contract-invalid",
+      "The live harness succeeded without the expected bounded, cleaned-up metadata receipt.",
+      70
+    );
+  }
+  return candidate as LiveFirstRunReceipt;
+};
+
+const requiredFirstRunCap = (
+  values: ReadonlyMap<string, string>,
+  name: string
+): number => {
+  const value = values.get(name);
+  if (value === undefined || value !== "1") {
+    throw new OnboardingCliError(
+      "cli-usage-error",
+      `Live onboarding requires ${name} 1.`,
+      2
+    );
+  }
+  return 1;
+};
+
+const assertFirstRunSucceeded = (
+  result: ProcessResult,
+  live: boolean
+): void => {
+  if (result.code === 0) {
+    return;
+  }
+  const failedStage = firstRunFailureStage(result.stderr);
+  throw new OnboardingCliError(
+    "first-run-failed",
+    live
+      ? `The bounded live first run failed at ${failedStage}. Inspect provider admission and retry with the same bounds.`
+      : `The offline first run failed at ${failedStage}. The self-host harness cleaned up its temporary stack and the same command can resume safely.`,
+    75,
+    [
+      action(
+        "resume",
+        "Resume the bounded first run",
+        live
+          ? [
+              "kurobara",
+              "first-run",
+              "--live",
+              "--max-companies",
+              "1",
+              "--max-contacts",
+              "1",
+              "--confirm-provider-credits",
+              "--json",
+            ]
+          : ["kurobara", "first-run", "--offline", "--json"],
+        live
+      ),
+    ],
+    true,
+    [`first_run:${failedStage}`]
+  );
+};
+
 const firstRun = async (
   invocation: OnboardingInvocation,
   argv: readonly string[]
@@ -1957,71 +2093,32 @@ const firstRun = async (
       ]
     );
   }
-  const parseCap = (name: string): number => {
-    const value = parsed.values.get(name);
-    if (value === undefined || value !== "1") {
-      throw new OnboardingCliError(
-        "cli-usage-error",
-        `Live onboarding requires ${name} 1.`,
-        2
-      );
-    }
-    return 1;
-  };
   const environment: Record<string, string | undefined> = {
     ...invocation.environment,
   };
   if (live) {
     environment.KUROBARA_DOGFOOD_MAX_COMPANIES = String(
-      parseCap("--max-companies")
+      requiredFirstRunCap(parsed.values, "--max-companies")
     );
     environment.KUROBARA_DOGFOOD_MAX_CONTACTS = String(
-      parseCap("--max-contacts")
+      requiredFirstRunCap(parsed.values, "--max-contacts")
     );
   }
   const repositoryRoot = fileURLToPath(new URL("../../../", import.meta.url));
   const runner = invocation.processRunner ?? defaultProcessRunner;
   const result = await runner({
-    args: live ? ["run", "b2b:dogfood"] : ["deploy/self-host/harness.sh"],
+    args: live
+      ? ["run", "b2b:dogfood", "--", "run", "--confirm-provider-calls"]
+      : ["deploy/self-host/harness.sh"],
     command: live ? "npm" : "bash",
     cwd: repositoryRoot,
     environment,
   });
-  if (result.code !== 0) {
-    const failedStage = firstRunFailureStage(result.stderr);
-    throw new OnboardingCliError(
-      "first-run-failed",
-      live
-        ? `The bounded live first run failed at ${failedStage}. Inspect provider admission and retry with the same bounds.`
-        : `The offline first run failed at ${failedStage}. The self-host harness cleaned up its temporary stack and the same command can resume safely.`,
-      75,
-      [
-        action(
-          "resume",
-          "Resume the bounded first run",
-          live
-            ? [
-                "kurobara",
-                "first-run",
-                "--live",
-                "--max-companies",
-                "1",
-                "--max-contacts",
-                "1",
-                "--confirm-provider-credits",
-                "--json",
-              ]
-            : ["kurobara", "first-run", "--offline", "--json"],
-          live
-        ),
-      ],
-      true,
-      [`first_run:${failedStage}`]
-    );
-  }
+  assertFirstRunSucceeded(result, live);
   const offlineReceipt = live
     ? undefined
     : offlineFirstRunReceipt(result.stdout);
+  const liveReceipt = live ? liveFirstRunReceipt(result.stdout) : undefined;
   return success("first-run", {
     completed_steps: [
       "import",
@@ -2064,7 +2161,13 @@ const firstRun = async (
     receipt: {
       durable_path:
         "CLI -> HTTP API -> PostgreSQL -> Hatchet -> worker -> export",
-      provider_calls: live ? "bounded" : 0,
+      provider_calls:
+        liveReceipt === undefined
+          ? 0
+          : {
+              maximum: liveReceipt.bounds.max_provider_requests,
+              providers: liveReceipt.proof.providers,
+            },
       synthetic: !live,
     },
     summary: live

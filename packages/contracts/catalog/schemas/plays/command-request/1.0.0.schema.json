@@ -84,6 +84,7 @@
       "additionalProperties": false,
       "required": [
         "approvals",
+        "authority_envelope_id",
         "audience",
         "broadening",
         "budget",
@@ -109,6 +110,12 @@
             "provider_spend": { "type": "boolean" },
             "reveal": { "type": "boolean" }
           }
+        },
+        "authority_envelope_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
         },
         "audience": {
           "type": "object",

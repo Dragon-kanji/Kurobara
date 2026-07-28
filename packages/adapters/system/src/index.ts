@@ -4,12 +4,17 @@ import {
   type CapabilityRef,
   capabilityId,
   contentHash,
+  correlationId,
   type DatasetGenerationQueryValue,
   datasetGenerationId,
   datasetGenerationPlanId,
+  datasetId,
   eventId,
+  fieldId,
+  idempotencyKey,
   instant,
   outboxMessageId,
+  recordId,
   runId,
   runPlanId,
 } from "@kurobara/kernel";
@@ -24,6 +29,14 @@ import type {
   IdentifierPort,
   PlanningIdentifierPort,
 } from "@kurobara/ports";
+
+export const toCapabilityId = capabilityId;
+export const toCorrelationId = correlationId;
+export const toDatasetId = datasetId;
+export const toFieldId = fieldId;
+export const toIdempotencyKey = idempotencyKey;
+export const toInstant = instant;
+export const toRecordId = recordId;
 
 const ORGANIZATIONS_DISCOVER = Object.freeze({
   capabilityId: capabilityId("organizations.discover"),

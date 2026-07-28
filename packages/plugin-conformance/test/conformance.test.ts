@@ -379,7 +379,7 @@ test("pins the matrix to the generated catalog and report schema", () => {
   );
   assert.equal(
     combination.catalog_fingerprint,
-    "sha256:26211b3954f9c88b24608746d744f15a870330809df021cd6fcd56499591d921"
+    "sha256:1466e9c9bff8bc3c3f3c5e330a5770cb57429cb03bd9a75cc0701c9a71c9744e"
   );
   assert.equal(Object.isFrozen(PLUGIN_CONFORMANCE_COMPATIBILITY_MATRIX), true);
   assert.equal(

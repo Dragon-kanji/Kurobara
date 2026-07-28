@@ -94,7 +94,8 @@ an unreviewed draft.
 A Play pins one exact Context revision. It declares a measurable objective,
 one `organization_search` or `imported_dataset` source, the audience,
 exclusions, selection rules, preview caps, capabilities, budget, deadline,
-stop conditions, approval state, and `no_send` delivery.
+stop conditions, one exact authority envelope, approval state, and `no_send`
+delivery.
 
 ```sh
 kurobara play preview --request ./play-preview.json --json
@@ -108,9 +109,26 @@ kurobara workbook approve --request ./workbook-approve.json --json
 
 Preview is the review boundary: inspect its quote, assumptions, permission
 envelope, exact stages, and human gates. Do not modify the Play between preview
-and start. Reuse the same idempotency key when resuming the same intent.
+and start. A `requests` quote is the exact cardinality-derived provider-call
+ceiling. Other units remain the approved budget cap until a provider-free
+conversion is available. Reuse the same idempotency key when resuming the same
+intent.
 Without `--timeout-ms`, `play run` performs exactly one durable status read.
 With a bounded timeout, it polls until the run is paused or terminal.
+
+The worker claims one Play checkpoint at a time with a fenced PostgreSQL
+lease. Each provider-backed stage creates or resumes a deterministic child
+dataset generation, so stopping the CLI does not stop the Play. A later
+`play run` continues from the durable receipt. The first executable preview
+supports at most three selected contacts. It requires `minimum_score: 0` and
+an empty `required_signals` list because general scoring is not yet an
+executable Play primitive.
+
+A completed run includes aggregate settled cost, provider-call count,
+provider-neutral provenance, every stage receipt, and the exact result
+`dataset_id`, `materialization_id`, `workbook_id`, and `export_ready` state.
+Private export still requires an explicit client-side `dataset export`
+command; the background worker does not invent a filesystem destination.
 
 A Workbook is a bounded server projection, not a copy of business rows. Read
 cell status, provenance, freshness, confidence, cost, errors, redaction, and

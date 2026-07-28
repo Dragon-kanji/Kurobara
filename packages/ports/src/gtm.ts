@@ -97,6 +97,7 @@ export type GtmPlayDefinition = Readonly<{
     providerSpend: boolean;
     reveal: boolean;
   }>;
+  authorityEnvelopeId: string;
   audience: Readonly<{
     companyCountries: readonly string[];
     departments: readonly string[];
@@ -211,15 +212,75 @@ export type GtmPlayRunState =
   | "queued"
   | "running";
 
+export type GtmPlayRunStageState =
+  | "completed"
+  | "failed"
+  | "pending"
+  | "running";
+
+export type GtmPlayRunStageReceipt = Readonly<{
+  cost: Readonly<{
+    reserved: number;
+    spent: number;
+    unit: string;
+  }>;
+  datasetId?: DatasetId;
+  generationId?: string;
+  materializationId?: DatasetMaterializationId;
+  operationId: string;
+  ordinal: number;
+  providerCalls: number;
+  recordCount?: number;
+  state: GtmPlayRunStageState;
+}>;
+
+export type GtmPlayRunResult = Readonly<{
+  datasetId: DatasetId;
+  exportReady: boolean;
+  materializationId: DatasetMaterializationId;
+  recordCount: number;
+  workbookId: string;
+}>;
+
+export type GtmPlayRunExecution = Readonly<{
+  cost: Readonly<{
+    reserved: number;
+    spent: number;
+    unit: string;
+  }>;
+  currentStageOrdinal?: number;
+  error?: Readonly<{
+    code: string;
+    message: string;
+    retryable: boolean;
+  }>;
+  providerCalls: number;
+  provenance: readonly string[];
+  result?: GtmPlayRunResult;
+  selectedRecordIds: readonly string[];
+  selectionReasons: readonly GtmWorkbookSelectionReason[];
+  stages: readonly GtmPlayRunStageReceipt[];
+}>;
+
+export type GtmPlayRunActor = Readonly<{
+  actorId: ActorId;
+  authenticationMode: "api-key";
+  permissions: readonly string[];
+}>;
+
 export type StoredGtmPlayRun = Readonly<{
   compilation: GtmPlayCompilation;
   createdAtMs: number;
   definition: GtmPlayDefinition;
+  execution: GtmPlayRunExecution;
+  executionActor: GtmPlayRunActor;
   idempotencyKey: string;
   playId: string;
   playRevision: number;
+  revision: number;
   runId: string;
   state: GtmPlayRunState;
+  updatedAtMs: number;
   workspaceId: WorkspaceId;
 }>;
 
@@ -227,6 +288,8 @@ export type GtmPlayRunWrite = Readonly<{
   compilation: GtmPlayCompilation;
   createdAtMs: number;
   definition: GtmPlayDefinition;
+  execution: GtmPlayRunExecution;
+  executionActor: GtmPlayRunActor;
   idempotencyKey: string;
   playId: string;
   playRevision: number;
@@ -241,6 +304,26 @@ export type GtmPlayRunWriteResult =
   | Readonly<{
       status: "conflict";
     }>;
+
+export type GtmPlayRunUpdate = Readonly<{
+  claimToken: string;
+  execution: GtmPlayRunExecution;
+  expectedRevision: number;
+  runId: string;
+  state: GtmPlayRunState;
+  updatedAtMs: number;
+}>;
+
+export type GtmPlayRunUpdateResult =
+  | Readonly<{ status: "conflict" | "not_found" }>
+  | Readonly<{ run: StoredGtmPlayRun; status: "updated" }>;
+
+export type GtmPlayRunClaim = Readonly<{
+  claimExpiresAtMs: number;
+  claimToken: string;
+  run: StoredGtmPlayRun;
+  workerId: string;
+}>;
 
 export type GtmWorkbookFilter = Readonly<{
   fieldKey: string;
@@ -320,6 +403,12 @@ export interface GtmPersistencePort {
     scope: WorkspaceScope,
     reference: GtmContextRevisionRef
   ): Promise<void>;
+  claimNextPlayRun(
+    workerId: string,
+    claimToken: string,
+    nowMs: number,
+    leaseMs: number
+  ): Promise<GtmPlayRunClaim | undefined>;
   createPlayRun(
     scope: WorkspaceScope,
     input: GtmPlayRunWrite
@@ -360,4 +449,8 @@ export interface GtmPersistencePort {
     scope: WorkspaceScope,
     input: GtmWorkbookViewWrite
   ): Promise<GtmWorkbookViewWriteResult>;
+  updatePlayRun(
+    scope: WorkspaceScope,
+    input: GtmPlayRunUpdate
+  ): Promise<GtmPlayRunUpdateResult>;
 }

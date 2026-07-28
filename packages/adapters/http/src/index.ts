@@ -2697,6 +2697,7 @@ const playDefinitionFromContract = (
       providerSpend: play.approvals.provider_spend,
       reveal: play.approvals.reveal,
     },
+    authorityEnvelopeId: play.authority_envelope_id,
     audience: {
       companyCountries: play.audience.company_countries,
       departments: play.audience.departments,
@@ -2805,6 +2806,13 @@ const toContractProjection = (value: unknown): unknown => {
     );
   }
   return value;
+};
+
+const playRunProjection = (
+  run: NonNullable<Awaited<ReturnType<GtmService["getPlayRun"]>>>
+): unknown => {
+  const { definition, executionActor: _executionActor, ...publicRun } = run;
+  return toContractProjection({ ...publicRun, play: definition });
 };
 
 const hasActorPermission = (
@@ -3373,7 +3381,7 @@ export const createHttpApp = (
       revision,
       ...(result.run === undefined
         ? {}
-        : { run: toContractProjection(result.run) }),
+        : { run: playRunProjection(result.run) }),
     };
     const contractFailure = validateOutput(
       context,
@@ -3410,7 +3418,7 @@ export const createHttpApp = (
     if (run === undefined) {
       return problemResponse(context, "gtm-resource-not-found");
     }
-    const responseBody = { run: toContractProjection(run) };
+    const responseBody = { run: playRunProjection(run) };
     const contractFailure = validateOutput(
       context,
       validatePlayRunGetResponse,

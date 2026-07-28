@@ -437,6 +437,132 @@ test("offline first run returns a structured zero-credit receipt", async () => {
   assert.deepEqual(request?.args, ["deploy/self-host/harness.sh"]);
 });
 
+test("live first run executes the bounded harness and validates its receipt", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "kurobara-onboarding-"));
+  let request: ProcessRequest | undefined;
+  const result = await invoke(
+    root,
+    [
+      "first-run",
+      "--live",
+      "--max-companies",
+      "1",
+      "--max-contacts",
+      "1",
+      "--confirm-provider-credits",
+      "--json",
+    ],
+    {
+      processRunner: (candidate) => {
+        request = candidate;
+        return Promise.resolve({
+          code: 0,
+          stderr: "",
+          stdout: `${JSON.stringify({
+            bounds: {
+              companies: 1,
+              contacts: 1,
+              max_provider_requests: 4,
+            },
+            cleanup: "completed",
+            command: "run",
+            proof: {
+              api: "ready",
+              export: "private-csv-verified",
+              hatchet: "executed",
+              interruption_resume: "verified",
+              play_run: "completed",
+              postgres: "durable-during-run",
+              providers: ["hunter", "prospeo"],
+              workbook: "inspected-and-approved",
+              work_email: "found-and-valid",
+            },
+            status: "passed",
+          })}\n`,
+        });
+      },
+    }
+  );
+  assert.equal(result.exitCode, 0);
+  assert.equal(JSON.parse(result.stdout).receipt.provider_calls.maximum, 4);
+  assert.equal(request?.command, "npm");
+  assert.deepEqual(request?.args, [
+    "run",
+    "b2b:dogfood",
+    "--",
+    "run",
+    "--confirm-provider-calls",
+  ]);
+  assert.equal(request?.environment.KUROBARA_DOGFOOD_MAX_COMPANIES, "1");
+  assert.equal(request?.environment.KUROBARA_DOGFOOD_MAX_CONTACTS, "1");
+});
+
+test("live first run rejects a child success without a verified live receipt", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "kurobara-onboarding-"));
+  const result = await invoke(
+    root,
+    [
+      "first-run",
+      "--live",
+      "--max-companies",
+      "1",
+      "--max-contacts",
+      "1",
+      "--confirm-provider-credits",
+      "--json",
+    ],
+    {
+      processRunner: () =>
+        Promise.resolve({ code: 0, stderr: "", stdout: "Usage: dogfood\n" }),
+    }
+  );
+  assert.equal(result.exitCode, 70);
+  assert.equal(
+    JSON.parse(result.stderr).problem.code,
+    "first-run-contract-invalid"
+  );
+});
+
+test("live first run rejects an incomplete success proof", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "kurobara-onboarding-"));
+  const result = await invoke(
+    root,
+    [
+      "first-run",
+      "--live",
+      "--max-companies",
+      "1",
+      "--max-contacts",
+      "1",
+      "--confirm-provider-credits",
+      "--json",
+    ],
+    {
+      processRunner: () =>
+        Promise.resolve({
+          code: 0,
+          stderr: "",
+          stdout: `${JSON.stringify({
+            bounds: {
+              companies: 1,
+              contacts: 1,
+              max_provider_requests: 4,
+            },
+            cleanup: "completed",
+            command: "run",
+            proof: {},
+            status: "passed",
+          })}\n`,
+        }),
+    }
+  );
+  assert.equal(result.exitCode, 70);
+  assert.equal(
+    JSON.parse(result.stderr).problem.code,
+    "first-run-contract-invalid"
+  );
+});
+
 test("offline first run reports an exact failed stage and a resumable argv", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "kurobara-onboarding-"));
   const result = await invoke(root, ["first-run", "--offline", "--json"], {

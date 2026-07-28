@@ -27,6 +27,7 @@ export type OrganizationDatasetSource = Readonly<{
   defaultCountryCode?: string;
   fieldMapping: OrganizationDatasetFieldMapping;
   kind: "dataset";
+  materializationId?: string;
 }>;
 
 export type OrganizationGenerationSource = Readonly<{
@@ -370,6 +371,17 @@ export const makeLoadImportedCompanyCandidates =
         code: "organization-dataset-unavailable",
         message:
           "The organization dataset must be a completed, content-addressed import.",
+      });
+    }
+    if (
+      request.source.materializationId !== undefined &&
+      stored.materialization.materializationId !==
+        request.source.materializationId
+    ) {
+      return fail({
+        code: "organization-dataset-unavailable",
+        message:
+          "The organization dataset no longer resolves to the exact pinned materialization.",
       });
     }
 

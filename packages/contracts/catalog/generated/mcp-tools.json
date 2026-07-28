@@ -1,7 +1,7 @@
 {
   "protocol_version": "2025-11-25",
   "publication_status": "local-development-only",
-  "source_catalog_fingerprint": "sha256:26211b3954f9c88b24608746d744f15a870330809df021cd6fcd56499591d921",
+  "source_catalog_fingerprint": "sha256:1466e9c9bff8bc3c3f3c5e330a5770cb57429cb03bd9a75cc0701c9a71c9744e",
   "tools": [
     {
       "idempotence": "inherent",
@@ -2220,6 +2220,7 @@
             "additionalProperties": false,
             "required": [
               "approvals",
+              "authority_envelope_id",
               "audience",
               "broadening",
               "budget",
@@ -2255,6 +2256,12 @@
                     "type": "boolean"
                   }
                 }
+              },
+              "authority_envelope_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
               },
               "audience": {
                 "type": "object",
@@ -2914,12 +2921,15 @@
             "required": [
               "compilation",
               "created_at_ms",
+              "execution",
               "idempotency_key",
               "play",
               "play_id",
               "play_revision",
+              "revision",
               "run_id",
               "state",
+              "updated_at_ms",
               "workspace_id"
             ],
             "properties": {
@@ -2930,6 +2940,9 @@
                 "type": "integer",
                 "minimum": 0,
                 "maximum": 9007199254740991
+              },
+              "execution": {
+                "$ref": "#/$defs/run_execution"
               },
               "idempotency_key": {
                 "type": "string",
@@ -2951,6 +2964,11 @@
                 "minimum": 1,
                 "maximum": 2147483647
               },
+              "revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              },
               "run_id": {
                 "type": "string",
                 "minLength": 1,
@@ -2968,11 +2986,256 @@
                   "cancelled"
                 ]
               },
+              "updated_at_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
               "workspace_id": {
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 255,
                 "pattern": "\\S"
+              }
+            }
+          },
+          "run_cost": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "reserved",
+              "spent",
+              "unit"
+            ],
+            "properties": {
+              "reserved": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000000
+              },
+              "spent": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000000
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64,
+                "pattern": "^[a-z][a-z0-9._-]*$"
+              }
+            }
+          },
+          "run_execution": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "cost",
+              "provider_calls",
+              "provenance",
+              "selected_record_ids",
+              "selection_reasons",
+              "stages"
+            ],
+            "properties": {
+              "cost": {
+                "$ref": "#/$defs/run_cost"
+              },
+              "current_stage_ordinal": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 128
+              },
+              "error": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "code",
+                  "message",
+                  "retryable"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^[a-z][a-z0-9-]*$"
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048,
+                    "pattern": "\\S"
+                  },
+                  "retryable": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "provider_calls": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "provenance": {
+                "type": "array",
+                "maxItems": 256,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "\\S"
+                }
+              },
+              "result": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "dataset_id",
+                  "export_ready",
+                  "materialization_id",
+                  "record_count",
+                  "workbook_id"
+                ],
+                "properties": {
+                  "dataset_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                  },
+                  "export_ready": {
+                    "type": "boolean"
+                  },
+                  "materialization_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                  },
+                  "record_count": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "workbook_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                  }
+                }
+              },
+              "selected_record_ids": {
+                "type": "array",
+                "maxItems": 1000,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                }
+              },
+              "selection_reasons": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "reasons",
+                    "record_id"
+                  ],
+                  "properties": {
+                    "reasons": {
+                      "type": "array",
+                      "maxItems": 32,
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "pattern": "\\S"
+                      }
+                    },
+                    "record_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    }
+                  }
+                }
+              },
+              "stages": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 128,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "cost",
+                    "operation_id",
+                    "ordinal",
+                    "provider_calls",
+                    "state"
+                  ],
+                  "properties": {
+                    "cost": {
+                      "$ref": "#/$defs/run_cost"
+                    },
+                    "dataset_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    },
+                    "generation_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    },
+                    "materialization_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    },
+                    "operation_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$"
+                    },
+                    "ordinal": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 128
+                    },
+                    "provider_calls": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000
+                    },
+                    "record_count": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2147483647
+                    },
+                    "state": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "running",
+                        "completed",
+                        "failed"
+                      ]
+                    }
+                  }
+                }
               }
             }
           }
@@ -3190,6 +3453,7 @@
             "additionalProperties": false,
             "required": [
               "approvals",
+              "authority_envelope_id",
               "audience",
               "broadening",
               "budget",
@@ -3225,6 +3489,12 @@
                     "type": "boolean"
                   }
                 }
+              },
+              "authority_envelope_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
               },
               "audience": {
                 "type": "object",
@@ -3884,12 +4154,15 @@
             "required": [
               "compilation",
               "created_at_ms",
+              "execution",
               "idempotency_key",
               "play",
               "play_id",
               "play_revision",
+              "revision",
               "run_id",
               "state",
+              "updated_at_ms",
               "workspace_id"
             ],
             "properties": {
@@ -3900,6 +4173,9 @@
                 "type": "integer",
                 "minimum": 0,
                 "maximum": 9007199254740991
+              },
+              "execution": {
+                "$ref": "#/$defs/run_execution"
               },
               "idempotency_key": {
                 "type": "string",
@@ -3921,6 +4197,11 @@
                 "minimum": 1,
                 "maximum": 2147483647
               },
+              "revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              },
               "run_id": {
                 "type": "string",
                 "minLength": 1,
@@ -3938,11 +4219,256 @@
                   "cancelled"
                 ]
               },
+              "updated_at_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
               "workspace_id": {
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 255,
                 "pattern": "\\S"
+              }
+            }
+          },
+          "run_cost": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "reserved",
+              "spent",
+              "unit"
+            ],
+            "properties": {
+              "reserved": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000000
+              },
+              "spent": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000000
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64,
+                "pattern": "^[a-z][a-z0-9._-]*$"
+              }
+            }
+          },
+          "run_execution": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "cost",
+              "provider_calls",
+              "provenance",
+              "selected_record_ids",
+              "selection_reasons",
+              "stages"
+            ],
+            "properties": {
+              "cost": {
+                "$ref": "#/$defs/run_cost"
+              },
+              "current_stage_ordinal": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 128
+              },
+              "error": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "code",
+                  "message",
+                  "retryable"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^[a-z][a-z0-9-]*$"
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048,
+                    "pattern": "\\S"
+                  },
+                  "retryable": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "provider_calls": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "provenance": {
+                "type": "array",
+                "maxItems": 256,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "\\S"
+                }
+              },
+              "result": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "dataset_id",
+                  "export_ready",
+                  "materialization_id",
+                  "record_count",
+                  "workbook_id"
+                ],
+                "properties": {
+                  "dataset_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                  },
+                  "export_ready": {
+                    "type": "boolean"
+                  },
+                  "materialization_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                  },
+                  "record_count": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "workbook_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                  }
+                }
+              },
+              "selected_record_ids": {
+                "type": "array",
+                "maxItems": 1000,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                }
+              },
+              "selection_reasons": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "reasons",
+                    "record_id"
+                  ],
+                  "properties": {
+                    "reasons": {
+                      "type": "array",
+                      "maxItems": 32,
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "pattern": "\\S"
+                      }
+                    },
+                    "record_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    }
+                  }
+                }
+              },
+              "stages": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 128,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "cost",
+                    "operation_id",
+                    "ordinal",
+                    "provider_calls",
+                    "state"
+                  ],
+                  "properties": {
+                    "cost": {
+                      "$ref": "#/$defs/run_cost"
+                    },
+                    "dataset_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    },
+                    "generation_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    },
+                    "materialization_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    },
+                    "operation_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$"
+                    },
+                    "ordinal": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 128
+                    },
+                    "provider_calls": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000
+                    },
+                    "record_count": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2147483647
+                    },
+                    "state": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "running",
+                        "completed",
+                        "failed"
+                      ]
+                    }
+                  }
+                }
               }
             }
           }

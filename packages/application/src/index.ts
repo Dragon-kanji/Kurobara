@@ -1,4 +1,21 @@
 export type {
+  DatasetGenerationCreation,
+  DatasetGenerationQueryValue,
+} from "@kurobara/kernel";
+export type {
+  GtmPlayRunStageReceipt,
+  StoredGtmPlayRun,
+  VerifiedApiKey,
+} from "@kurobara/ports";
+export type {
+  AdvanceGtmPlayRunDependencies,
+  AdvanceGtmPlayRunResult,
+  GtmPlayGenerationSnapshot,
+  GtmPlayProjectionResult,
+} from "./advance-gtm-play-run.ts";
+// biome-ignore lint/performance/noBarrelFile: This package root is its deliberate public API boundary.
+export { makeAdvanceNextGtmPlayRun } from "./advance-gtm-play-run.ts";
+export type {
   ApplyRecipeCounts,
   ApplyRecipeDependencies,
   ApplyRecipeFailure,
@@ -6,7 +23,6 @@ export type {
   ApplyRecipeRequest,
   ApplyRecipeSuccess,
 } from "./apply-recipe.ts";
-// biome-ignore lint/performance/noBarrelFile: This package root is its deliberate public API boundary.
 export { makeApplyRecipe } from "./apply-recipe.ts";
 export type {
   AuthenticateApiKeyCommand,

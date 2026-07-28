@@ -14,7 +14,13 @@ import type {
   GtmPlayCompilation,
   GtmPlayDefinition,
   GtmPlayLifecycle,
+  GtmPlayRunActor,
+  GtmPlayRunClaim,
+  GtmPlayRunExecution,
+  GtmPlayRunStageReceipt,
   GtmPlayRunState,
+  GtmPlayRunUpdate,
+  GtmPlayRunUpdateResult,
   GtmWorkbookAnnotation,
   GtmWorkbookApproval,
   GtmWorkbookFilter,
@@ -61,11 +67,15 @@ type PlayRunRow = Readonly<{
   compilation: unknown;
   created_at_ms: string;
   definition: unknown;
+  execution: unknown;
+  execution_actor: unknown;
   idempotency_key: string;
   play_id: string;
   play_revision: number;
+  revision: number;
   run_id: string;
   state: string;
+  updated_at_ms: string;
   workspace_id: string;
 }>;
 
@@ -357,6 +367,11 @@ const parsePlayDefinition = (value: unknown): GtmPlayDefinition => {
       providerSpend: value.approvals.providerSpend,
       reveal: value.approvals.reveal,
     },
+    authorityEnvelopeId: requiredString(
+      value.authorityEnvelopeId,
+      "Play authority envelope",
+      255
+    ),
     audience: {
       companyCountries: stringArray(
         value.audience.companyCountries,
@@ -563,6 +578,205 @@ const isPlayRunState = (value: string): value is GtmPlayRunState =>
     value
   );
 
+const parseRunCost = (
+  value: unknown,
+  label: string
+): GtmPlayRunExecution["cost"] => {
+  if (!isObject(value)) {
+    return invalid(`Stored ${label} cost is invalid.`);
+  }
+  return {
+    reserved: finiteNumber(value.reserved, `${label} reserved cost`),
+    spent: finiteNumber(value.spent, `${label} spent cost`),
+    unit: requiredString(value.unit, `${label} cost unit`, 64),
+  };
+};
+
+const parseRunStageReceipt = (value: unknown): GtmPlayRunStageReceipt => {
+  if (!isObject(value)) {
+    return invalid("Stored Play run stage receipt is invalid.");
+  }
+  const state = requiredString(value.state, "Play run stage state", 32);
+  if (!["completed", "failed", "pending", "running"].includes(state)) {
+    return invalid("Stored Play run stage state is invalid.");
+  }
+  return {
+    cost: parseRunCost(value.cost, "Play run stage"),
+    ...(value.datasetId === undefined
+      ? {}
+      : {
+          datasetId: datasetId(
+            requiredString(value.datasetId, "Play run stage dataset", 255)
+          ),
+        }),
+    ...(value.generationId === undefined
+      ? {}
+      : {
+          generationId: requiredString(
+            value.generationId,
+            "Play run stage generation",
+            255
+          ),
+        }),
+    ...(value.materializationId === undefined
+      ? {}
+      : {
+          materializationId: datasetMaterializationId(
+            requiredString(
+              value.materializationId,
+              "Play run stage materialization",
+              255
+            )
+          ),
+        }),
+    operationId: requiredString(
+      value.operationId,
+      "Play run stage operation",
+      255
+    ),
+    ordinal: safeInteger(value.ordinal, "Play run stage ordinal", 1),
+    providerCalls: safeInteger(
+      value.providerCalls,
+      "Play run stage provider calls"
+    ),
+    ...(value.recordCount === undefined
+      ? {}
+      : {
+          recordCount: safeInteger(
+            value.recordCount,
+            "Play run stage record count"
+          ),
+        }),
+    state: state as GtmPlayRunStageReceipt["state"],
+  };
+};
+
+const parseRunSelectionReasons = (
+  value: unknown
+): GtmPlayRunExecution["selectionReasons"] => {
+  if (!Array.isArray(value) || value.length > 1000) {
+    return invalid("Stored Play run selection reasons are invalid.");
+  }
+  return value.map((entry) => {
+    if (!isObject(entry)) {
+      return invalid("Stored Play run selection reason is invalid.");
+    }
+    return {
+      reasons: stringArray(
+        entry.reasons,
+        "Play run selection reason values",
+        32
+      ),
+      recordId: requiredString(
+        entry.recordId,
+        "Play run selection record",
+        255
+      ),
+    };
+  });
+};
+
+const parseRunExecution = (value: unknown): GtmPlayRunExecution => {
+  if (
+    !(
+      isObject(value) &&
+      Array.isArray(value.provenance) &&
+      Array.isArray(value.selectedRecordIds) &&
+      Array.isArray(value.stages)
+    )
+  ) {
+    return invalid("Stored Play run execution is invalid.");
+  }
+  const result = value.result;
+  const error = value.error;
+  let parsedError: GtmPlayRunExecution["error"];
+  if (error !== undefined) {
+    if (!(isObject(error) && typeof error.retryable === "boolean")) {
+      return invalid("Stored Play run error is invalid.");
+    }
+    parsedError = {
+      code: requiredString(error.code, "Play run error code", 128),
+      message: requiredString(error.message, "Play run error message", 2048),
+      retryable: error.retryable,
+    };
+  }
+  let parsedResult: GtmPlayRunExecution["result"];
+  if (result !== undefined) {
+    if (!isObject(result)) {
+      return invalid("Stored Play run result is invalid.");
+    }
+    parsedResult = {
+      datasetId: datasetId(
+        requiredString(result.datasetId, "Play run result dataset", 255)
+      ),
+      exportReady:
+        typeof result.exportReady === "boolean"
+          ? result.exportReady
+          : invalid("Stored Play run export readiness is invalid."),
+      materializationId: datasetMaterializationId(
+        requiredString(
+          result.materializationId,
+          "Play run result materialization",
+          255
+        )
+      ),
+      recordCount: safeInteger(
+        result.recordCount,
+        "Play run result record count"
+      ),
+      workbookId: requiredString(
+        result.workbookId,
+        "Play run result Workbook",
+        255
+      ),
+    };
+  }
+  return {
+    cost: parseRunCost(value.cost, "Play run"),
+    ...(value.currentStageOrdinal === undefined
+      ? {}
+      : {
+          currentStageOrdinal: safeInteger(
+            value.currentStageOrdinal,
+            "Play run current stage",
+            1
+          ),
+        }),
+    ...(parsedError === undefined ? {} : { error: parsedError }),
+    providerCalls: safeInteger(value.providerCalls, "Play run provider calls"),
+    provenance: stringArray(value.provenance, "Play run provenance", 256),
+    ...(parsedResult === undefined ? {} : { result: parsedResult }),
+    selectedRecordIds: stringArray(
+      value.selectedRecordIds,
+      "Play run selected records",
+      1000
+    ),
+    selectionReasons: parseRunSelectionReasons(value.selectionReasons),
+    stages: value.stages.map(parseRunStageReceipt),
+  };
+};
+
+const parseRunActor = (value: unknown): GtmPlayRunActor => {
+  if (
+    !(
+      isObject(value) &&
+      value.authenticationMode === "api-key" &&
+      Array.isArray(value.permissions)
+    )
+  ) {
+    return invalid("Stored Play run actor is invalid.");
+  }
+  return {
+    actorId: actorId(requiredString(value.actorId, "Play run actor", 255)),
+    authenticationMode: "api-key",
+    permissions: stringArray(
+      value.permissions,
+      "Play run actor permissions",
+      256
+    ),
+  };
+};
+
 const parsePlayRunRow = (row: PlayRunRow): StoredGtmPlayRun => {
   if (!isPlayRunState(row.state)) {
     return invalid("Stored Play run state is invalid.");
@@ -571,6 +785,8 @@ const parsePlayRunRow = (row: PlayRunRow): StoredGtmPlayRun => {
     compilation: parseCompilation(row.compilation),
     createdAtMs: bigintNumber(row.created_at_ms, "Play run timestamp"),
     definition: parsePlayDefinition(row.definition),
+    execution: parseRunExecution(row.execution),
+    executionActor: parseRunActor(row.execution_actor),
     idempotencyKey: requiredString(
       row.idempotency_key,
       "Play run idempotency key",
@@ -578,8 +794,10 @@ const parsePlayRunRow = (row: PlayRunRow): StoredGtmPlayRun => {
     ),
     playId: requiredString(row.play_id, "Play identity", 255),
     playRevision: safeInteger(row.play_revision, "Play revision", 1),
+    revision: safeInteger(row.revision, "Play run revision", 1),
     runId: requiredString(row.run_id, "Play run identity", 255),
     state: row.state,
+    updatedAtMs: bigintNumber(row.updated_at_ms, "Play run update timestamp"),
     workspaceId: workspaceId(row.workspace_id),
   };
 };
@@ -909,7 +1127,11 @@ export const createPostgresGtmPersistence = (
           state,
           compilation,
           definition,
-          created_at_ms::text
+          execution,
+          execution_actor,
+          revision,
+          created_at_ms::text,
+          updated_at_ms::text
         FROM kurobara_core.gtm_play_runs
         WHERE workspace_id = ${scope.workspaceId}
           AND idempotency_key = ${input.idempotencyKey}
@@ -934,7 +1156,11 @@ export const createPostgresGtmPersistence = (
           state,
           compilation,
           definition,
-          created_at_ms
+          execution,
+          execution_actor,
+          revision,
+          created_at_ms,
+          updated_at_ms
         ) VALUES (
           ${scope.workspaceId},
           ${input.runId},
@@ -945,6 +1171,10 @@ export const createPostgresGtmPersistence = (
           'queued',
           ${transaction.json(toJsonValue(input.compilation))},
           ${transaction.json(toJsonValue(input.definition))},
+          ${transaction.json(toJsonValue(input.execution))},
+          ${transaction.json(toJsonValue(input.executionActor))},
+          1,
+          ${input.createdAtMs},
           ${input.createdAtMs}
         )
       `;
@@ -958,7 +1188,11 @@ export const createPostgresGtmPersistence = (
           state,
           compilation,
           definition,
-          created_at_ms::text
+          execution,
+          execution_actor,
+          revision,
+          created_at_ms::text,
+          updated_at_ms::text
         FROM kurobara_core.gtm_play_runs
         WHERE workspace_id = ${scope.workspaceId}
           AND run_id = ${input.runId}
@@ -968,6 +1202,60 @@ export const createPostgresGtmPersistence = (
           created[0] ?? invalid("Created Play run could not be read back.")
         ),
         status: "created" as const,
+      };
+    }),
+  claimNextPlayRun: async (
+    workerId,
+    claimToken,
+    nowMs,
+    leaseMs
+  ): Promise<GtmPlayRunClaim | undefined> =>
+    sql.begin(async (transactionSql) => {
+      const transaction = transactionSql as unknown as postgres.Sql;
+      const candidates = await transaction<readonly PlayRunRow[]>`
+        SELECT
+          workspace_id,
+          run_id,
+          play_id,
+          play_revision,
+          idempotency_key,
+          state,
+          compilation,
+          definition,
+          execution,
+          execution_actor,
+          revision,
+          created_at_ms::text,
+          updated_at_ms::text
+        FROM kurobara_core.gtm_play_runs
+        WHERE state IN ('queued', 'running')
+          AND (
+            claim_expires_at_ms IS NULL
+            OR claim_expires_at_ms <= ${nowMs}
+          )
+        ORDER BY updated_at_ms ASC, run_id ASC
+        FOR UPDATE SKIP LOCKED
+        LIMIT 1
+      `;
+      const candidate = candidates[0];
+      if (candidate === undefined) {
+        return;
+      }
+      const claimExpiresAtMs = nowMs + leaseMs;
+      await transaction`
+        UPDATE kurobara_core.gtm_play_runs
+        SET
+          claim_owner = ${workerId},
+          claim_token = ${claimToken},
+          claim_expires_at_ms = ${claimExpiresAtMs}
+        WHERE workspace_id = ${candidate.workspace_id}
+          AND run_id = ${candidate.run_id}
+      `;
+      return {
+        claimExpiresAtMs,
+        claimToken,
+        run: parsePlayRunRow(candidate),
+        workerId,
       };
     }),
   getActiveContext: async (scope) => {
@@ -1006,7 +1294,11 @@ export const createPostgresGtmPersistence = (
         state,
         compilation,
         definition,
-        created_at_ms::text
+        execution,
+        execution_actor,
+        revision,
+        created_at_ms::text,
+        updated_at_ms::text
       FROM kurobara_core.gtm_play_runs
       WHERE workspace_id = ${scope.workspaceId}
         AND run_id = ${runId}
@@ -1246,4 +1538,50 @@ export const createPostgresGtmPersistence = (
         ),
       };
     }),
+  updatePlayRun: async (
+    scope,
+    input: GtmPlayRunUpdate
+  ): Promise<GtmPlayRunUpdateResult> => {
+    const rows = await sql<readonly PlayRunRow[]>`
+      UPDATE kurobara_core.gtm_play_runs
+      SET
+        state = ${input.state},
+        execution = ${sql.json(toJsonValue(input.execution))},
+        revision = revision + 1,
+        updated_at_ms = ${input.updatedAtMs},
+        claim_owner = NULL,
+        claim_token = NULL,
+        claim_expires_at_ms = NULL
+      WHERE workspace_id = ${scope.workspaceId}
+        AND run_id = ${input.runId}
+        AND revision = ${input.expectedRevision}
+        AND claim_token = ${input.claimToken}
+      RETURNING
+        workspace_id,
+        run_id,
+        play_id,
+        play_revision,
+        idempotency_key,
+        state,
+        compilation,
+        definition,
+        execution,
+        execution_actor,
+        revision,
+        created_at_ms::text,
+        updated_at_ms::text
+    `;
+    if (rows[0] !== undefined) {
+      return { run: parsePlayRunRow(rows[0]), status: "updated" };
+    }
+    const exists = await sql<readonly { exists: boolean }[]>`
+      SELECT EXISTS (
+        SELECT 1
+        FROM kurobara_core.gtm_play_runs
+        WHERE workspace_id = ${scope.workspaceId}
+          AND run_id = ${input.runId}
+      ) AS exists
+    `;
+    return { status: exists[0]?.exists === true ? "conflict" : "not_found" };
+  },
 });

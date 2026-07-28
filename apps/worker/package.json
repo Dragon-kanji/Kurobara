@@ -12,6 +12,7 @@
   "dependencies": {
     "@kurobara/adapter-effect-deterministic": "file:../../packages/adapters/effect-deterministic",
     "@kurobara/adapter-effect-plugin": "file:../../packages/adapters/effect-plugin",
+    "@kurobara/adapter-http": "file:../../packages/adapters/http",
     "@kurobara/adapter-orchestration-hatchet": "file:../../packages/adapters/orchestration-hatchet",
     "@kurobara/adapter-output-json-schema": "file:../../packages/adapters/output-json-schema",
     "@kurobara/adapter-postgres": "file:../../packages/adapters/postgres",

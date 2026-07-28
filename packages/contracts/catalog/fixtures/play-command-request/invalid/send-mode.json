@@ -6,6 +6,7 @@
       "provider_spend": false,
       "reveal": false
     },
+    "authority_envelope_id": "authority-synthetic-play",
     "audience": {
       "company_countries": ["FR"],
       "departments": [],

@@ -41,8 +41,10 @@ npm run b2b:dogfood -- run --confirm-provider-calls
 
 The harness is capped at three companies, three contacts, and four provider
 requests. It runs the real CLI, API, PostgreSQL, Hatchet, Hunter, and Prospeo
-path, then removes its private CSV and temporary runtime. It is a qualification
-tool, not a persistent campaign runner.
+path through a GTM Context, approved Play, interrupted and resumed Play run,
+Workbook inspection, one human approval, and private export. It then removes
+its private CSV and temporary runtime. It is a qualification tool, not a
+persistent campaign runner.
 
 ## Persistent CLI workflow
 
