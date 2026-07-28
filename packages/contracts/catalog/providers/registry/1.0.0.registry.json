@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0.0",
+  "publication_status": "source-preview",
+  "providers": [
+    {
+      "key": "prospeo",
+      "display_name": "Prospeo",
+      "credential_environment_variable": "PROSPEO_API_KEY",
+      "roles": [
+        "contact discovery",
+        "identity reveal",
+        "work email resolution"
+      ],
+      "capabilities": [
+        "contacts.discover",
+        "contacts.identity.reveal",
+        "contacts.work-email.resolve"
+      ],
+      "admission": "default",
+      "default_order": 10,
+      "probe": "none",
+      "cost_notice": "Provider requests can consume credits."
+    },
+    {
+      "key": "hunter",
+      "display_name": "Hunter",
+      "credential_environment_variable": "HUNTER_API_KEY",
+      "roles": [
+        "company discovery",
+        "work email resolution",
+        "work email verification"
+      ],
+      "capabilities": [
+        "organizations.discover",
+        "contacts.work-email.resolve",
+        "contacts.work-email.verify"
+      ],
+      "admission": "default",
+      "default_order": 20,
+      "probe": "none",
+      "cost_notice": "Provider requests can consume credits."
+    },
+    {
+      "key": "tavily",
+      "display_name": "Tavily",
+      "credential_environment_variable": "TAVILY_API_KEY",
+      "roles": ["organization website resolution"],
+      "capabilities": ["organizations.website.resolve"],
+      "admission": "opt_in",
+      "default_order": null,
+      "probe": "none",
+      "cost_notice": "Provider requests can consume credits."
+    },
+    {
+      "key": "exa",
+      "display_name": "Exa",
+      "credential_environment_variable": "EXA_API_KEY",
+      "rights_attestation_environment_variable": "KUROBARA_EXA_DATA_RIGHTS_CONFIRMED",
+      "roles": ["organization website resolution"],
+      "capabilities": ["organizations.website.resolve"],
+      "admission": "rights_required",
+      "default_order": null,
+      "probe": "none",
+      "cost_notice": "Provider requests can consume credits."
+    },
+    {
+      "key": "apollo",
+      "display_name": "Apollo",
+      "credential_environment_variable": "APOLLO_API_KEY",
+      "roles": ["optional contact discovery", "optional identity reveal"],
+      "capabilities": ["contacts.discover", "contacts.identity.reveal"],
+      "admission": "opt_in",
+      "default_order": null,
+      "probe": "none",
+      "cost_notice": "Endpoint access depends on the operator's Apollo plan and requests can consume credits."
+    },
+    {
+      "key": "pdl",
+      "display_name": "People Data Labs",
+      "credential_environment_variable": "PDL_API_KEY",
+      "rights_attestation_environment_variable": "KUROBARA_PDL_DATA_RIGHTS_CONFIRMED",
+      "roles": ["candidate contact discovery"],
+      "capabilities": ["contacts.discover"],
+      "admission": "candidate_rights_required",
+      "default_order": null,
+      "probe": "none",
+      "cost_notice": "This adapter is an offline-only candidate in the current preview."
+    }
+  ]
+}

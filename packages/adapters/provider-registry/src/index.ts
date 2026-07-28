@@ -1,3 +1,6 @@
+import providerRegistry from "@kurobara/contracts/provider-registry.json" with {
+  type: "json",
+};
 import { type CapabilityRef, capabilityId } from "@kurobara/kernel";
 import type { CapabilityRoute } from "@kurobara/ports";
 
@@ -6,15 +9,26 @@ import type { CapabilityRoute } from "@kurobara/ports";
  * imply provider endorsement, contractual admission, or rights over provider
  * data or marks.
  */
-export const OFFICIAL_PROVIDER_NAMES = Object.freeze([
-  "prospeo",
+export type OfficialProviderName =
+  | "apollo"
+  | "exa"
+  | "hunter"
+  | "prospeo"
+  | "tavily";
+const OFFICIAL_PROVIDER_NAME_SET = new Set<OfficialProviderName>([
   "apollo",
-  "hunter",
-  "tavily",
   "exa",
-] as const);
-
-export type OfficialProviderName = (typeof OFFICIAL_PROVIDER_NAMES)[number];
+  "hunter",
+  "prospeo",
+  "tavily",
+]);
+export const OFFICIAL_PROVIDER_NAMES = Object.freeze(
+  providerRegistry.providers
+    .map((provider) => provider.key)
+    .filter((key): key is OfficialProviderName =>
+      OFFICIAL_PROVIDER_NAME_SET.has(key as OfficialProviderName)
+    )
+);
 export type OfficialProviderId =
   | "apollo-people-enrichment"
   | "apollo-people-search"
@@ -99,8 +113,19 @@ const createDescriptor = (
   providerId: OfficialProviderId,
   credentialEnvironmentVariable: OfficialProviderRouteDescriptor["credentialEnvironmentVariable"],
   capability: CapabilityRef = WEBSITE_CAPABILITY
-): OfficialProviderRouteDescriptor =>
-  Object.freeze({
+): OfficialProviderRouteDescriptor => {
+  const provider = providerRegistry.providers.find(({ key }) =>
+    providerId.startsWith(`${key}-`)
+  );
+  if (
+    provider === undefined ||
+    provider.credential_environment_variable !== credentialEnvironmentVariable
+  ) {
+    throw new Error(
+      `Provider route ${providerId} is inconsistent with the canonical provider registry.`
+    );
+  }
+  return Object.freeze({
     capability,
     credentialEnvironmentVariable,
     effectAdapterKey: providerId,
@@ -109,6 +134,7 @@ const createDescriptor = (
     reservationUnit: "requests",
     routeKey: providerId,
   });
+};
 
 const DESCRIPTORS = Object.freeze({
   apollo: createDescriptor(
@@ -213,11 +239,7 @@ const selectedContactRouteOwner = (
 const isOfficialProviderName = (
   candidate: string
 ): candidate is OfficialProviderName =>
-  candidate === "prospeo" ||
-  candidate === "apollo" ||
-  candidate === "hunter" ||
-  candidate === "tavily" ||
-  candidate === "exa";
+  OFFICIAL_PROVIDER_NAME_SET.has(candidate as OfficialProviderName);
 
 const parseProviderOrder = (
   rawValue: string | undefined
@@ -396,6 +418,19 @@ const PDL_CONTACT_DISCOVERY_DESCRIPTOR = Object.freeze({
   rightsAttestationEnvironmentVariable: "KUROBARA_PDL_DATA_RIGHTS_CONFIRMED",
   routeKey: "pdl-contact-search",
 }) satisfies PdlContactDiscoveryRouteCandidate;
+
+const pdlCatalogEntry = providerRegistry.providers.find(
+  ({ key }) => key === "pdl"
+);
+if (
+  pdlCatalogEntry?.credential_environment_variable !== "PDL_API_KEY" ||
+  pdlCatalogEntry.rights_attestation_environment_variable !==
+    "KUROBARA_PDL_DATA_RIGHTS_CONFIRMED"
+) {
+  throw new Error(
+    "The PDL route candidate is inconsistent with the canonical provider registry."
+  );
+}
 
 const credentialIsConfigured = (
   environment: Readonly<Record<string, string | undefined>>,

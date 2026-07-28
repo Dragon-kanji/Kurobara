@@ -897,7 +897,7 @@ const exerciseOfflineCli = async ({
   });
   const combined = `${help.stdout}${help.stderr}`;
   if (
-    !combined.includes("Expected command:") ||
+    !(combined.includes("KUROBARA") && combined.includes("setup inspect")) ||
     combined.includes("node_modules/.cache")
   ) {
     throw new ReleaseCandidateError(

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Kurobara CLI"
+  short_description: "Build bounded B2B lists from the CLI"
+  default_prompt: "Use $kurobara-cli to inspect setup and build a bounded B2B list safely."

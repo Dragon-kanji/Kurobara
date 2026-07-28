@@ -38,7 +38,7 @@ const DYNAMIC_REQUIRE_ERROR = /Dynamic require/u;
 const ABSOLUTE_PATH_PATTERN = /absolute path/u;
 const CHECKSUM_LINE_PATTERN = /^([0-9a-f]{64}) {2}(.+)$/u;
 const EXPLICIT_TEST_PROCESS_PATTERN = /explicit test process/u;
-const HELP_OUTPUT_PATTERN = /Expected command:/u;
+const HELP_OUTPUT_PATTERN = /setup inspect/u;
 const TRACKED_FILE_PATTERN = /tracked\.txt/u;
 const THIRD_PARTY_NOTICES_PATH = "THIRD_PARTY_NOTICES.md";
 
@@ -170,6 +170,7 @@ test("tracked dirtiness is detected independently from untracked files", async (
       "user.email",
       "synthetic@example.invalid",
     ]);
+    await git(temporaryRoot, ["config", "commit.gpgsign", "false"]);
     await writeFile(path.join(temporaryRoot, "tracked.txt"), "clean\n", "utf8");
     await git(temporaryRoot, ["add", "tracked.txt"]);
     await git(temporaryRoot, ["commit", "--quiet", "-m", "fixture"]);
@@ -252,6 +253,7 @@ test("isolates committed source and recreates node_modules from the lockfile", a
       "user.email",
       "synthetic@example.invalid",
     ]);
+    await git(repository, ["config", "commit.gpgsign", "false"]);
     await git(repository, ["add", "."]);
     await git(repository, ["commit", "--quiet", "-m", "fixture"]);
     const commit = await git(repository, ["rev-parse", "HEAD"]);

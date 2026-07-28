@@ -33,10 +33,25 @@ Hunter.
 
 ## Credential handling
 
-- Keep keys in a secret manager or private environment file.
+- For local onboarding, store a key from a named environment variable or stdin:
+
+  ```sh
+  kurobara provider configure prospeo \
+    --from-env PROSPEO_API_KEY \
+    --enable \
+    --json
+  ```
+
+- Kurobara uses macOS Keychain or Linux `secret-tool` when available. Its
+  fallback is a private mode-`0600` file under the XDG data directory, outside
+  the repository.
+- Keep production keys in the deployment secret manager.
 - Inject only the keys required by the API and worker.
 - API and worker must use the same route configuration.
-- Never pass a provider key through the Kurobara CLI.
+- Never pass a provider key to a client-side API operation; provider
+  credentials belong to the local server runtime.
+- Never pass a provider key value in argv. `--from-env` passes only the variable
+  name; `--stdin` is also supported.
 - Never commit a real `.env`, provider response, or contact export.
 - Redact authorization headers, signed URLs, provider IDs, and personal data
   from logs and bug reports.

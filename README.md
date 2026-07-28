@@ -47,19 +47,32 @@ The complete, intentionally small documentation index is in
 separately in
 [`Dragon-kanji/kurobara.systems`](https://github.com/Dragon-kanji/kurobara.systems).
 
-## Two-command evaluation
+## First run
 
 Requirements: Git, Docker with Compose v2, Node.js `24.14.0`, and npm `10.9.4`.
 
 ```sh
+git clone https://github.com/Dragon-kanji/Kurobara.git
+cd Kurobara
 npm ci
-npm run self-host:smoke
+npm run install:cli -- --prefix "$HOME/.local"
+export PATH="$HOME/.local/bin:$PATH"
+
+kurobara setup
+kurobara first-run --offline --json
 ```
 
-The smoke test builds the local distribution, starts PostgreSQL, Hatchet, the
-API, and the worker, then exercises import, recipe execution, restart,
-backup/restore, and result readback with synthetic data. It makes no provider
-call and consumes no provider credit.
+`setup` is a short human TTY flow. Coding agents use the same engine through
+`setup inspect`, `setup plan`, and `setup apply --non-interactive --json`.
+
+The offline first run builds the local distribution, starts PostgreSQL,
+Hatchet, the API, and the worker, then exercises import, recipe execution,
+restart, backup/restore, export, and cleanup with synthetic data. It makes no
+provider call and consumes no provider credit.
+
+This is a source-preview installation tied to the checkout; no npm package is
+published. See the [quickstart](./docs/getting-started.md) for agent setup,
+credentials, upgrades, and uninstall.
 
 ## Provider-backed B2B workflow
 
@@ -107,6 +120,9 @@ CLI success output is JSON. Errors use a bounded Problem Details shape and a
 non-zero exit code. A caller can dry-run a plan, inspect it, and start the same
 intent without giving the agent direct access to PostgreSQL or provider
 internals.
+
+The repository ships a companion
+[`kurobara-cli` skill](./.codex/skills/kurobara-cli/SKILL.md) for coding agents.
 
 There is no MCP server in this preview. Agents use the CLI or REST API today.
 
