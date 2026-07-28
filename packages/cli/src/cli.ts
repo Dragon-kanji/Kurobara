@@ -30,6 +30,7 @@ import {
   type RecipeApplyRequest,
   type SelectedContactDerivationRequest,
 } from "@kurobara/sdk";
+import { runOnboardingCli } from "./onboarding.ts";
 
 const DEFAULT_ENDPOINT = "http://127.0.0.1:3000";
 const MAX_API_KEY_FILE_BYTES = 4096;
@@ -127,6 +128,7 @@ if (
 }
 
 type WritableTarget = Readonly<{
+  isTTY?: boolean;
   off?: (event: "drain", listener: () => void) => unknown;
   once?: (event: "drain", listener: () => void) => unknown;
   write: (chunk: string | Uint8Array) => unknown;
@@ -3032,6 +3034,10 @@ const handleCliError = (
 };
 
 export const runCli = async (invocation: CliInvocation): Promise<number> => {
+  const onboardingExitCode = await runOnboardingCli(invocation);
+  if (onboardingExitCode !== undefined) {
+    return onboardingExitCode;
+  }
   let selectedCommand: CliArguments["command"] | undefined;
   try {
     const parsed = parseArguments(invocation.argv, invocation.environment);

@@ -8,7 +8,8 @@
     "kurobara": "./src/index.ts"
   },
   "exports": {
-    ".": "./src/cli.ts"
+    ".": "./src/cli.ts",
+    "./onboarding": "./src/onboarding.ts"
   },
   "scripts": {
     "start": "node --experimental-strip-types src/index.ts",

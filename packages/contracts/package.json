@@ -7,9 +7,11 @@
   "exports": {
     ".": "./src/generated/v1.ts",
     "./catalog-manifest.json": "./catalog/generated/catalog-manifest.json",
+    "./cli-onboarding.json": "./catalog/cli-onboarding/1.0.0.contract.json",
     "./cli-commands.json": "./catalog/generated/cli-commands.json",
     "./mcp-tools.json": "./catalog/generated/mcp-tools.json",
     "./openapi-v1.json": "./catalog/generated/openapi-3.1.1.json",
+    "./provider-registry.json": "./catalog/providers/registry/1.0.0.registry.json",
     "./operations/datasets-import.json": "./catalog/operations/datasets.import/1.0.0.operation.json",
     "./operations/dataset-generations-cancel.json": "./catalog/operations/dataset-generations.cancel/1.0.0.operation.json",
     "./operations/dataset-generations-get.json": "./catalog/operations/dataset-generations.get/1.0.0.operation.json",

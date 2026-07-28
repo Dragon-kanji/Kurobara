@@ -5,7 +5,10 @@ import { runCli } from "./cli.ts";
 const argv = process.argv.slice(2);
 const commandController =
   (argv[0] === "recipe" && (argv[1] === "export" || argv[1] === "watch")) ||
-  (argv[0] === "dataset" && argv[1] === "export")
+  (argv[0] === "dataset" && argv[1] === "export") ||
+  argv[0] === "setup" ||
+  argv[0] === "first-run" ||
+  argv[0] === "runtime"
     ? new AbortController()
     : undefined;
 const abortCommand = (): void => commandController?.abort();

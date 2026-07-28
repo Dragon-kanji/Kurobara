@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "publication_status": "source-preview",
+  "commands": [
+    "doctor",
+    "first-run",
+    "provider configure",
+    "provider disable",
+    "provider list",
+    "provider probe",
+    "runtime exec",
+    "secret delete",
+    "secret set",
+    "secret status",
+    "setup",
+    "setup apply",
+    "setup inspect",
+    "setup migrate",
+    "setup plan",
+    "setup status"
+  ],
+  "setup_phases": [
+    "detect",
+    "plan",
+    "confirm",
+    "apply",
+    "verify"
+  ],
+  "profiles": [
+    "local",
+    "remote"
+  ],
+  "machine_result_fields": [
+    "schema_version",
+    "ok",
+    "command",
+    "completed_steps",
+    "blocked_steps",
+    "warnings",
+    "requires_confirmation",
+    "next_actions"
+  ],
+  "exit_codes": {
+    "success": 0,
+    "usage": 2,
+    "configuration": 3,
+    "unavailable": 69,
+    "internal": 70,
+    "temporary": 75,
+    "interrupted": 130
+  },
+  "secret_rules": {
+    "argv_values_forbidden": true,
+    "provider_keys_server_side_only": true,
+    "remote_provider_secret_writes_forbidden": true,
+    "fallback_file_mode": "0600"
+  }
+}

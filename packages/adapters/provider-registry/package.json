@@ -12,6 +12,7 @@
     "typecheck": "tsc --project tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@kurobara/contracts": "file:../../contracts",
     "@kurobara/kernel": "file:../../kernel",
     "@kurobara/ports": "file:../../ports"
   }

@@ -192,6 +192,9 @@ const layerRules = [
       adapter,
       "packages/ports",
       "packages/kernel",
+      ...(adapter === "packages/adapters/provider-registry"
+        ? ["packages/contracts"]
+        : []),
     ])
   ),
   {
