@@ -43,8 +43,14 @@ kurobara setup status
 kurobara first-run --offline --json
 ```
 
-The TTY uses a concise black, white, and pink identity. It automatically
-disables color or motion for `NO_COLOR`, `TERM=dumb`, CI, JSON, and
+The TTY uses a concise black, white, and pink identity. Human Context, Play,
+run, and Workbook receipts separate status, constraints, execution stages,
+rows, evidence, and review state so the important boundary is visible before
+the next action. Workbook columns that do not fit are reported rather than
+silently omitted; use `--json` for the complete machine projection.
+
+Color disables for `--no-color`, `NO_COLOR`, and `TERM=dumb`. Watch progress is
+interactive-TTY only and disables for `TERM=dumb`, CI, JSON, and
 non-interactive execution.
 
 The offline first run proves:

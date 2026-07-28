@@ -131,10 +131,12 @@ Agent-controlled work is constrained by:
 - durable checkpoints and cost records;
 - fail-closed handling of ambiguous provider outcomes.
 
-CLI success output is JSON. Errors use a bounded Problem Details shape and a
-non-zero exit code. A caller can dry-run a plan, inspect it, and start the same
-intent without giving the agent direct access to PostgreSQL or provider
-internals.
+Agents pass `--json` for deterministic success output. Interactive terminals
+render structured human receipts for Context, Play, run, and Workbook review;
+these receipts never replace the machine contract. Errors use a bounded
+Problem Details shape and a non-zero exit code. A caller can dry-run a plan,
+inspect it, and start the same intent without giving the agent direct access
+to PostgreSQL or provider internals.
 
 The repository ships a companion
 [`kurobara-cli` skill](./.codex/skills/kurobara-cli/SKILL.md) for coding agents.

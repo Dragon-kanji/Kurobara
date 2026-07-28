@@ -38,7 +38,11 @@ import {
   type WorkbookGetInput,
   type WorkbookUpdateInput,
 } from "@kurobara/sdk";
-import { renderHumanCommandResult } from "./human-output.ts";
+import {
+  clearHumanPlayRunProgress,
+  renderHumanCommandResult,
+  renderHumanPlayRunProgress,
+} from "./human-output.ts";
 import { runOnboardingCli } from "./onboarding.ts";
 
 const DEFAULT_ENDPOINT = "http://127.0.0.1:3000";
@@ -2231,6 +2235,7 @@ const waitFor = (milliseconds: number, signal?: AbortSignal): Promise<void> =>
 
 type WatchRuntime = Readonly<{
   now: () => number;
+  onPlayRunSnapshot?: (snapshot: PlayRun, pollCount: number) => void;
   signal?: AbortSignal;
   wait: (milliseconds: number, signal?: AbortSignal) => Promise<void>;
 }>;
@@ -2471,10 +2476,12 @@ const watchPlayRun = async (
     snapshot.run.state === "cancelled";
 
   try {
+    let pollCount = 1;
     let snapshot = await getSnapshot();
     if (shouldReturn(snapshot)) {
       return snapshot;
     }
+    runtime.onPlayRunSnapshot?.(snapshot, pollCount);
     while (true) {
       const remainingMs = parsed.timeoutMs - (runtime.now() - startedAt);
       if (remainingMs <= 0) {
@@ -2490,10 +2497,12 @@ const watchPlayRun = async (
       if (runtime.now() - startedAt >= parsed.timeoutMs) {
         throw timedOut();
       }
+      pollCount += 1;
       snapshot = await getSnapshot();
       if (shouldReturn(snapshot)) {
         return snapshot;
       }
+      runtime.onPlayRunSnapshot?.(snapshot, pollCount);
     }
   } catch (error) {
     if (deadline.elapsed()) {
@@ -3533,12 +3542,33 @@ const handleCliError = (
   return 70;
 };
 
+const humanOutputCommand = (
+  command: CliArguments["command"],
+  argv: readonly string[]
+): string => {
+  if (command !== "workbooks.update") {
+    return command;
+  }
+  const alias = argv[1];
+  if (alias === "select" || alias === "approve" || alias === "reject") {
+    return `workbooks.${alias}`;
+  }
+  return command;
+};
+
+const isHumanSurfaceCommand = (command: CliArguments["command"]): boolean =>
+  command.startsWith("gtm-contexts.") ||
+  command.startsWith("plays.") ||
+  command === "play-runs.get" ||
+  command.startsWith("workbooks.");
+
 export const runCli = async (invocation: CliInvocation): Promise<number> => {
   const onboardingExitCode = await runOnboardingCli(invocation);
   if (onboardingExitCode !== undefined) {
     return onboardingExitCode;
   }
   let selectedCommand: CliArguments["command"] | undefined;
+  let clearWatchProgress: (() => void) | undefined;
   try {
     const machineRequested = invocation.argv.includes("--json");
     const noColor =
@@ -3550,6 +3580,22 @@ export const runCli = async (invocation: CliInvocation): Promise<number> => {
     );
     const parsed = parseArguments(argv, invocation.environment);
     selectedCommand = parsed.command;
+    const humanSurface =
+      !machineRequested &&
+      invocation.stdout.isTTY === true &&
+      isHumanSurfaceCommand(parsed.command);
+    const watchProgressEnabled =
+      humanSurface &&
+      invocation.environment.CI === undefined &&
+      invocation.environment.TERM !== "dumb";
+    let watchProgressVisible = false;
+    const clearProgress = (): void => {
+      if (watchProgressVisible) {
+        clearHumanPlayRunProgress(invocation.stdout);
+        watchProgressVisible = false;
+      }
+    };
+    clearWatchProgress = clearProgress;
     const apiKey = await readApiKey(parsed.apiKeyFile, invocation.environment);
     const client = createKurobaraClient({
       apiKey,
@@ -3566,21 +3612,29 @@ export const runCli = async (invocation: CliInvocation): Promise<number> => {
         ...(invocation.signal === undefined
           ? {}
           : { signal: invocation.signal }),
+        ...(watchProgressEnabled && parsed.command === "play-runs.get"
+          ? {
+              onPlayRunSnapshot: (snapshot: PlayRun, pollCount: number) => {
+                watchProgressVisible = true;
+                renderHumanPlayRunProgress(
+                  invocation.stdout,
+                  snapshot,
+                  pollCount,
+                  !noColor
+                );
+              },
+            }
+          : {}),
         wait: invocation.wait ?? waitFor,
       }
     );
+    clearProgress();
+    clearWatchProgress = undefined;
     if (result !== DATASET_EXPORT_STDOUT_COMPLETE) {
-      const humanSurface =
-        !machineRequested &&
-        invocation.stdout.isTTY === true &&
-        (parsed.command.startsWith("gtm-contexts.") ||
-          parsed.command.startsWith("plays.") ||
-          parsed.command === "play-runs.get" ||
-          parsed.command.startsWith("workbooks."));
       if (humanSurface) {
         renderHumanCommandResult(
           invocation.stdout,
-          parsed.command,
+          humanOutputCommand(parsed.command, argv),
           result,
           !noColor
         );
@@ -3590,6 +3644,7 @@ export const runCli = async (invocation: CliInvocation): Promise<number> => {
     }
     return 0;
   } catch (error) {
+    clearWatchProgress?.();
     return handleCliError(error, selectedCommand, invocation.stderr);
   }
 };

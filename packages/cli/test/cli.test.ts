@@ -38,10 +38,12 @@ const jsonResponse = (
     status,
   });
 
-const capture = () => {
+const capture = (isTTY = false, columns = 96) => {
   const chunks: Uint8Array[] = [];
   return {
     target: {
+      columns,
+      isTTY,
       write: (chunk: string | Uint8Array) => {
         chunks.push(
           typeof chunk === "string" ? new TextEncoder().encode(chunk) : chunk
@@ -3045,6 +3047,74 @@ test("workbook review aliases use the same versioned update contract", async () 
   }
 });
 
+test("workbook review aliases keep their action in human TTY receipts", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "kurobara-workbook-human-"));
+  const requestFile = path.join(root, "workbook-selection.json");
+  const request = {
+    annotations: [],
+    approvals: [],
+    column_order: ["domain"],
+    dataset_id: "dataset-workbook",
+    expected_revision: 0,
+    filters: [],
+    materialization_id: "materialization-workbook",
+    name: "Synthetic Workbook",
+    selection_reasons: [],
+    selected_record_ids: [],
+    workbook_id: "workbook-synthetic",
+  } as const;
+  const response = {
+    view: {
+      annotations: request.annotations,
+      approvals: request.approvals,
+      column_order: request.column_order,
+      dataset_id: request.dataset_id,
+      filters: request.filters,
+      materialization_id: request.materialization_id,
+      name: request.name,
+      revision: 1,
+      selection_reasons: request.selection_reasons,
+      selected_record_ids: request.selected_record_ids,
+      workbook_id: request.workbook_id,
+      workspace_id: "workspace-cli-test",
+    },
+  };
+  const expectedTitles = new Map([
+    ["select", "SELECTION SAVED"],
+    ["approve", "APPROVAL SAVED"],
+    ["reject", "REJECTION SAVED"],
+  ]);
+  await writeFile(requestFile, JSON.stringify(request));
+
+  for (const [command, expectedTitle] of expectedTitles) {
+    const stdout = capture(true);
+    const stderr = capture();
+    const exitCode = await runCli({
+      argv: [
+        "workbook",
+        command,
+        "--endpoint",
+        TEST_ENDPOINT,
+        "--no-color",
+        "--request",
+        requestFile,
+      ],
+      environment: { KUROBARA_API_KEY: "synthetic-api-key" },
+      fetch: fetchFrom(() => jsonResponse(response)),
+      stderr: stderr.target,
+      stdin: Readable.from([]),
+      stdout: stdout.target,
+    });
+
+    assert.equal(exitCode, 0);
+    assert.equal(stderr.value(), "");
+    assert.ok(stdout.value().includes(`KUROBARA ◆ ${expectedTitle}`));
+    assert.ok(
+      stdout.value().includes("✓ SAVED  Versioned review state persisted")
+    );
+  }
+});
+
 test("play run defaults to one durable resume read", async () => {
   const stdout = capture();
   const stderr = capture();
@@ -3137,4 +3207,116 @@ test("play run polls until the run reaches a review boundary", async () => {
   assert.equal(calls, 2);
   assert.equal(stderr.value(), "");
   assert.deepEqual(JSON.parse(stdout.value()), completed);
+});
+
+test("human play run watch shows bounded progress before the final receipt", async () => {
+  const stdout = capture(true, 100);
+  const stderr = capture();
+  const running = JSON.parse(
+    await readFile(
+      new URL(
+        "../../contracts/catalog/fixtures/play-run-get-response/valid/minimal.json",
+        import.meta.url
+      ),
+      "utf8"
+    )
+  ) as { run: { run_id: string; state: string } };
+  running.run.state = "running";
+  const completed = structuredClone(running);
+  completed.run.state = "completed";
+  let calls = 0;
+  let clock = 0;
+
+  const exitCode = await runCli({
+    argv: [
+      "play",
+      "run",
+      "--endpoint",
+      TEST_ENDPOINT,
+      "--no-color",
+      "--poll-interval-ms",
+      "100",
+      "--run-id",
+      running.run.run_id,
+      "--timeout-ms",
+      "1000",
+    ],
+    environment: { KUROBARA_API_KEY: "synthetic-api-key" },
+    fetch: fetchFrom(() => {
+      calls += 1;
+      return jsonResponse(calls === 1 ? running : completed);
+    }),
+    now: () => clock,
+    stderr: stderr.target,
+    stdin: Readable.from([]),
+    stdout: stdout.target,
+    wait: (milliseconds) => {
+      clock += milliseconds;
+      return Promise.resolve();
+    },
+  });
+
+  assert.equal(exitCode, 0);
+  assert.equal(calls, 2);
+  assert.equal(stderr.value(), "");
+  assert.ok(stdout.value().includes("\r···●····●···  ● RUNNING  poll 1"));
+  assert.ok(stdout.value().includes("KUROBARA ◆ PLAY RUN"));
+  assert.ok(stdout.value().includes("✓ COMPLETED"));
+  assert.ok(stdout.value().includes("EXECUTION PLAN  1 stage"));
+});
+
+test("human play run watch suppresses replaceable progress in CI", async () => {
+  const stdout = capture(true, 100);
+  const stderr = capture();
+  const running = JSON.parse(
+    await readFile(
+      new URL(
+        "../../contracts/catalog/fixtures/play-run-get-response/valid/minimal.json",
+        import.meta.url
+      ),
+      "utf8"
+    )
+  ) as { run: { state: string } };
+  running.run.state = "running";
+  const completed = structuredClone(running);
+  completed.run.state = "completed";
+  let calls = 0;
+  let clock = 0;
+
+  const exitCode = await runCli({
+    argv: [
+      "play",
+      "run",
+      "--endpoint",
+      TEST_ENDPOINT,
+      "--no-color",
+      "--poll-interval-ms",
+      "100",
+      "--run-id",
+      "play-run-ci",
+      "--timeout-ms",
+      "1000",
+    ],
+    environment: {
+      CI: "1",
+      KUROBARA_API_KEY: "synthetic-api-key",
+    },
+    fetch: fetchFrom(() => {
+      calls += 1;
+      return jsonResponse(calls === 1 ? running : completed);
+    }),
+    now: () => clock,
+    stderr: stderr.target,
+    stdin: Readable.from([]),
+    stdout: stdout.target,
+    wait: (milliseconds) => {
+      clock += milliseconds;
+      return Promise.resolve();
+    },
+  });
+
+  assert.equal(exitCode, 0);
+  assert.equal(stderr.value(), "");
+  assert.equal(stdout.value().includes("\r"), false);
+  assert.ok(stdout.value().includes("KUROBARA ◆ PLAY RUN"));
 });

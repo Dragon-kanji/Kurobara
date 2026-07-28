@@ -38,7 +38,8 @@ command from prose.
 
 ## Machine contract
 
-- Successful CLI output is JSON on stdout.
+- Agents must pass `--json`. Successful machine output is then deterministic
+  JSON on stdout; interactive TTY receipts are for human review only.
 - Errors use a bounded Problem Details JSON shape on stderr and a non-zero exit
   code; stdout stays empty.
 - The default API endpoint is `http://127.0.0.1:3000`.
