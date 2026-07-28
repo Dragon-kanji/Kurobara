@@ -1,0 +1,32 @@
+{
+  "blocking_question_ids": [],
+  "context": {
+    "assertions": [],
+    "context_id": "synthetic-context",
+    "name": "Synthetic GTM",
+    "questionnaire_version": "1.0.0"
+  },
+  "fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "issues": [],
+  "mode": "plan",
+  "ready_for": {
+    "agentic_outbound_play": false,
+    "dataset_import": true,
+    "imported_dataset_enrichment": false,
+    "offline_fixture": true
+  },
+  "revision": {
+    "context": {
+      "assertions": [],
+      "context_id": "synthetic-context",
+      "name": "Synthetic GTM",
+      "questionnaire_version": "1.0.0"
+    },
+    "context_id": "synthetic-context",
+    "created_at_ms": 1,
+    "created_by_actor_id": "actor",
+    "fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "revision": 1,
+    "workspace_id": "workspace"
+  }
+}

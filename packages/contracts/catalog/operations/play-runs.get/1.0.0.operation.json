@@ -1,0 +1,39 @@
+{
+  "operation_id": "play-runs.get",
+  "operation_version": "1.0.0",
+  "action_ref": "GetPlayRun",
+  "kind": "query",
+  "auth_profile": "http-bearer",
+  "idempotence": "inherent",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/play-runs/get-request/1.0.0",
+  "output_schema_id": "https://schemas.kurobara.invalid/schemas/play-runs/get-response/1.0.0",
+  "problem_codes": [
+    "authentication-required",
+    "authority-permission-missing",
+    "gtm-resource-not-found",
+    "internal-error",
+    "invalid-credential",
+    "output-contract-violation",
+    "request-invalid",
+    "service-unavailable"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["plays:read"],
+  "human_gates": [],
+  "accepted_data_classes": ["internal"],
+  "produced_data_classes": ["internal"],
+  "status": "experimental",
+  "projections": {
+    "rest": {
+      "method": "GET",
+      "path": "/v1/play-runs/{run_id}",
+      "path_parameters": ["run_id"]
+    },
+    "sdk_ts": { "method": "plays.getRun" },
+    "cli": { "command": "play run", "output_mode": "json" },
+    "mcp": {
+      "availability": "available",
+      "tool": "kurobara_play_run"
+    }
+  }
+}

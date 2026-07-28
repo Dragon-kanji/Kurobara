@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/workbooks/update-request/1.0.0",
+  "title": "WorkbookUpdateRequest",
+  "description": "Versioned view-state update without copied dataset payloads.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "annotations",
+    "approvals",
+    "column_order",
+    "dataset_id",
+    "expected_revision",
+    "filters",
+    "materialization_id",
+    "name",
+    "selection_reasons",
+    "selected_record_ids",
+    "workbook_id"
+  ],
+  "properties": {
+    "annotations": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "$ref": "https://schemas.kurobara.invalid/schemas/workbooks/get-response/1.0.0#/$defs/annotation"
+      }
+    },
+    "approvals": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "$ref": "https://schemas.kurobara.invalid/schemas/workbooks/get-response/1.0.0#/$defs/approval"
+      }
+    },
+    "column_order": {
+      "type": "array",
+      "maxItems": 256,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]{0,127}$"
+      }
+    },
+    "context_ref": {
+      "$ref": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0#/$defs/context_ref"
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "expected_revision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647
+    },
+    "filters": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "$ref": "https://schemas.kurobara.invalid/schemas/workbooks/get-response/1.0.0#/$defs/filter"
+      }
+    },
+    "materialization_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "play_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "play_revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647
+    },
+    "play_run_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "recipe_application_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "selection_reasons": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "$ref": "https://schemas.kurobara.invalid/schemas/workbooks/get-response/1.0.0#/$defs/selection_reason"
+      }
+    },
+    "selected_record_ids": {
+      "type": "array",
+      "maxItems": 1000,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "pattern": "\\S"
+      }
+    },
+    "workbook_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    }
+  },
+  "dependentRequired": {
+    "play_revision": ["play_id"],
+    "play_run_id": ["play_id", "play_revision"]
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.gtm",
+  "x-kurobara-data-classification": "confidential",
+  "x-kurobara-redaction": "view-state-only-no-dataset-copy",
+  "x-kurobara-publication-status": "local-development-only"
+}

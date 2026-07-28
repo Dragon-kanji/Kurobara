@@ -36,8 +36,8 @@ const input = {
   contentHash: hash("e"),
   contract: {
     catalogFingerprint:
-      "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4",
-    catalogVersion: "0.12.0",
+      "sha256:26211b3954f9c88b24608746d744f15a870330809df021cd6fcd56499591d921",
+    catalogVersion: "0.13.0",
     schemaFingerprint:
       "sha256:9c1fed09cc7cc924ac5e824ea07fcefc738fd78265075c7c37e5bd935b2c5d78",
     schemaId: "https://schemas.kurobara.invalid/schemas/product/record/1.0.0",
@@ -183,8 +183,8 @@ test("normalizes immutable JSON and classifies diagnostics without leakage", asy
     operationKey: "synthetic:normalize",
     outputContract: {
       catalogFingerprint:
-        "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4",
-      catalogVersion: "0.12.0",
+        "sha256:26211b3954f9c88b24608746d744f15a870330809df021cd6fcd56499591d921",
+      catalogVersion: "0.13.0",
       schemaFingerprint:
         "sha256:02f08ae5cb4775e420fcc1c4ce468943e497ef430da7e03d7be0b6a91e060d8e",
       schemaId:

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/workbooks/update-response/1.0.0",
+  "title": "WorkbookUpdateResponse",
+  "description": "Durable Workbook view revision readback.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["view"],
+  "properties": {
+    "view": {
+      "$ref": "https://schemas.kurobara.invalid/schemas/workbooks/get-response/1.0.0#/$defs/view"
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.gtm",
+  "x-kurobara-data-classification": "confidential",
+  "x-kurobara-redaction": "view-state-only-no-dataset-copy",
+  "x-kurobara-publication-status": "local-development-only"
+}

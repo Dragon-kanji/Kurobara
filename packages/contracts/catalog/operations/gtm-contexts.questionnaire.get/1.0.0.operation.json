@@ -1,0 +1,38 @@
+{
+  "operation_id": "gtm-contexts.questionnaire.get",
+  "operation_version": "1.0.0",
+  "action_ref": "GetGtmQuestionnaire",
+  "kind": "query",
+  "auth_profile": "http-bearer",
+  "idempotence": "inherent",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/gtm/questionnaire-request/1.0.0",
+  "output_schema_id": "https://schemas.kurobara.invalid/schemas/gtm/questionnaire-response/1.0.0",
+  "problem_codes": [
+    "authentication-required",
+    "authority-permission-missing",
+    "internal-error",
+    "invalid-credential",
+    "output-contract-violation",
+    "request-invalid",
+    "service-unavailable"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["contexts:read"],
+  "human_gates": [],
+  "accepted_data_classes": ["internal"],
+  "produced_data_classes": ["internal"],
+  "status": "experimental",
+  "projections": {
+    "rest": {
+      "method": "GET",
+      "path": "/v1/gtm-context-questionnaires/{profile}",
+      "path_parameters": ["profile"]
+    },
+    "sdk_ts": { "method": "contexts.questions" },
+    "cli": { "command": "context questions", "output_mode": "json" },
+    "mcp": {
+      "availability": "available",
+      "tool": "kurobara_context_questions"
+    }
+  }
+}

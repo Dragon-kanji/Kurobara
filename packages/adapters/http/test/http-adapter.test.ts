@@ -1166,14 +1166,14 @@ describe("selected-contact derived dataset routes", () => {
 
     assert.deepEqual(contactIdentityExecutionQueryContract, {
       catalogFingerprint,
-      catalogVersion: "0.12.0",
+      catalogVersion: "0.13.0",
       schemaFingerprint: schemaFingerprints.ContactIdentityExecutionQuery,
       schemaId: schemaIds.ContactIdentityExecutionQuery,
       schemaVersion: "1.0.0",
     });
     assert.deepEqual(contactWorkEmailExecutionQueryContract, {
       catalogFingerprint,
-      catalogVersion: "0.12.0",
+      catalogVersion: "0.13.0",
       schemaFingerprint: schemaFingerprints.ContactWorkEmailExecutionQuery,
       schemaId: schemaIds.ContactWorkEmailExecutionQuery,
       schemaVersion: "1.0.0",

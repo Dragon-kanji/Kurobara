@@ -1,7 +1,7 @@
 {
   "canonical_namespace": "https://schemas.kurobara.invalid/",
   "canonicalization": "RFC-8785",
-  "catalog_version": "0.12.0",
+  "catalog_version": "0.13.0",
   "hash_algorithm": "SHA-256",
   "json_schema_dialect": "https://json-schema.org/draft/2020-12/schema",
   "members": [
@@ -270,6 +270,54 @@
       "version": "1.0.0"
     },
     {
+      "fingerprint": "sha256:e12dfa01b48ca7c166a4db1c888d3bd34857f81c260f5022753ea3951fdac012",
+      "id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/gtm/context-command-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:448913020fa249e03f418c914bad87b0a61d70790d4fb16d90ae8edce406a4d5",
+      "id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/gtm/context-command-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:7d9d72aa869f65280e649135d50104209582afbcd0b4bff3844d3602dacf9df5",
+      "id": "https://schemas.kurobara.invalid/schemas/gtm/context-status-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/gtm/context-status-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:49598eb550745760fcc0453fefba0aa01e53e626307e49fa3c0c5c5b86ea8630",
+      "id": "https://schemas.kurobara.invalid/schemas/gtm/context-status-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/gtm/context-status-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:f863c46f9a4b3e57b1a5b35ee32899378d657fb9fff0a4f49414d90e2912569e",
+      "id": "https://schemas.kurobara.invalid/schemas/gtm/questionnaire-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/gtm/questionnaire-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:9a3747ed906be380dee9fb00b2944b2d8d2d77c14bccbe2848721a5968e88902",
+      "id": "https://schemas.kurobara.invalid/schemas/gtm/questionnaire-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/gtm/questionnaire-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
       "fingerprint": "sha256:278caf57796db93788ffc7f5530d329ea4594edef86286814867627c608d01e8",
       "id": "https://schemas.kurobara.invalid/schemas/organizations/candidates-list-request/1.0.0",
       "media_type": "application/schema+json",
@@ -334,6 +382,38 @@
       "version": "1.0.0"
     },
     {
+      "fingerprint": "sha256:acd0c647bba770de78f9b265162b42036aad95a2278cd8afbb1c4c57b26ca6fa",
+      "id": "https://schemas.kurobara.invalid/schemas/play-runs/get-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/play-runs/get-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:b57d75940b3b5a80fcc6fcbb9cb8bdac69b6dd2919fcd6446e77a89d265b3138",
+      "id": "https://schemas.kurobara.invalid/schemas/play-runs/get-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/play-runs/get-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:11e7420684d1cd35189990b92a902003be78aa073acc16fd71dc3ef6bf640846",
+      "id": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/plays/command-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:a061471d95e1476e24634f73dfe05594a1d9eb6c6b3d3285230ebe903ffe24a2",
+      "id": "https://schemas.kurobara.invalid/schemas/plays/command-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/plays/command-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
       "fingerprint": "sha256:16c0d9e715287fd820ce1a3d2a665f292cf3d29bcfb0ce312f010598f2da6a50",
       "id": "https://schemas.kurobara.invalid/schemas/plugins/conformance-report/1.0.0",
       "media_type": "application/schema+json",
@@ -366,7 +446,7 @@
       "version": "1.0.0"
     },
     {
-      "fingerprint": "sha256:a66d93eca0240210e6c6d529279a4a0406999a04f2be2419f2b226850d84dd45",
+      "fingerprint": "sha256:20155e6bb653dfcbf879b43e2ed894f9a07c7f9b8310530a41e9babca99b2f57",
       "id": "https://schemas.kurobara.invalid/schemas/problems/problem-details/1.0.0",
       "media_type": "application/schema+json",
       "role": "schema",
@@ -518,6 +598,38 @@
       "version": "1.0.0"
     },
     {
+      "fingerprint": "sha256:3ab32adce1994c60b1eb9178c91f6188eb5cbad0884ccf5bb3910250d05d8035",
+      "id": "https://schemas.kurobara.invalid/schemas/workbooks/get-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/workbooks/get-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:c12e4f396d4caea3abc50cf7405ea922b77b33fe991cd88208efb8dd7bab4c5a",
+      "id": "https://schemas.kurobara.invalid/schemas/workbooks/get-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/workbooks/get-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:bde3984d34b0a402f2b4cc3124daaa1613c39772deef90050eeb686c5101e948",
+      "id": "https://schemas.kurobara.invalid/schemas/workbooks/update-request/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/workbooks/update-request/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:402dc02ea807449a453406d8042f7e415e719f231150b644642836f2aa42e6cc",
+      "id": "https://schemas.kurobara.invalid/schemas/workbooks/update-response/1.0.0",
+      "media_type": "application/schema+json",
+      "role": "schema",
+      "source": "catalog/schemas/workbooks/update-response/1.0.0.schema.json",
+      "version": "1.0.0"
+    },
+    {
       "fingerprint": "sha256:c968f55d2f94d22217b586a652c89550e198434f396768604e148574a94523ac",
       "id": "operation:capabilities.list:1.0.0",
       "media_type": "application/json",
@@ -622,6 +734,38 @@
       "version": "1.0.0"
     },
     {
+      "fingerprint": "sha256:c77924f57a2c758a69ab3b53d0780398a68137a73c92b38faeaff7e106a2f28e",
+      "id": "operation:gtm-contexts.apply:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/gtm-contexts.apply/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:967c94e62e949384b54a7fad9b1e563b5b7e83880601797ee702f759c15e63e5",
+      "id": "operation:gtm-contexts.plan:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/gtm-contexts.plan/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:4c1a177698b724efd2f0179971f5af92dd743a98af887ecee2dd0476d806ff17",
+      "id": "operation:gtm-contexts.questionnaire.get:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/gtm-contexts.questionnaire.get/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:0eb0a3222feb4f04387a39453666c475b358eda28436b5ae04b6866d69925a49",
+      "id": "operation:gtm-contexts.status.get:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/gtm-contexts.status.get/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
       "fingerprint": "sha256:6b7a6a26dd258b2f6e11c96dfc6b95ee9ccbb3fb991db01814c5f8166c924407",
       "id": "operation:organizations.candidates.list:1.0.0",
       "media_type": "application/json",
@@ -643,6 +787,30 @@
       "media_type": "application/json",
       "role": "operation",
       "source": "catalog/operations/plans.quote/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:d379cf292821af11b2fff4559c958b713b2ce3122bd27871b3da09fe0ae97ddf",
+      "id": "operation:play-runs.get:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/play-runs.get/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:652e637e7898489f0c874292dfe9010981b0f43ceb4735edaebbcfb653bb35e2",
+      "id": "operation:plays.apply:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/plays.apply/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:aa09c32a0747347f9f33505e2d3eef4528a290f1365071cf5928d0d5a58ad5af",
+      "id": "operation:plays.preview:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/plays.preview/1.0.0.operation.json",
       "version": "1.0.0"
     },
     {
@@ -691,6 +859,22 @@
       "media_type": "application/json",
       "role": "operation",
       "source": "catalog/operations/runs.get/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:d776924d428a5e22627f595168781a1a837f7d41713479733615fcaae5694847",
+      "id": "operation:workbooks.get:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/workbooks.get/1.0.0.operation.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:aac4d892b483cd58b207e46a1ab7f4202afeb25642fb2208d89117f9efd1ca5a",
+      "id": "operation:workbooks.update:1.0.0",
+      "media_type": "application/json",
+      "role": "operation",
+      "source": "catalog/operations/workbooks.update/1.0.0.operation.json",
       "version": "1.0.0"
     },
     {
@@ -787,6 +971,14 @@
       "media_type": "application/problem+json",
       "role": "problem",
       "source": "catalog/problems/export-too-large/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
+      "fingerprint": "sha256:c98fa59b8f25e026c05123ec0effd14802659d3b3ae78aa3b3528dbcd3263d25",
+      "id": "problem:gtm-resource-not-found:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/gtm-resource-not-found/1.0.0.problem.json",
       "version": "1.0.0"
     },
     {
@@ -894,6 +1086,14 @@
       "version": "1.0.0"
     },
     {
+      "fingerprint": "sha256:4fde8d70b768271ceb988c2787060f3550712389c801cd677dbf989373d2aa55",
+      "id": "problem:revision-conflict:1.0.0",
+      "media_type": "application/problem+json",
+      "role": "problem",
+      "source": "catalog/problems/revision-conflict/1.0.0.problem.json",
+      "version": "1.0.0"
+    },
+    {
       "fingerprint": "sha256:9bcafabbd27c3ff285125caeef0f40c3b59c9d53471f147e3a12adad41f760b4",
       "id": "problem:route-not-found:1.0.0",
       "media_type": "application/problem+json",
@@ -975,5 +1175,5 @@
     }
   ],
   "publication_status": "local-development-only",
-  "catalog_fingerprint": "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4"
+  "catalog_fingerprint": "sha256:26211b3954f9c88b24608746d744f15a870330809df021cd6fcd56499591d921"
 }

@@ -43,6 +43,7 @@ import type {
   DatasetPersistencePort,
   DatasetRecordPageQueryPort,
   ExportDeliveryPersistencePort,
+  GtmPersistencePort,
   LeafEffectRecoveryClaim,
   LeafEffectRecoveryPort,
   LeafOutboxClaim,
@@ -116,6 +117,7 @@ import {
   RunAggregateConflictError,
 } from "./errors.ts";
 import { createPostgresExportDeliveryPersistence } from "./export-delivery.ts";
+import { createPostgresGtmPersistence } from "./gtm.ts";
 import { toJsonValue } from "./json.ts";
 import { parseLeafOutboxMessageIdentity } from "./leaf-outbox-payload.ts";
 import {
@@ -5640,6 +5642,7 @@ export type PostgresRuntime = Readonly<{
   datasets: DatasetPersistencePort;
   datasetRecordPages: DatasetRecordPageQueryPort;
   exportDeliveries: ExportDeliveryPersistencePort;
+  gtm: GtmPersistencePort;
   health(): Promise<void>;
   leafEffectRecovery: LeafEffectRecoveryPort;
   leafOutbox: LeafOutboxDispatchPort;
@@ -5723,6 +5726,7 @@ export const createPostgresRuntime = (
     datasetRecordPages: createPostgresDatasetRecordPageQuery(sql, datasets),
     datasets,
     exportDeliveries: createPostgresExportDeliveryPersistence(sql),
+    gtm: createPostgresGtmPersistence(sql),
     health: async () => {
       await sql`SELECT 1`;
     },

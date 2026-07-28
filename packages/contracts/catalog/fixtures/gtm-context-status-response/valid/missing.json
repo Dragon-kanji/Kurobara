@@ -1,0 +1,6 @@
+{
+  "business_context": "missing",
+  "profile": "agentic_outbound_play",
+  "ready": false,
+  "remediation": ["Create and explicitly activate a GTM Context revision."]
+}

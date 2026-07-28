@@ -1,0 +1,13 @@
+{
+  "annotations": [],
+  "approvals": [],
+  "column_order": ["domain"],
+  "dataset_id": "synthetic-dataset",
+  "expected_revision": 0,
+  "filters": [],
+  "materialization_id": "synthetic-materialization",
+  "name": "Synthetic Workbook",
+  "selection_reasons": [],
+  "selected_record_ids": [],
+  "workbook_id": "synthetic-workbook"
+}

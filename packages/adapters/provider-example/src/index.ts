@@ -5,7 +5,7 @@ import {
 } from "@kurobara/plugin-sdk";
 
 const CATALOG_FINGERPRINT =
-  "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4";
+  "sha256:26211b3954f9c88b24608746d744f15a870330809df021cd6fcd56499591d921";
 const INPUT_SCHEMA_FINGERPRINT =
   "sha256:9c1fed09cc7cc924ac5e824ea07fcefc738fd78265075c7c37e5bd935b2c5d78";
 const OUTPUT_SCHEMA_FINGERPRINT =
@@ -28,7 +28,7 @@ const manifest = {
       capabilityVersion: "1.0.0",
       inputContract: {
         catalogFingerprint: CATALOG_FINGERPRINT,
-        catalogVersion: "0.12.0",
+        catalogVersion: "0.13.0",
         schemaFingerprint: INPUT_SCHEMA_FINGERPRINT,
         schemaId:
           "https://schemas.kurobara.invalid/schemas/product/record/1.0.0",
@@ -36,7 +36,7 @@ const manifest = {
       },
       outputContract: {
         catalogFingerprint: CATALOG_FINGERPRINT,
-        catalogVersion: "0.12.0",
+        catalogVersion: "0.13.0",
         schemaFingerprint: OUTPUT_SCHEMA_FINGERPRINT,
         schemaId:
           "https://schemas.kurobara.invalid/schemas/fixtures/deterministic-output/1.0.0",

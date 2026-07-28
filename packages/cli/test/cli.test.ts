@@ -2918,3 +2918,223 @@ test("company cancel sends one non-interactive idempotent stop request", async (
   assert.equal(stderr.value(), "");
   assert.deepEqual(JSON.parse(stdout.value()), response);
 });
+
+test("agent reads the canonical GTM questionnaire as stable JSON without prompting", async () => {
+  const stdout = capture();
+  const stderr = capture();
+  const response = {
+    profile: "agentic_outbound_play",
+    questionnaire_version: "1.0.0",
+    questions: [
+      {
+        answer_schema: { type: "string" },
+        prompt: "What do you sell?",
+        question_id: "offer.summary",
+        required_for: ["agentic_outbound_play"],
+        requires_human_confirmation: false,
+        section: "offer",
+        sensitivity: "business",
+      },
+      {
+        answer_schema: { type: "boolean" },
+        prompt: "Have provider rights been confirmed?",
+        question_id: "policy.provider_rights_confirmed",
+        required_for: ["agentic_outbound_play"],
+        requires_human_confirmation: true,
+        section: "policy",
+        sensitivity: "policy",
+      },
+    ],
+  } as const;
+  const exitCode = await runCli({
+    argv: [
+      "context",
+      "questions",
+      "--profile",
+      "agentic_outbound_play",
+      "--endpoint",
+      TEST_ENDPOINT,
+      "--json",
+    ],
+    environment: { KUROBARA_API_KEY: "synthetic-api-key" },
+    fetch: fetchFrom((request) => {
+      assert.equal(
+        new URL(request.url).pathname,
+        "/v1/gtm-context-questionnaires/agentic_outbound_play"
+      );
+      return jsonResponse(response);
+    }),
+    stderr: stderr.target,
+    stdin: Readable.from([]),
+    stdout: stdout.target,
+  });
+
+  assert.equal(exitCode, 0);
+  assert.equal(stderr.value(), "");
+  assert.deepEqual(JSON.parse(stdout.value()), response);
+});
+
+test("workbook review aliases use the same versioned update contract", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "kurobara-workbook-"));
+  const requestFile = path.join(root, "workbook-selection.json");
+  const request = {
+    annotations: [],
+    approvals: [],
+    column_order: ["domain"],
+    dataset_id: "dataset-workbook",
+    expected_revision: 0,
+    filters: [],
+    materialization_id: "materialization-workbook",
+    name: "Synthetic Workbook",
+    selection_reasons: [
+      {
+        reasons: ["company_match"],
+        record_id: "record-1",
+      },
+    ],
+    selected_record_ids: ["record-1"],
+    workbook_id: "workbook-synthetic",
+  } as const;
+  const response = {
+    view: {
+      annotations: request.annotations,
+      approvals: request.approvals,
+      column_order: request.column_order,
+      dataset_id: request.dataset_id,
+      filters: request.filters,
+      materialization_id: request.materialization_id,
+      name: request.name,
+      revision: 1,
+      selection_reasons: request.selection_reasons,
+      selected_record_ids: request.selected_record_ids,
+      workbook_id: request.workbook_id,
+      workspace_id: "workspace-cli-test",
+    },
+  };
+  await writeFile(requestFile, JSON.stringify(request));
+  for (const command of ["select", "approve", "reject"]) {
+    const stdout = capture();
+    const stderr = capture();
+    const exitCode = await runCli({
+      argv: [
+        "workbook",
+        command,
+        "--endpoint",
+        TEST_ENDPOINT,
+        "--request",
+        requestFile,
+        "--json",
+      ],
+      environment: { KUROBARA_API_KEY: "synthetic-api-key" },
+      fetch: fetchFrom(async (httpRequest) => {
+        assert.equal(httpRequest.method, "PUT");
+        assert.equal(
+          new URL(httpRequest.url).pathname,
+          "/v1/workbooks/workbook-synthetic"
+        );
+        assert.deepEqual(await httpRequest.json(), request);
+        return jsonResponse(response);
+      }),
+      stderr: stderr.target,
+      stdin: Readable.from([]),
+      stdout: stdout.target,
+    });
+    assert.equal(exitCode, 0);
+    assert.equal(stderr.value(), "");
+    assert.deepEqual(JSON.parse(stdout.value()), response);
+  }
+});
+
+test("play run defaults to one durable resume read", async () => {
+  const stdout = capture();
+  const stderr = capture();
+  const snapshot = JSON.parse(
+    await readFile(
+      new URL(
+        "../../contracts/catalog/fixtures/play-run-get-response/valid/minimal.json",
+        import.meta.url
+      ),
+      "utf8"
+    )
+  ) as { run: { run_id: string; state: string } };
+  let calls = 0;
+  const exitCode = await runCli({
+    argv: [
+      "play",
+      "run",
+      "--endpoint",
+      TEST_ENDPOINT,
+      "--run-id",
+      snapshot.run.run_id,
+      "--json",
+    ],
+    environment: { KUROBARA_API_KEY: "synthetic-api-key" },
+    fetch: fetchFrom((request) => {
+      calls += 1;
+      assert.equal(
+        new URL(request.url).pathname,
+        `/v1/play-runs/${snapshot.run.run_id}`
+      );
+      return jsonResponse(snapshot);
+    }),
+    stderr: stderr.target,
+    stdin: Readable.from([]),
+    stdout: stdout.target,
+  });
+
+  assert.equal(exitCode, 0);
+  assert.equal(calls, 1);
+  assert.equal(stderr.value(), "");
+  assert.deepEqual(JSON.parse(stdout.value()), snapshot);
+});
+
+test("play run polls until the run reaches a review boundary", async () => {
+  const stdout = capture();
+  const stderr = capture();
+  const queued = JSON.parse(
+    await readFile(
+      new URL(
+        "../../contracts/catalog/fixtures/play-run-get-response/valid/minimal.json",
+        import.meta.url
+      ),
+      "utf8"
+    )
+  ) as { run: { run_id: string; state: string } };
+  const completed = structuredClone(queued);
+  completed.run.state = "completed";
+  let calls = 0;
+  let clock = 0;
+  const exitCode = await runCli({
+    argv: [
+      "play",
+      "run",
+      "--endpoint",
+      TEST_ENDPOINT,
+      "--poll-interval-ms",
+      "100",
+      "--run-id",
+      queued.run.run_id,
+      "--timeout-ms",
+      "1000",
+      "--json",
+    ],
+    environment: { KUROBARA_API_KEY: "synthetic-api-key" },
+    fetch: fetchFrom(() => {
+      calls += 1;
+      return jsonResponse(calls === 1 ? queued : completed);
+    }),
+    now: () => clock,
+    stderr: stderr.target,
+    stdin: Readable.from([]),
+    stdout: stdout.target,
+    wait: (milliseconds) => {
+      clock += milliseconds;
+      return Promise.resolve();
+    },
+  });
+
+  assert.equal(exitCode, 0);
+  assert.equal(calls, 2);
+  assert.equal(stderr.value(), "");
+  assert.deepEqual(JSON.parse(stdout.value()), completed);
+});

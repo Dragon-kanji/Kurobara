@@ -16,10 +16,20 @@ import type {
   ExportDeliveriesRevokeRequest,
   ExportDeliveryRevokeResponse,
   ExportDeliveryStateResponse,
+  GtmContextCommandRequest,
+  GtmContextCommandResponse,
+  GtmContextStatusRequest,
+  GtmContextStatusResponse,
+  GtmQuestionnaireRequest,
+  GtmQuestionnaireResponse,
   OrganizationsCandidatesListRequest,
   OrganizationsCandidatesListResponse,
   OrganizationsDiscoverRequest,
   OrganizationsDiscoverResponse,
+  PlayCommandRequest,
+  PlayCommandResponse,
+  PlayRunGetRequest,
+  PlayRunGetResponse,
   ProblemDetails,
   RecipeApplicationsExportRequest,
   RecipeApplicationsGetRequest,
@@ -30,6 +40,10 @@ import type {
   RunsCancelResponse,
   SelectedContactDerivedDatasetRequest,
   SelectedContactDerivedDatasetResponse,
+  WorkbookGetRequest,
+  WorkbookGetResponse,
+  WorkbookUpdateRequest,
+  WorkbookUpdateResponse,
 } from "@kurobara/contracts";
 import contactPrivacyRestrictOperation from "@kurobara/contracts/operations/contact-privacy-restrict.json" with {
   type: "json",
@@ -67,10 +81,31 @@ import exportDeliveriesGetOperation from "@kurobara/contracts/operations/export-
 import exportDeliveriesRevokeOperation from "@kurobara/contracts/operations/export-deliveries-revoke.json" with {
   type: "json",
 };
+import gtmContextsApplyOperation from "@kurobara/contracts/operations/gtm-contexts-apply.json" with {
+  type: "json",
+};
+import gtmContextsPlanOperation from "@kurobara/contracts/operations/gtm-contexts-plan.json" with {
+  type: "json",
+};
+import gtmContextsQuestionnaireGetOperation from "@kurobara/contracts/operations/gtm-contexts-questionnaire-get.json" with {
+  type: "json",
+};
+import gtmContextsStatusGetOperation from "@kurobara/contracts/operations/gtm-contexts-status-get.json" with {
+  type: "json",
+};
 import organizationsCandidatesListOperation from "@kurobara/contracts/operations/organizations-candidates-list.json" with {
   type: "json",
 };
 import organizationsDiscoverOperation from "@kurobara/contracts/operations/organizations-discover.json" with {
+  type: "json",
+};
+import playRunsGetOperation from "@kurobara/contracts/operations/play-runs-get.json" with {
+  type: "json",
+};
+import playsApplyOperation from "@kurobara/contracts/operations/plays-apply.json" with {
+  type: "json",
+};
+import playsPreviewOperation from "@kurobara/contracts/operations/plays-preview.json" with {
   type: "json",
 };
 import recipeApplicationsExportOperation from "@kurobara/contracts/operations/recipe-applications-export.json" with {
@@ -83,6 +118,12 @@ import recipesApplyOperation from "@kurobara/contracts/operations/recipes-apply.
   type: "json",
 };
 import runsCancelOperation from "@kurobara/contracts/operations/runs-cancel.json" with {
+  type: "json",
+};
+import workbooksGetOperation from "@kurobara/contracts/operations/workbooks-get.json" with {
+  type: "json",
+};
+import workbooksUpdateOperation from "@kurobara/contracts/operations/workbooks-update.json" with {
   type: "json",
 };
 import problemRegistry from "@kurobara/contracts/problem-registry.json" with {
@@ -163,6 +204,24 @@ import exportDeliveryStateResponseSchema from "@kurobara/contracts/schemas/expor
 import fieldSchema from "@kurobara/contracts/schemas/field.json" with {
   type: "json",
 };
+import gtmContextCommandRequestSchema from "@kurobara/contracts/schemas/gtm-context-command-request.json" with {
+  type: "json",
+};
+import gtmContextCommandResponseSchema from "@kurobara/contracts/schemas/gtm-context-command-response.json" with {
+  type: "json",
+};
+import gtmContextStatusRequestSchema from "@kurobara/contracts/schemas/gtm-context-status-request.json" with {
+  type: "json",
+};
+import gtmContextStatusResponseSchema from "@kurobara/contracts/schemas/gtm-context-status-response.json" with {
+  type: "json",
+};
+import gtmQuestionnaireRequestSchema from "@kurobara/contracts/schemas/gtm-questionnaire-request.json" with {
+  type: "json",
+};
+import gtmQuestionnaireResponseSchema from "@kurobara/contracts/schemas/gtm-questionnaire-response.json" with {
+  type: "json",
+};
 import organizationDiscoveryQuerySchema from "@kurobara/contracts/schemas/organization-discovery-query.json" with {
   type: "json",
 };
@@ -176,6 +235,18 @@ import organizationsDiscoverRequestSchema from "@kurobara/contracts/schemas/orga
   type: "json",
 };
 import organizationsDiscoverResponseSchema from "@kurobara/contracts/schemas/organizations-discover-response.json" with {
+  type: "json",
+};
+import playCommandRequestSchema from "@kurobara/contracts/schemas/play-command-request.json" with {
+  type: "json",
+};
+import playCommandResponseSchema from "@kurobara/contracts/schemas/play-command-response.json" with {
+  type: "json",
+};
+import playRunGetRequestSchema from "@kurobara/contracts/schemas/play-run-get-request.json" with {
+  type: "json",
+};
+import playRunGetResponseSchema from "@kurobara/contracts/schemas/play-run-get-response.json" with {
   type: "json",
 };
 import problemDetailsSchema from "@kurobara/contracts/schemas/problem-details.json" with {
@@ -206,6 +277,18 @@ import selectedContactDerivedDatasetRequestSchema from "@kurobara/contracts/sche
   type: "json",
 };
 import selectedContactDerivedDatasetResponseSchema from "@kurobara/contracts/schemas/selected-contact-derived-dataset-response.json" with {
+  type: "json",
+};
+import workbookGetRequestSchema from "@kurobara/contracts/schemas/workbook-get-request.json" with {
+  type: "json",
+};
+import workbookGetResponseSchema from "@kurobara/contracts/schemas/workbook-get-response.json" with {
+  type: "json",
+};
+import workbookUpdateRequestSchema from "@kurobara/contracts/schemas/workbook-update-request.json" with {
+  type: "json",
+};
+import workbookUpdateResponseSchema from "@kurobara/contracts/schemas/workbook-update-response.json" with {
   type: "json",
 };
 import { sha256 } from "@noble/hashes/sha2.js";
@@ -276,8 +359,39 @@ const recipeApplicationsExportProblemCodes = new Set<string>(
 const runsCancelProblemCodes = new Set<string>(
   runsCancelOperation.problem_codes
 );
+const gtmContextsQuestionnaireGetProblemCodes = new Set<string>(
+  gtmContextsQuestionnaireGetOperation.problem_codes
+);
+const gtmContextsPlanProblemCodes = new Set<string>(
+  gtmContextsPlanOperation.problem_codes
+);
+const gtmContextsApplyProblemCodes = new Set<string>(
+  gtmContextsApplyOperation.problem_codes
+);
+const gtmContextsStatusGetProblemCodes = new Set<string>(
+  gtmContextsStatusGetOperation.problem_codes
+);
+const playsPreviewProblemCodes = new Set<string>(
+  playsPreviewOperation.problem_codes
+);
+const playsApplyProblemCodes = new Set<string>(
+  playsApplyOperation.problem_codes
+);
+const playRunsGetProblemCodes = new Set<string>(
+  playRunsGetOperation.problem_codes
+);
+const workbooksGetProblemCodes = new Set<string>(
+  workbooksGetOperation.problem_codes
+);
+const workbooksUpdateProblemCodes = new Set<string>(
+  workbooksUpdateOperation.problem_codes
+);
 
-const ajv = new Ajv2020({ strict: true, validateFormats: false });
+const ajv = new Ajv2020({
+  strict: true,
+  strictRequired: false,
+  validateFormats: false,
+});
 for (const keyword of [
   "x-kurobara-data-classification",
   "x-kurobara-owner",
@@ -296,6 +410,20 @@ ajv.addSchema(contactOrganizationSourceLineageSchema);
 ajv.addSchema(contactCandidateSchema);
 ajv.addSchema(organizationDiscoveryQuerySchema);
 ajv.addSchema(companyCandidateSchema);
+ajv.addSchema(gtmQuestionnaireRequestSchema);
+ajv.addSchema(gtmQuestionnaireResponseSchema);
+ajv.addSchema(gtmContextCommandRequestSchema);
+ajv.addSchema(gtmContextCommandResponseSchema);
+ajv.addSchema(gtmContextStatusRequestSchema);
+ajv.addSchema(gtmContextStatusResponseSchema);
+ajv.addSchema(playCommandRequestSchema);
+ajv.addSchema(playCommandResponseSchema);
+ajv.addSchema(playRunGetRequestSchema);
+ajv.addSchema(playRunGetResponseSchema);
+ajv.addSchema(workbookGetRequestSchema);
+ajv.addSchema(workbookGetResponseSchema);
+ajv.addSchema(workbookUpdateRequestSchema);
+ajv.addSchema(workbookUpdateResponseSchema);
 const validateOrganizationsCandidatesListRequest =
   ajv.compile<OrganizationsCandidatesListRequest>(
     organizationsCandidatesListRequestSchema
@@ -395,6 +523,56 @@ const validateRunsCancelRequest = ajv.compile<RunsCancelRequest>(
 const validateRunsCancelResponse = ajv.compile<RunsCancelResponse>(
   runsCancelResponseSchema
 );
+const validatorFor = <Value>(schemaId: string) => {
+  const validator = ajv.getSchema<Value>(schemaId);
+  if (validator === undefined) {
+    throw new Error(
+      `The generated contract validator is unavailable: ${schemaId}`
+    );
+  }
+  return validator;
+};
+const validateGtmQuestionnaireRequest = validatorFor<GtmQuestionnaireRequest>(
+  gtmQuestionnaireRequestSchema.$id
+);
+const validateGtmQuestionnaireResponse = validatorFor<GtmQuestionnaireResponse>(
+  gtmQuestionnaireResponseSchema.$id
+);
+const validateGtmContextCommandRequest = validatorFor<GtmContextCommandRequest>(
+  gtmContextCommandRequestSchema.$id
+);
+const validateGtmContextCommandResponse =
+  validatorFor<GtmContextCommandResponse>(gtmContextCommandResponseSchema.$id);
+const validateGtmContextStatusRequest = validatorFor<GtmContextStatusRequest>(
+  gtmContextStatusRequestSchema.$id
+);
+const validateGtmContextStatusResponse = validatorFor<GtmContextStatusResponse>(
+  gtmContextStatusResponseSchema.$id
+);
+const validatePlayCommandRequest = validatorFor<PlayCommandRequest>(
+  playCommandRequestSchema.$id
+);
+const validatePlayCommandResponse = validatorFor<PlayCommandResponse>(
+  playCommandResponseSchema.$id
+);
+const validatePlayRunGetRequest = validatorFor<PlayRunGetRequest>(
+  playRunGetRequestSchema.$id
+);
+const validatePlayRunGetResponse = validatorFor<PlayRunGetResponse>(
+  playRunGetResponseSchema.$id
+);
+const validateWorkbookGetRequest = validatorFor<WorkbookGetRequest>(
+  workbookGetRequestSchema.$id
+);
+const validateWorkbookGetResponse = validatorFor<WorkbookGetResponse>(
+  workbookGetResponseSchema.$id
+);
+const validateWorkbookUpdateRequest = validatorFor<WorkbookUpdateRequest>(
+  workbookUpdateRequestSchema.$id
+);
+const validateWorkbookUpdateResponse = validatorFor<WorkbookUpdateResponse>(
+  workbookUpdateResponseSchema.$id
+);
 const validateProblemDetails =
   ajv.compile<ProblemDetails>(problemDetailsSchema);
 const problemMetadata = new Map(
@@ -439,6 +617,20 @@ export type ExportDeliveryRevocation = ExportDeliveryRevokeResponse;
 export type ExportDeliveryState = ExportDeliveryStateResponse;
 export type RunCancelRequest = RunsCancelRequest;
 export type RunCancelResponse = RunsCancelResponse;
+export type GtmQuestionnaireInput = GtmQuestionnaireRequest;
+export type GtmQuestionnaire = GtmQuestionnaireResponse;
+export type GtmContextCommand = GtmContextCommandRequest;
+export type GtmContextCommandResult = GtmContextCommandResponse;
+export type GtmContextStatusInput = GtmContextStatusRequest;
+export type GtmContextStatus = GtmContextStatusResponse;
+export type PlayCommand = PlayCommandRequest;
+export type PlayCommandResult = PlayCommandResponse;
+export type PlayRunGetInput = PlayRunGetRequest;
+export type PlayRun = PlayRunGetResponse;
+export type WorkbookGetInput = WorkbookGetRequest;
+export type Workbook = WorkbookGetResponse;
+export type WorkbookUpdateInput = WorkbookUpdateRequest;
+export type WorkbookUpdateResult = WorkbookUpdateResponse;
 
 type KurobaraExportDescriptor = Readonly<{
   bytes: AsyncIterable<Uint8Array>;
@@ -497,6 +689,24 @@ export type KurobaraClientOptions = Readonly<{
 }>;
 
 export type KurobaraClient = Readonly<{
+  contexts: Readonly<{
+    apply: (
+      request: Extract<GtmContextCommand, Readonly<{ mode: "apply" }>>,
+      options?: KurobaraRequestOptions
+    ) => Promise<Extract<GtmContextCommandResult, Readonly<{ mode: "apply" }>>>;
+    plan: (
+      request: Extract<GtmContextCommand, Readonly<{ mode: "plan" }>>,
+      options?: KurobaraRequestOptions
+    ) => Promise<Extract<GtmContextCommandResult, Readonly<{ mode: "plan" }>>>;
+    questions: (
+      request: GtmQuestionnaireInput,
+      options?: KurobaraRequestOptions
+    ) => Promise<GtmQuestionnaire>;
+    status: (
+      request: GtmContextStatusInput,
+      options?: KurobaraRequestOptions
+    ) => Promise<GtmContextStatus>;
+  }>;
   contactPrivacy: Readonly<{
     restrict: (
       request: ContactPrivacyRestrictionRequest,
@@ -562,6 +772,22 @@ export type KurobaraClient = Readonly<{
       options?: KurobaraRequestOptions
     ) => Promise<OrganizationCandidatesListResponse>;
   }>;
+  playRuns: Readonly<{
+    get: (
+      request: PlayRunGetInput,
+      options?: KurobaraRequestOptions
+    ) => Promise<PlayRun>;
+  }>;
+  plays: Readonly<{
+    apply: (
+      request: Exclude<PlayCommand, Readonly<{ action: "preview" }>>,
+      options?: KurobaraRequestOptions
+    ) => Promise<Exclude<PlayCommandResult, Readonly<{ action: "preview" }>>>;
+    preview: (
+      request: Extract<PlayCommand, Readonly<{ action: "preview" }>>,
+      options?: KurobaraRequestOptions
+    ) => Promise<Extract<PlayCommandResult, Readonly<{ action: "preview" }>>>;
+  }>;
   recipes: Readonly<{
     apply: (
       request: RecipeApplyRequest,
@@ -583,6 +809,16 @@ export type KurobaraClient = Readonly<{
       request: RunCancelRequest,
       options?: KurobaraRequestOptions
     ) => Promise<RunCancelResponse>;
+  }>;
+  workbooks: Readonly<{
+    get: (
+      request: WorkbookGetInput,
+      options?: KurobaraRequestOptions
+    ) => Promise<Workbook>;
+    update: (
+      request: WorkbookUpdateInput,
+      options?: KurobaraRequestOptions
+    ) => Promise<WorkbookUpdateResult>;
   }>;
 }>;
 
@@ -1167,6 +1403,21 @@ const parseDatasetGenerationGetRequest = (
   );
 };
 
+const parseGeneratedRequest = <Value>(
+  value: unknown,
+  validate: (candidate: unknown) => candidate is Value,
+  label: string
+): Value => {
+  try {
+    if (validate(value)) {
+      return value;
+    }
+  } catch {
+    // AJV may throw while traversing hostile cyclic or accessor-backed input.
+  }
+  throw new KurobaraTransportError("invalid-input", `${label} is invalid.`);
+};
+
 export const parseExportDeliveryGetRequest = (
   value: unknown
 ): ExportDeliveryGetRequest => {
@@ -1366,6 +1617,7 @@ type JsonMutationFetchOptions = Readonly<{
   baseUrl: URL;
   body: string;
   fetchImplementation: typeof fetch;
+  method?: "POST" | "PUT";
   path: string;
   signal?: AbortSignal;
 }>;
@@ -1375,6 +1627,7 @@ const fetchJsonMutation = async ({
   baseUrl,
   body,
   fetchImplementation,
+  method = "POST",
   path,
   signal,
 }: JsonMutationFetchOptions): Promise<Response> => {
@@ -1385,7 +1638,7 @@ const fetchJsonMutation = async ({
         authorization: `Bearer ${apiKey}`,
         "content-type": JSON_MEDIA_TYPE,
       },
-      method: "POST",
+      method,
       signal,
     });
   } catch (error) {
@@ -1987,6 +2240,289 @@ export const createKurobaraClient = (
   const maxResponseBytes = validateMaximum(options.maxResponseBytes);
   const nextBoundary = options.multipartBoundary ?? defaultBoundary;
 
+  const generatedMutation = async <Request, Value>(
+    input: Readonly<{
+      invalidResponseMessage: string;
+      label: string;
+      method?: "POST" | "PUT";
+      path: string;
+      problemCodes: ReadonlySet<string>;
+      request: Request;
+      signal?: AbortSignal;
+      validateRequest: (value: unknown) => value is Request;
+      validateResponse: (value: unknown) => value is Value;
+    }>
+  ): Promise<Value> => {
+    const validated = parseGeneratedRequest(
+      input.request,
+      input.validateRequest,
+      input.label
+    );
+    const body = serializeBoundedJson(
+      validated,
+      DEFAULT_MAX_REQUEST_BYTES,
+      input.label
+    );
+    const response = await fetchJsonMutation({
+      apiKey,
+      baseUrl,
+      body,
+      fetchImplementation,
+      ...(input.method === undefined ? {} : { method: input.method }),
+      path: input.path,
+      ...(input.signal === undefined ? {} : { signal: input.signal }),
+    });
+    return parseOperationResponse(
+      response,
+      maxResponseBytes,
+      input.problemCodes,
+      input.validateResponse,
+      input.invalidResponseMessage
+    );
+  };
+
+  const generatedGet = async <Request, Value>(
+    input: Readonly<{
+      invalidResponseMessage: string;
+      label: string;
+      path: (request: Request) => string;
+      problemCodes: ReadonlySet<string>;
+      request: Request;
+      signal?: AbortSignal;
+      validateRequest: (value: unknown) => value is Request;
+      validateResponse: (value: unknown) => value is Value;
+    }>
+  ): Promise<Value> => {
+    const validated = parseGeneratedRequest(
+      input.request,
+      input.validateRequest,
+      input.label
+    );
+    const response = await fetchJsonGet({
+      apiKey,
+      baseUrl,
+      fetchImplementation,
+      path: input.path(validated),
+      ...(input.signal === undefined ? {} : { signal: input.signal }),
+    });
+    return parseOperationResponse(
+      response,
+      maxResponseBytes,
+      input.problemCodes,
+      input.validateResponse,
+      input.invalidResponseMessage
+    );
+  };
+
+  const getContextQuestions = (
+    request: GtmQuestionnaireInput,
+    requestOptions: KurobaraRequestOptions = {}
+  ): Promise<GtmQuestionnaire> =>
+    generatedGet({
+      invalidResponseMessage:
+        "The Kurobara API returned an invalid GTM questionnaire.",
+      label: "GTM questionnaire request",
+      path: (value) =>
+        `v1/gtm-context-questionnaires/${encodeURIComponent(value.profile)}`,
+      problemCodes: gtmContextsQuestionnaireGetProblemCodes,
+      request,
+      ...(requestOptions.signal === undefined
+        ? {}
+        : { signal: requestOptions.signal }),
+      validateRequest: validateGtmQuestionnaireRequest,
+      validateResponse: validateGtmQuestionnaireResponse,
+    });
+
+  const planContext = (
+    request: Extract<GtmContextCommand, Readonly<{ mode: "plan" }>>,
+    requestOptions: KurobaraRequestOptions = {}
+  ): Promise<Extract<GtmContextCommandResult, Readonly<{ mode: "plan" }>>> =>
+    generatedMutation({
+      invalidResponseMessage:
+        "The Kurobara API returned an invalid GTM Context plan.",
+      label: "GTM Context plan request",
+      path: "v1/gtm-context-plans",
+      problemCodes: gtmContextsPlanProblemCodes,
+      request,
+      ...(requestOptions.signal === undefined
+        ? {}
+        : { signal: requestOptions.signal }),
+      validateRequest: (
+        value
+      ): value is Extract<GtmContextCommand, Readonly<{ mode: "plan" }>> =>
+        validateGtmContextCommandRequest(value) &&
+        (value as GtmContextCommand).mode === "plan",
+      validateResponse: (
+        value
+      ): value is Extract<
+        GtmContextCommandResult,
+        Readonly<{ mode: "plan" }>
+      > =>
+        validateGtmContextCommandResponse(value) &&
+        (value as GtmContextCommandResult).mode === "plan",
+    });
+
+  const applyContext = (
+    request: Extract<GtmContextCommand, Readonly<{ mode: "apply" }>>,
+    requestOptions: KurobaraRequestOptions = {}
+  ): Promise<Extract<GtmContextCommandResult, Readonly<{ mode: "apply" }>>> =>
+    generatedMutation({
+      invalidResponseMessage:
+        "The Kurobara API returned an invalid GTM Context revision.",
+      label: "GTM Context apply request",
+      path: "v1/gtm-context-revisions",
+      problemCodes: gtmContextsApplyProblemCodes,
+      request,
+      ...(requestOptions.signal === undefined
+        ? {}
+        : { signal: requestOptions.signal }),
+      validateRequest: (
+        value
+      ): value is Extract<GtmContextCommand, Readonly<{ mode: "apply" }>> =>
+        validateGtmContextCommandRequest(value) &&
+        (value as GtmContextCommand).mode === "apply",
+      validateResponse: (
+        value
+      ): value is Extract<
+        GtmContextCommandResult,
+        Readonly<{ mode: "apply" }>
+      > =>
+        validateGtmContextCommandResponse(value) &&
+        (value as GtmContextCommandResult).mode === "apply",
+    });
+
+  const getContextStatus = (
+    request: GtmContextStatusInput,
+    requestOptions: KurobaraRequestOptions = {}
+  ): Promise<GtmContextStatus> =>
+    generatedGet({
+      invalidResponseMessage:
+        "The Kurobara API returned an invalid GTM Context status.",
+      label: "GTM Context status request",
+      path: (value) =>
+        `v1/gtm-context-status/${encodeURIComponent(value.profile)}`,
+      problemCodes: gtmContextsStatusGetProblemCodes,
+      request,
+      ...(requestOptions.signal === undefined
+        ? {}
+        : { signal: requestOptions.signal }),
+      validateRequest: validateGtmContextStatusRequest,
+      validateResponse: validateGtmContextStatusResponse,
+    });
+
+  const previewPlay = (
+    request: Extract<PlayCommand, Readonly<{ action: "preview" }>>,
+    requestOptions: KurobaraRequestOptions = {}
+  ): Promise<Extract<PlayCommandResult, Readonly<{ action: "preview" }>>> =>
+    generatedMutation({
+      invalidResponseMessage:
+        "The Kurobara API returned an invalid Play preview.",
+      label: "Play preview request",
+      path: "v1/play-previews",
+      problemCodes: playsPreviewProblemCodes,
+      request,
+      ...(requestOptions.signal === undefined
+        ? {}
+        : { signal: requestOptions.signal }),
+      validateRequest: (
+        value
+      ): value is Extract<PlayCommand, Readonly<{ action: "preview" }>> =>
+        validatePlayCommandRequest(value) &&
+        (value as PlayCommand).action === "preview",
+      validateResponse: (
+        value
+      ): value is Extract<PlayCommandResult, Readonly<{ action: "preview" }>> =>
+        validatePlayCommandResponse(value) &&
+        (value as PlayCommandResult).action === "preview",
+    });
+
+  const applyPlay = (
+    request: Exclude<PlayCommand, Readonly<{ action: "preview" }>>,
+    requestOptions: KurobaraRequestOptions = {}
+  ): Promise<Exclude<PlayCommandResult, Readonly<{ action: "preview" }>>> =>
+    generatedMutation({
+      invalidResponseMessage:
+        "The Kurobara API returned an invalid Play revision.",
+      label: "Play apply request",
+      path: "v1/play-revisions",
+      problemCodes: playsApplyProblemCodes,
+      request,
+      ...(requestOptions.signal === undefined
+        ? {}
+        : { signal: requestOptions.signal }),
+      validateRequest: (
+        value
+      ): value is Exclude<PlayCommand, Readonly<{ action: "preview" }>> =>
+        validatePlayCommandRequest(value) &&
+        (value as PlayCommand).action !== "preview",
+      validateResponse: (
+        value
+      ): value is Exclude<PlayCommandResult, Readonly<{ action: "preview" }>> =>
+        validatePlayCommandResponse(value) &&
+        (value as PlayCommandResult).action !== "preview",
+    });
+
+  const getPlayRun = (
+    request: PlayRunGetInput,
+    requestOptions: KurobaraRequestOptions = {}
+  ): Promise<PlayRun> =>
+    generatedGet({
+      invalidResponseMessage: "The Kurobara API returned an invalid Play run.",
+      label: "Play run request",
+      path: (value) => `v1/play-runs/${encodeURIComponent(value.run_id)}`,
+      problemCodes: playRunsGetProblemCodes,
+      request,
+      ...(requestOptions.signal === undefined
+        ? {}
+        : { signal: requestOptions.signal }),
+      validateRequest: validatePlayRunGetRequest,
+      validateResponse: validatePlayRunGetResponse,
+    });
+
+  const getWorkbook = (
+    request: WorkbookGetInput,
+    requestOptions: KurobaraRequestOptions = {}
+  ): Promise<Workbook> =>
+    generatedGet({
+      invalidResponseMessage: "The Kurobara API returned an invalid Workbook.",
+      label: "Workbook get request",
+      path: (value) => {
+        const query = new URLSearchParams({
+          after_ordinal: String(value.after_ordinal),
+          dataset_id: value.dataset_id,
+          limit: String(value.limit),
+          materialization_id: value.materialization_id,
+        });
+        return `v1/workbooks/${encodeURIComponent(value.workbook_id)}?${query.toString()}`;
+      },
+      problemCodes: workbooksGetProblemCodes,
+      request,
+      ...(requestOptions.signal === undefined
+        ? {}
+        : { signal: requestOptions.signal }),
+      validateRequest: validateWorkbookGetRequest,
+      validateResponse: validateWorkbookGetResponse,
+    });
+
+  const updateWorkbook = (
+    request: WorkbookUpdateInput,
+    requestOptions: KurobaraRequestOptions = {}
+  ): Promise<WorkbookUpdateResult> =>
+    generatedMutation({
+      invalidResponseMessage:
+        "The Kurobara API returned an invalid Workbook revision.",
+      label: "Workbook update request",
+      method: "PUT",
+      path: `v1/workbooks/${encodeURIComponent(request.workbook_id)}`,
+      problemCodes: workbooksUpdateProblemCodes,
+      request,
+      ...(requestOptions.signal === undefined
+        ? {}
+        : { signal: requestOptions.signal }),
+      validateRequest: validateWorkbookUpdateRequest,
+      validateResponse: validateWorkbookUpdateResponse,
+    });
+
   const restrictContactPrivacy = async (
     request: ContactPrivacyRestrictionRequest,
     requestOptions: KurobaraRequestOptions = {}
@@ -2573,6 +3109,12 @@ export const createKurobaraClient = (
   };
 
   return {
+    contexts: {
+      apply: applyContext,
+      plan: planContext,
+      questions: getContextQuestions,
+      status: getContextStatus,
+    },
     contactPrivacy: {
       restrict: restrictContactPrivacy,
     },
@@ -2596,11 +3138,20 @@ export const createKurobaraClient = (
       discover: discoverOrganizations,
       listCandidates: listOrganizationCandidates,
     },
+    playRuns: { get: getPlayRun },
+    plays: {
+      apply: applyPlay,
+      preview: previewPlay,
+    },
     recipeApplications: {
       export: exportRecipeApplication,
       get: getRecipeApplication,
     },
     recipes: { apply: applyRecipe },
     runs: { cancel: cancelRun },
+    workbooks: {
+      get: getWorkbook,
+      update: updateWorkbook,
+    },
   };
 };

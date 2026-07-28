@@ -1,0 +1,456 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/workbooks/get-response/1.0.0",
+  "title": "WorkbookGetResponse",
+  "description": "Human and agent-readable Workbook page with cell state, provenance, freshness, confidence, cost, errors, and redaction.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fields", "has_more", "next_after_ordinal", "records", "view"],
+  "properties": {
+    "fields": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field_id", "key", "label", "value_type"],
+        "properties": {
+          "field_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          },
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,127}$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          },
+          "value_type": {
+            "type": "string",
+            "enum": ["boolean", "number", "string"]
+          }
+        }
+      }
+    },
+    "has_more": { "type": "boolean" },
+    "next_after_ordinal": {
+      "type": ["integer", "null"],
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "records": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["cells", "ordinal", "record_id", "selection_reasons"],
+        "properties": {
+          "cells": {
+            "type": "array",
+            "maxItems": 256,
+            "items": { "$ref": "#/$defs/cell" }
+          },
+          "ordinal": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "record_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          },
+          "selection_reasons": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "pattern": "\\S"
+            }
+          }
+        }
+      }
+    },
+    "view": { "$ref": "#/$defs/view" }
+  },
+  "$defs": {
+    "cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "confidence",
+        "cost",
+        "error",
+        "field_id",
+        "freshness",
+        "provenance",
+        "redacted",
+        "status",
+        "value"
+      ],
+      "properties": {
+        "confidence": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "cost": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["amount", "basis", "unit"],
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000000000
+                },
+                "basis": {
+                  "type": "string",
+                  "enum": ["estimated", "exact"]
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[a-z][a-z0-9._-]*$"
+                }
+              }
+            }
+          ]
+        },
+        "error": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["code", "message", "retryable"],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^[a-z][a-z0-9-]*$"
+                },
+                "message": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024,
+                  "pattern": "\\S"
+                },
+                "retryable": { "type": "boolean" }
+              }
+            }
+          ]
+        },
+        "field_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "freshness": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["expires_at_ms", "observed_at_ms"],
+              "properties": {
+                "expires_at_ms": {
+                  "type": ["integer", "null"],
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "observed_at_ms": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              }
+            }
+          ]
+        },
+        "provenance": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048,
+            "pattern": "\\S"
+          }
+        },
+        "redacted": { "type": "boolean" },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "running", "succeeded", "failed", "skipped"]
+        },
+        "value": {
+          "oneOf": [
+            { "type": "boolean" },
+            {
+              "type": "number",
+              "minimum": -1000000000000000,
+              "maximum": 1000000000000000
+            },
+            { "type": "string", "maxLength": 16384 },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "view": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "annotations",
+        "approvals",
+        "column_order",
+        "dataset_id",
+        "filters",
+        "materialization_id",
+        "name",
+        "revision",
+        "selection_reasons",
+        "selected_record_ids",
+        "workbook_id",
+        "workspace_id"
+      ],
+      "properties": {
+        "annotations": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": { "$ref": "#/$defs/annotation" }
+        },
+        "approvals": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": { "$ref": "#/$defs/approval" }
+        },
+        "column_order": {
+          "type": "array",
+          "maxItems": 256,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,127}$"
+          }
+        },
+        "context_ref": {
+          "$ref": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0#/$defs/context_ref"
+        },
+        "dataset_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "filters": {
+          "type": "array",
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/filter" }
+        },
+        "materialization_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "play_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "play_revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "play_run_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "recipe_application_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "selection_reasons": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": { "$ref": "#/$defs/selection_reason" }
+        },
+        "selected_record_ids": {
+          "type": "array",
+          "maxItems": 1000,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          }
+        },
+        "workbook_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "workspace_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["created_at_ms", "created_by_actor_id", "note", "record_id"],
+      "properties": {
+        "created_at_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "created_by_actor_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "\\S"
+        },
+        "record_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "created_at_ms",
+        "created_by_actor_id",
+        "decision",
+        "record_id"
+      ],
+      "properties": {
+        "created_at_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "created_by_actor_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "decision": {
+          "type": "string",
+          "enum": ["approved", "rejected"]
+        },
+        "record_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "selection_reason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reasons", "record_id"],
+      "properties": {
+        "reasons": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048,
+            "pattern": "\\S"
+          }
+        },
+        "record_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "filter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field_key", "operator"],
+      "properties": {
+        "field_key": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,127}$"
+        },
+        "operator": {
+          "type": "string",
+          "enum": ["equals", "is_not_null"]
+        },
+        "value": {
+          "oneOf": [
+            { "type": "boolean" },
+            {
+              "type": "number",
+              "minimum": -1000000000000000,
+              "maximum": 1000000000000000
+            },
+            { "type": "string", "maxLength": 16384 }
+          ]
+        }
+      }
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.gtm",
+  "x-kurobara-data-classification": "confidential",
+  "x-kurobara-redaction": "sensitive-cell-values-require-contact-permission",
+  "x-kurobara-publication-status": "local-development-only"
+}

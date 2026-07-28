@@ -1,0 +1,18 @@
+{
+  "blocking_question_ids": ["activation.mode"],
+  "context": {
+    "assertions": [],
+    "context_id": "synthetic-context",
+    "name": "Synthetic GTM",
+    "questionnaire_version": "1.0.0"
+  },
+  "fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "issues": [],
+  "mode": "plan",
+  "ready_for": {
+    "agentic_outbound_play": false,
+    "dataset_import": true,
+    "imported_dataset_enrichment": false,
+    "offline_fixture": true
+  }
+}

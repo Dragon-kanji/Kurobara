@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-request/1.0.0",
+  "title": "GtmContextCommandRequest",
+  "description": "Deterministic plan or explicitly confirmed apply command for one workspace GTM Context revision.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["context", "mode"],
+  "properties": {
+    "activate": { "type": "boolean" },
+    "confirm_active_change": { "type": "boolean" },
+    "confirmed": { "type": "boolean" },
+    "context": { "$ref": "#/$defs/context" },
+    "expected_base_revision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647
+    },
+    "mode": { "type": "string", "enum": ["apply", "plan"] },
+    "plan_fingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["mode"],
+      "properties": {
+        "mode": { "const": "plan" },
+        "activate": false,
+        "confirm_active_change": false,
+        "confirmed": false,
+        "plan_fingerprint": false
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "activate",
+        "confirm_active_change",
+        "confirmed",
+        "mode",
+        "plan_fingerprint"
+      ],
+      "properties": {
+        "mode": { "const": "apply" }
+      }
+    }
+  ],
+  "$defs": {
+    "answer_value": {
+      "oneOf": [
+        { "type": "boolean" },
+        {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000000
+        },
+        { "type": "string", "maxLength": 16384 },
+        {
+          "type": "array",
+          "maxItems": 128,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 16384,
+            "pattern": "\\S"
+          }
+        }
+      ]
+    },
+    "assertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provenance", "question_id", "state"],
+      "properties": {
+        "provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["recorded_at_ms", "source"],
+          "properties": {
+            "actor_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "pattern": "\\S"
+            },
+            "recorded_at_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "source": {
+              "type": "string",
+              "enum": ["agent", "human", "import"]
+            }
+          }
+        },
+        "question_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[a-z][a-z0-9_.-]*$"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "confirmed",
+            "inferred",
+            "unknown",
+            "not_applicable",
+            "imported_unverified"
+          ]
+        },
+        "value": { "$ref": "#/$defs/answer_value" }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["value"],
+          "properties": {
+            "state": {
+              "enum": ["confirmed", "inferred", "imported_unverified"]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "state": { "enum": ["unknown", "not_applicable"] },
+            "value": false
+          }
+        }
+      ]
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assertions", "context_id", "name", "questionnaire_version"],
+      "properties": {
+        "assertions": {
+          "type": "array",
+          "maxItems": 128,
+          "items": { "$ref": "#/$defs/assertion" }
+        },
+        "context_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "questionnaire_version": { "type": "string", "const": "1.0.0" }
+      }
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.gtm",
+  "x-kurobara-data-classification": "confidential",
+  "x-kurobara-redaction": "no-secrets-policy-answers-only",
+  "x-kurobara-publication-status": "local-development-only"
+}

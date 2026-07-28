@@ -332,6 +332,30 @@ export type {
 } from "./get-run-by-id.ts";
 export { makeGetRunById } from "./get-run-by-id.ts";
 export type {
+  GtmBusinessContextState,
+  GtmContextIdentity,
+  GtmContextPlan,
+  GtmContextStatus,
+  GtmDatasetIdentity,
+  GtmIdentifierPort,
+  GtmPlayPreview,
+  GtmQuestion,
+  GtmReadiness,
+  GtmReadinessProfile,
+  GtmRecipeProjectionPort,
+  GtmService,
+  GtmServiceActor,
+  GtmServiceDependencies,
+  GtmValidationIssue,
+  GtmWorkbookCell,
+  GtmWorkbookPage,
+} from "./gtm-service.ts";
+export {
+  createGtmService,
+  GTM_QUESTIONNAIRE_VERSION,
+  GTM_QUESTIONS,
+} from "./gtm-service.ts";
+export type {
   ImportDatasetDependencies,
   ImportDatasetFailure,
   ImportDatasetFailureCode,

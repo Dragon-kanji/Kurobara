@@ -1,0 +1,210 @@
+{
+  "context": {
+    "assertions": [
+      {
+        "provenance": {
+          "actor_id": "agent-example",
+          "recorded_at_ms": 1,
+          "source": "agent"
+        },
+        "question_id": "offer.summary",
+        "state": "inferred",
+        "value": "A synthetic service that helps B2B teams qualify public company data."
+      },
+      {
+        "provenance": {
+          "actor_id": "agent-example",
+          "recorded_at_ms": 1,
+          "source": "agent"
+        },
+        "question_id": "offer.value_proposition",
+        "state": "inferred",
+        "value": "Reduce manual qualification time while keeping every external effect bounded."
+      },
+      {
+        "provenance": {
+          "actor_id": "agent-example",
+          "recorded_at_ms": 1,
+          "source": "agent"
+        },
+        "question_id": "offer.customer_problems",
+        "state": "inferred",
+        "value": ["stale account lists", "untraceable enrichment decisions"]
+      },
+      {
+        "provenance": {
+          "actor_id": "agent-example",
+          "recorded_at_ms": 1,
+          "source": "agent"
+        },
+        "question_id": "offer.proof_points",
+        "state": "inferred",
+        "value": ["bounded synthetic workflow", "per-cell provenance"]
+      },
+      {
+        "provenance": {
+          "actor_id": "agent-example",
+          "recorded_at_ms": 1,
+          "source": "agent"
+        },
+        "question_id": "audience.segments",
+        "state": "inferred",
+        "value": ["B2B software"]
+      },
+      {
+        "provenance": {
+          "actor_id": "agent-example",
+          "recorded_at_ms": 1,
+          "source": "agent"
+        },
+        "question_id": "audience.company_countries",
+        "state": "inferred",
+        "value": ["ES"]
+      },
+      {
+        "provenance": {
+          "actor_id": "agent-example",
+          "recorded_at_ms": 1,
+          "source": "agent"
+        },
+        "question_id": "audience.company_traits",
+        "state": "inferred",
+        "value": ["software", "11-200 employees"]
+      },
+      {
+        "provenance": {
+          "actor_id": "agent-example",
+          "recorded_at_ms": 1,
+          "source": "agent"
+        },
+        "question_id": "audience.exclusions",
+        "state": "inferred",
+        "value": ["existing customers", "suppression list"]
+      },
+      {
+        "provenance": {
+          "actor_id": "agent-example",
+          "recorded_at_ms": 1,
+          "source": "agent"
+        },
+        "question_id": "audience.personas",
+        "state": "inferred",
+        "value": ["founder", "growth lead"]
+      },
+      {
+        "provenance": {
+          "actor_id": "agent-example",
+          "recorded_at_ms": 1,
+          "source": "agent"
+        },
+        "question_id": "audience.titles",
+        "state": "inferred",
+        "value": ["Founder", "Head of Growth"]
+      },
+      {
+        "provenance": {
+          "actor_id": "agent-example",
+          "recorded_at_ms": 1,
+          "source": "agent"
+        },
+        "question_id": "qualification.required_signals",
+        "state": "inferred",
+        "value": ["country match", "role match"]
+      },
+      {
+        "provenance": {
+          "actor_id": "agent-example",
+          "recorded_at_ms": 1,
+          "source": "agent"
+        },
+        "question_id": "qualification.minimum_score",
+        "state": "inferred",
+        "value": 70
+      },
+      {
+        "provenance": {
+          "actor_id": "agent-example",
+          "recorded_at_ms": 1,
+          "source": "agent"
+        },
+        "question_id": "data.desired_fields",
+        "state": "inferred",
+        "value": ["company domain", "professional role"]
+      },
+      {
+        "provenance": {
+          "actor_id": "human-example",
+          "recorded_at_ms": 1,
+          "source": "human"
+        },
+        "question_id": "data.prohibited_fields",
+        "state": "confirmed",
+        "value": ["personal email", "personal phone"]
+      },
+      {
+        "provenance": {
+          "actor_id": "human-example",
+          "recorded_at_ms": 1,
+          "source": "human"
+        },
+        "question_id": "policy.provider_rights_confirmed",
+        "state": "confirmed",
+        "value": true
+      },
+      {
+        "provenance": {
+          "actor_id": "human-example",
+          "recorded_at_ms": 1,
+          "source": "human"
+        },
+        "question_id": "policy.initial_budget_limit",
+        "state": "confirmed",
+        "value": 10
+      },
+      {
+        "provenance": {
+          "actor_id": "human-example",
+          "recorded_at_ms": 1,
+          "source": "human"
+        },
+        "question_id": "policy.initial_budget_unit",
+        "state": "confirmed",
+        "value": "credits"
+      },
+      {
+        "provenance": {
+          "actor_id": "human-example",
+          "recorded_at_ms": 1,
+          "source": "human"
+        },
+        "question_id": "policy.retention_days",
+        "state": "confirmed",
+        "value": 30
+      },
+      {
+        "provenance": {
+          "actor_id": "human-example",
+          "recorded_at_ms": 1,
+          "source": "human"
+        },
+        "question_id": "activation.private_export_requested",
+        "state": "confirmed",
+        "value": false
+      },
+      {
+        "provenance": {
+          "actor_id": "human-example",
+          "recorded_at_ms": 1,
+          "source": "human"
+        },
+        "question_id": "activation.mode",
+        "state": "confirmed",
+        "value": "no_send"
+      }
+    ],
+    "context_id": "synthetic-gtm-context",
+    "name": "Synthetic GTM Context",
+    "questionnaire_version": "1.0.0"
+  },
+  "mode": "plan"
+}

@@ -691,8 +691,8 @@ test("exposes only canonical V1 contracts from the package root", async () => {
     ],
     "./catalog/schemas/organizations/candidates-list-response/1.0.0.schema.json"
   );
-  assert.equal(catalogManifest.catalog_version, "0.12.0");
-  assert.equal(catalogManifest.members.length, 121);
+  assert.equal(catalogManifest.catalog_version, "0.13.0");
+  assert.equal(catalogManifest.members.length, 146);
   assert.deepEqual(
     Object.fromEntries(
       [...Map.groupBy(catalogManifest.members, (member) => member.role)].map(
@@ -701,9 +701,9 @@ test("exposes only canonical V1 contracts from the package root", async () => {
     ),
     {
       event: 1,
-      schema: 63,
-      operation: 22,
-      problem: 32,
+      schema: 77,
+      operation: 31,
+      problem: 34,
       "projection-rule": 3,
     }
   );
@@ -1245,7 +1245,7 @@ test("generates byte-identical artifacts repeatedly from one catalog", async () 
   assert.equal(first.catalogFingerprint, second.catalogFingerprint);
   assert.equal(
     first.catalogFingerprint,
-    "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4"
+    "sha256:26211b3954f9c88b24608746d744f15a870330809df021cd6fcd56499591d921"
   );
   assert.deepEqual([...first.outputs], [...second.outputs]);
   assert.equal(first.outputs.size, 7);
@@ -1328,7 +1328,7 @@ test("keeps RFC 9457 problem registry, REST statuses, and MCP codes aligned", as
   const problemsByCode = new Map(
     catalog.problems.map(({ document }) => [document.problem_code, document])
   );
-  assert.equal(problemsByCode.size, 32);
+  assert.equal(problemsByCode.size, 34);
 
   const createOperation = catalog.operations.find(
     ({ document }) => document.operation_id === "runs.create"
@@ -1841,15 +1841,24 @@ test("keeps operation, event, and projection identities aligned", async () => {
       "datasets.import",
       "export-deliveries.get",
       "export-deliveries.revoke",
+      "gtm-contexts.apply",
+      "gtm-contexts.plan",
+      "gtm-contexts.questionnaire.get",
+      "gtm-contexts.status.get",
       "organizations.candidates.list",
       "organizations.discover",
       "plans.quote",
+      "play-runs.get",
+      "plays.apply",
+      "plays.preview",
       "recipe-applications.export",
       "recipe-applications.get",
       "recipes.apply",
       "runs.cancel",
       "runs.create",
       "runs.get",
+      "workbooks.get",
+      "workbooks.update",
     ]
   );
   assert.equal(
@@ -2124,7 +2133,22 @@ test("keeps operation, event, and projection identities aligned", async () => {
   const mcp = JSON.parse(outputs.get("catalog/generated/mcp-tools.json"));
   assert.deepEqual(
     mcp.tools.map((tool) => tool.name),
-    ["list_capabilities", "quote_run", "cancel_run", "create_run", "get_run"]
+    [
+      "list_capabilities",
+      "kurobara_context_apply",
+      "kurobara_context_plan",
+      "kurobara_context_questions",
+      "kurobara_context_status",
+      "quote_run",
+      "kurobara_play_run",
+      "kurobara_play_apply",
+      "kurobara_play_preview",
+      "cancel_run",
+      "create_run",
+      "get_run",
+      "kurobara_workbook_get",
+      "kurobara_workbook_update",
+    ]
   );
   assert.equal(
     mcp.tools.find((tool) => tool.operation_id === "datasets.import"),
@@ -2178,15 +2202,24 @@ test("keeps operation, event, and projection identities aligned", async () => {
       "dataset import",
       "dataset export-status",
       "dataset export-revoke",
+      "context apply",
+      "context plan",
+      "context questions",
+      "context status",
       "company results",
       "company search",
       "quote",
+      "play run",
+      "play apply",
+      "play preview",
       "recipe export",
       "recipe watch",
       "recipe apply",
       "run cancel",
       "run create",
       "run get",
+      "workbook get",
+      "workbook update",
     ]
   );
   const importCommand = cli.commands.find(

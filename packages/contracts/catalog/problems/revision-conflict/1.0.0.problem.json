@@ -1,0 +1,10 @@
+{
+  "problem_code": "revision-conflict",
+  "problem_version": "1.0.0",
+  "type_uri": "https://problems.kurobara.invalid/revision-conflict",
+  "title": "Revision conflict",
+  "default_status": 409,
+  "retryable": false,
+  "safe_extensions": ["correlation_id"],
+  "publication_status": "local-development-only"
+}
