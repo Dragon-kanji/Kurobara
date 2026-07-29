@@ -371,7 +371,7 @@ test("update check is explicit, read-only, and machine-readable", async () => {
   const current = await invoke(root, ["update", "check", "--json"], {
     fetch: () =>
       Promise.resolve(
-        new Response(JSON.stringify([{ tag_name: "v0.1.0-rc.7" }]), {
+        new Response(JSON.stringify([{ tag_name: "v0.1.0-rc.8" }]), {
           headers: { "content-type": "application/json" },
           status: 200,
         })

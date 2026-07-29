@@ -159,7 +159,7 @@ with `npm run start:mcp`; it reads `KUROBARA_API_URL` and
 ## Preview status
 
 The latest published preview is
-[`v0.1.0-rc.7`](https://github.com/Dragon-kanji/Kurobara/releases/tag/v0.1.0-rc.7).
+[`v0.1.0-rc.8`](https://github.com/Dragon-kanji/Kurobara/releases/tag/v0.1.0-rc.8).
 It is a source preview, not a stable release. The repository does not currently
 publish an npm package, an OCI image, a hosted API, a product UI, or a managed
 service. Kurobara intentionally remains headless and CLI-first. The separately
