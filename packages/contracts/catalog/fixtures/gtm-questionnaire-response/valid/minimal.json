@@ -1,0 +1,17 @@
+{
+  "profile": "agentic_outbound_play",
+  "questionnaire_version": "1.0.0",
+  "questions": [
+    {
+      "answer_schema": {
+        "type": "string"
+      },
+      "prompt": "What do you sell?",
+      "question_id": "offer.summary",
+      "required_for": ["agentic_outbound_play"],
+      "requires_human_confirmation": false,
+      "section": "offer",
+      "sensitivity": "business"
+    }
+  ]
+}

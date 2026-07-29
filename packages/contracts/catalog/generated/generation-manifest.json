@@ -7,29 +7,29 @@
   "outputs": [
     {
       "file": "catalog/generated/catalog-manifest.json",
-      "fingerprint": "sha256:be999f32bab8bd525079f7bd87ff65f30b3a6f2ab253e1af6a6b1ff8235c5e94"
+      "fingerprint": "sha256:fa35cb5f10819154cb580eec673f532b3c223006282ed7d9fff4384a96c0e3b8"
     },
     {
       "file": "catalog/generated/openapi-3.1.1.json",
-      "fingerprint": "sha256:eb9c139b1d7942b0e1ec3fd68996cb4407cf917c4cf860c37e7c53af53d4b61f"
+      "fingerprint": "sha256:6e4e0243eeb8af8edc93d9cca3df1e21776e73880c4d4eeb09894dd0bd4fd81b"
     },
     {
       "file": "catalog/generated/mcp-tools.json",
-      "fingerprint": "sha256:b1fc6926dde0e474f29bab3716d0a042c549315da8571ea0ff42dcbafc6fc4b8"
+      "fingerprint": "sha256:1414e6926255ccf86724cf946c23a0ef1d42707e1db584a9c42ac74e71ad2fae"
     },
     {
       "file": "catalog/generated/problem-registry.json",
-      "fingerprint": "sha256:700d7e9718ccc2ce18a8d3352120f0b7d3aed3cc393c0e98c512a83de6aa1a4b"
+      "fingerprint": "sha256:8d82ef7ab74d90818d1ecd5fb616b4d3c4b0c73910b2321858eaeccefcfa9f29"
     },
     {
       "file": "catalog/generated/cli-commands.json",
-      "fingerprint": "sha256:fae273092ea0345f915563db09aff132cf1b69e6fc4bd462261a06ab1979393a"
+      "fingerprint": "sha256:a985d355aa7846a71fa024f98622761dbb347bec8e4a885e193e42cc4154b861"
     },
     {
       "file": "src/generated/v1.ts",
-      "fingerprint": "sha256:c5776897560c992923727220743b3a6772d964cf514e3ec1ba471168a28518b9"
+      "fingerprint": "sha256:34e4642ddfb35cbc372e4d0d0d5e8de9b8e879342ddcc36c784e9b711c5e959b"
     }
   ],
   "runtime": "node-24.14.0",
-  "source_catalog_fingerprint": "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4"
+  "source_catalog_fingerprint": "sha256:1466e9c9bff8bc3c3f3c5e330a5770cb57429cb03bd9a75cc0701c9a71c9744e"
 }

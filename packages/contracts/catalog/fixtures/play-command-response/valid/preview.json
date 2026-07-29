@@ -1,0 +1,86 @@
+{
+  "action": "preview",
+  "compilation": {
+    "assumptions": ["Audience broadening is forbidden."],
+    "authority": {
+      "human_gates": ["private_export"],
+      "permissions": ["datasets:read", "plays:execute", "recipes:export"]
+    },
+    "budget": {
+      "limit": 4,
+      "quoted_upper_bound": 4,
+      "unit": "credits"
+    },
+    "deadline_ms": 2000000000000,
+    "export_mode": "no_send",
+    "intention_hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "stages": [
+      {
+        "capability": "contacts.discover",
+        "input_fingerprint": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "operation_id": "contacts.discover",
+        "ordinal": 1
+      }
+    ]
+  },
+  "fingerprint": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+  "issues": [],
+  "lifecycle": "awaiting_approval",
+  "play": {
+    "approvals": {
+      "export": false,
+      "provider_spend": false,
+      "reveal": false
+    },
+    "authority_envelope_id": "authority-synthetic-play",
+    "audience": {
+      "company_countries": ["FR"],
+      "departments": [],
+      "person_countries": [],
+      "seniorities": [],
+      "titles": []
+    },
+    "broadening": "forbidden",
+    "budget": {
+      "limit": 4,
+      "unit": "credits"
+    },
+    "capabilities": ["contacts.discover"],
+    "context_ref": {
+      "context_id": "synthetic-context",
+      "fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "revision": 1
+    },
+    "deadline_ms": 2000000000000,
+    "delivery": {
+      "mode": "no_send",
+      "private_export": true
+    },
+    "exclusions": [],
+    "objective": {
+      "metric": "contacts",
+      "target": 3,
+      "text": "Find three contacts"
+    },
+    "play_id": "synthetic-play",
+    "preview": {
+      "max_companies": 3,
+      "max_contacts_per_company": 1,
+      "max_contacts_total": 3,
+      "max_provider_calls": 4,
+      "sample_size": 3
+    },
+    "selection": {
+      "minimum_score": 0,
+      "required_signals": []
+    },
+    "source": {
+      "countries": ["FR"],
+      "industries": ["software"],
+      "keywords": [],
+      "kind": "organization_search"
+    },
+    "stop_conditions": ["budget_exhausted"]
+  },
+  "requires_human_approval": true
+}

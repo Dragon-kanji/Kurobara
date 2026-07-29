@@ -10,9 +10,10 @@ import {
   makeAuthorizeDatasetGenerationPage,
   makeCheckpointDatasetGenerationPage,
 } from "@kurobara/application";
-
 import type { WorkerProcessConfig } from "./config.ts";
 import { createDatasetGenerationSchedulerService } from "./dataset-generation-scheduler-service.ts";
+import { createConfiguredGtmPlayExecutor } from "./gtm-play-executor.ts";
+import { createGtmPlaySchedulerService } from "./gtm-play-scheduler-service.ts";
 import type { WorkerProcessService } from "./lifecycle.ts";
 import { composeWorker } from "./main.ts";
 import { createConfiguredLeafEffectRuntime } from "./provider-effects.ts";
@@ -24,6 +25,7 @@ export type WorkerServiceTopology = Readonly<{
   dispatcher: WorkerProcessService;
   effectReconciler: WorkerProcessService;
   executor: WorkerProcessService;
+  gtmPlayScheduler?: WorkerProcessService;
   leafDispatcher: WorkerProcessService;
   reconciler: WorkerProcessService;
   routeScheduler: WorkerProcessService;
@@ -177,6 +179,20 @@ export const createConfiguredWorkerTopology = async (
       schedulerId: config.datasetGenerationScheduler.schedulerId,
       work: runtime.datasetGenerationWork,
     });
+    const gtmPlayExecutor = createConfiguredGtmPlayExecutor(
+      runtime,
+      environment
+    );
+    const gtmPlayScheduler = createGtmPlaySchedulerService({
+      claimLeaseMs: config.datasetGenerationScheduler.claimLeaseMs,
+      clock: generationClock,
+      inspectGeneration: gtmPlayExecutor.inspectGeneration,
+      persistence: runtime.gtm,
+      pollIntervalMs: config.datasetGenerationScheduler.pollIntervalMs,
+      projectWorkbook: gtmPlayExecutor.projectWorkbook,
+      startStage: gtmPlayExecutor.startStage,
+      workerId: `${config.datasetGenerationScheduler.schedulerId}-gtm-play`,
+    });
 
     return {
       close: runtime.close,
@@ -185,6 +201,7 @@ export const createConfiguredWorkerTopology = async (
       dispatcher: composition.dispatcher,
       effectReconciler: composition.effectReconciler,
       executor: composition.executor,
+      gtmPlayScheduler,
       leafDispatcher: composition.leafDispatcher,
       reconciler: composition.reconciler,
       routeScheduler: composition.routeScheduler,
@@ -299,6 +316,9 @@ export const createWorkerService = (
       await startService(candidate.dagScheduler);
       await startService(candidate.dispatcher);
       await startService(candidate.datasetGenerationScheduler);
+      if (candidate.gtmPlayScheduler !== undefined) {
+        await startService(candidate.gtmPlayScheduler);
+      }
       supervise(candidate.executor);
       supervise(candidate.reconciler);
       supervise(candidate.effectReconciler);
@@ -307,6 +327,9 @@ export const createWorkerService = (
       supervise(candidate.dagScheduler);
       supervise(candidate.dispatcher);
       supervise(candidate.datasetGenerationScheduler);
+      if (candidate.gtmPlayScheduler !== undefined) {
+        supervise(candidate.gtmPlayScheduler);
+      }
       topology = candidate;
     } catch (error) {
       const cleanupOperations = [...attemptedServices]
@@ -340,6 +363,11 @@ export const createWorkerService = (
     topology = undefined;
     stopPromise = runCleanup(
       [
+        ...(current.gtmPlayScheduler === undefined
+          ? []
+          : [
+              () => current.gtmPlayScheduler?.stop(reason) ?? Promise.resolve(),
+            ]),
         () => current.datasetGenerationScheduler.stop(reason),
         () => current.dispatcher.stop(reason),
         () => current.dagScheduler.stop(reason),

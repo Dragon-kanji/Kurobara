@@ -15,7 +15,7 @@ const FILE_EXTENSION_PATTERN = /^[a-z0-9]+$/u;
 const DOWNLOAD_FILENAME_PATTERN = /^[a-z0-9]+(?:[.-][a-z0-9]+)*$/u;
 const PROBLEM_SCHEMA_ID =
   "https://schemas.kurobara.invalid/schemas/problems/problem-details/1.0.0";
-const CATALOG_VERSION = "0.12.0";
+const CATALOG_VERSION = "0.13.0";
 const HTTP_BEARER_AUTH_PROFILE = "http-bearer";
 const QUALIFIED_NODE_VERSION = "24.14.0";
 const MCP_AVAILABILITIES = new Set(["available", "deferred"]);

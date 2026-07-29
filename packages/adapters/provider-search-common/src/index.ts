@@ -18,7 +18,7 @@ export const SEARCH_CAPABILITY = Object.freeze({
 // the contracts workspace. It must be refreshed after canonical contract
 // generation before the adapter set is released.
 export const SEARCH_CATALOG_FINGERPRINT =
-  "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4";
+  "sha256:1466e9c9bff8bc3c3f3c5e330a5770cb57429cb03bd9a75cc0701c9a71c9744e";
 
 const RECIPE_CELL_INPUT_SCHEMA_FINGERPRINT =
   "sha256:c40a6d60340e2fcc29415f4594b5b3f951da7a798d41a245bb63cecd1600eccd";
@@ -35,14 +35,14 @@ const RECIPE_CELL_OUTPUT_SCHEMA_ID =
 export const SEARCH_CONTRACTS = Object.freeze({
   input: Object.freeze({
     catalogFingerprint: SEARCH_CATALOG_FINGERPRINT,
-    catalogVersion: "0.12.0",
+    catalogVersion: "0.13.0",
     schemaFingerprint: RECIPE_CELL_INPUT_SCHEMA_FINGERPRINT,
     schemaId: RECIPE_CELL_INPUT_SCHEMA_ID,
     schemaVersion: "1.0.0",
   }),
   output: Object.freeze({
     catalogFingerprint: SEARCH_CATALOG_FINGERPRINT,
-    catalogVersion: "0.12.0",
+    catalogVersion: "0.13.0",
     schemaFingerprint: RECIPE_CELL_OUTPUT_SCHEMA_FINGERPRINT,
     schemaId: RECIPE_CELL_OUTPUT_SCHEMA_ID,
     schemaVersion: "1.0.0",

@@ -21,10 +21,22 @@ and machine-readable outputs.
   selection.
 - Verifies work emails as a separate, explicit action.
 - Applies versioned enrichment recipes to existing datasets.
+- Stores immutable, workspace-scoped GTM Context revisions with explicit
+  assertion provenance and human-only policy confirmations.
+- Compiles versioned, provider-neutral Plays from an exact Context revision,
+  with bounded previews, budgets, authority gates, and `no_send` delivery.
+- Executes approved Plays through fenced PostgreSQL claims and restart-safe
+  stage checkpoints, then returns the exact result dataset, materialization,
+  Workbook, settled cost, provider-call count, and export readiness.
+- Projects datasets through bounded Workbooks with cell status, provenance,
+  freshness, confidence, cost, errors, redaction, selection reasons, and
+  append-only human approvals.
 - Persists runs, checkpoints, costs, provenance, retries, cancellations, and
   ambiguous outcomes in PostgreSQL.
 - Exposes the same product logic through REST, a TypeScript SDK, and a
-  non-interactive CLI.
+  CLI with a guided human Context flow and deterministic JSON for agents.
+- Serves the generated Context, Play, run, and Workbook tools over an optional
+  local stdio MCP server.
 - Exports deterministic CSV or JSONL with privacy-aware delivery receipts for
   contact data.
 
@@ -61,11 +73,15 @@ npm run install:cli -- --prefix "$HOME/.local"
 export PATH="$HOME/.local/bin:$PATH"
 
 kurobara setup
+kurobara context setup --profile agentic_outbound_play
+kurobara doctor --profile agentic_outbound_play
 kurobara first-run --offline --json
 ```
 
-`setup` is a short human TTY flow. Coding agents use the same engine through
-`setup inspect`, `setup plan`, and `setup apply --non-interactive --json`.
+`setup` is a short technical TTY flow. `context setup` continues in the same
+CLI language for the human business interview. Coding agents use the same
+engine through `setup inspect`, `setup plan`, `setup apply`,
+`context questions`, `context plan`, and `context apply` with JSON.
 
 The offline first run builds the local distribution, starts PostgreSQL,
 Hatchet, the API, and the worker, then exercises import, recipe execution,
@@ -104,6 +120,12 @@ npm run b2b:dogfood:preflight
 npm run b2b:dogfood -- run --confirm-provider-calls
 ```
 
+The live harness uses the same agent-first Context, Play, run, Workbook review,
+and private export surfaces as an external coding agent. It interrupts client
+polling once and resumes the same durable Play run. The default qualification
+is capped at three companies, three contacts, and four provider requests; use
+the documented environment caps to reduce those bounds.
+
 Read the [B2B list workflow](./docs/b2b-lists.md) before confirming calls.
 
 ## Designed for agents
@@ -118,15 +140,21 @@ Agent-controlled work is constrained by:
 - durable checkpoints and cost records;
 - fail-closed handling of ambiguous provider outcomes.
 
-CLI success output is JSON. Errors use a bounded Problem Details shape and a
-non-zero exit code. A caller can dry-run a plan, inspect it, and start the same
-intent without giving the agent direct access to PostgreSQL or provider
-internals.
+Agents pass `--json` for deterministic success output. Interactive terminals
+render structured human receipts for Context, Play, run, and Workbook review;
+these receipts never replace the machine contract. Errors use a bounded
+Problem Details shape and a non-zero exit code. A caller can dry-run a plan,
+inspect it, and start the same intent without giving the agent direct access
+to PostgreSQL or provider internals.
 
 The repository ships a companion
 [`kurobara-cli` skill](./.codex/skills/kurobara-cli/SKILL.md) for coding agents.
 
-There is no MCP server in this preview. Agents use the CLI or REST API today.
+The optional `@kurobara/mcp` stdio process projects the same generated
+contracts. It has no PostgreSQL access, provider credentials, file transport,
+or embedded model. Point it at an already running Kurobara API and start it
+with `npm run start:mcp`; it reads `KUROBARA_API_URL` and
+`KUROBARA_API_KEY` from its own process environment.
 
 ## Preview status
 
@@ -134,7 +162,8 @@ The latest published preview is
 [`v0.1.0-rc.7`](https://github.com/Dragon-kanji/Kurobara/releases/tag/v0.1.0-rc.7).
 It is a source preview, not a stable release. The repository does not currently
 publish an npm package, an OCI image, a hosted API, a product UI, or a managed
-service. The separately maintained public project website is a static
+service. Kurobara intentionally remains headless and CLI-first. The separately
+maintained public project website is a static
 introduction to the OSS project.
 
 The preview has passed:

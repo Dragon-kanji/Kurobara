@@ -1,0 +1,36 @@
+{
+  "operation_id": "gtm-contexts.plan",
+  "operation_version": "1.0.0",
+  "action_ref": "PlanGtmContext",
+  "kind": "query",
+  "auth_profile": "http-bearer",
+  "idempotence": "inherent",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-request/1.0.0",
+  "output_schema_id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-response/1.0.0",
+  "problem_codes": [
+    "authentication-required",
+    "authority-permission-missing",
+    "internal-error",
+    "invalid-credential",
+    "output-contract-violation",
+    "payload-too-large",
+    "request-invalid",
+    "service-unavailable",
+    "unsupported-media-type"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["contexts:read"],
+  "human_gates": [],
+  "accepted_data_classes": ["confidential"],
+  "produced_data_classes": ["confidential"],
+  "status": "experimental",
+  "projections": {
+    "rest": { "method": "POST", "path": "/v1/gtm-context-plans" },
+    "sdk_ts": { "method": "contexts.plan" },
+    "cli": { "command": "context plan", "output_mode": "json" },
+    "mcp": {
+      "availability": "available",
+      "tool": "kurobara_context_plan"
+    }
+  }
+}

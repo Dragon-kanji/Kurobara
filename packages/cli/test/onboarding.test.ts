@@ -19,6 +19,9 @@ const BRAND_PATTERN = /KUROBARA/u;
 const DOT_FLOW_PATTERN = /···●····●···/u;
 const MASK_PATTERN = /••••/u;
 const WRITE_CONFIRMATION_PATTERN = /configuration written atomically/u;
+const GTM_CONTEXT_PATTERN = /GTM CONTEXT/u;
+const FINGERPRINT_PATTERN = /Fingerprint:/u;
+const CONTEXT_STORED_PATTERN = /immutable Context revision stored/u;
 
 const capture = (isTTY = false) => {
   const chunks: Uint8Array[] = [];
@@ -314,13 +317,43 @@ test("doctor diagnoses healthy and unavailable runtime without exposing auth", a
   const root = await mkdtemp(path.join(tmpdir(), "kurobara-onboarding-"));
   await configure(root);
   const syntheticKey = "synthetic-client-secret";
+  const configBefore = await readFile(
+    path.join(root, "config", "config.json"),
+    "utf8"
+  );
+  const requestedUrls: string[] = [];
   const healthy = await invoke(root, ["doctor", "--json"], {
     environment: { KUROBARA_API_KEY: syntheticKey },
-    fetch: async () => new Response("{}", { status: 200 }),
+    fetch: (input) => {
+      requestedUrls.push(String(input));
+      return Promise.resolve(new Response("{}", { status: 200 }));
+    },
   });
   assert.equal(healthy.exitCode, 0);
   const healthyResult = JSON.parse(healthy.stdout);
   assert.equal(healthyResult.ready, true);
+  assert.equal(healthyResult.profile_ready, false);
+  assert.equal(healthyResult.operational_ready, false);
+  assert.equal(healthyResult.business_context.ready, false);
+  assert.equal(healthyResult.provider_credit_spend, 0);
+  assert.equal(healthyResult.side_effects, "read_only");
+  assert.equal(healthyResult.blocked_steps.includes("business_context"), false);
+  assert.equal(
+    healthyResult.next_actions.some(
+      (nextAction: { argv: readonly string[] }) =>
+        nextAction.argv.join(" ") ===
+        "kurobara context setup --profile agentic_outbound_play"
+    ),
+    true
+  );
+  assert.equal(
+    requestedUrls.some((url) => url.includes("/providers/")),
+    false
+  );
+  assert.equal(
+    await readFile(path.join(root, "config", "config.json"), "utf8"),
+    configBefore
+  );
   assert.equal(healthy.stdout.includes(syntheticKey), false);
 
   const unavailable = await invoke(root, ["doctor", "--json"], {
@@ -404,6 +437,132 @@ test("offline first run returns a structured zero-credit receipt", async () => {
   assert.deepEqual(request?.args, ["deploy/self-host/harness.sh"]);
 });
 
+test("live first run executes the bounded harness and validates its receipt", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "kurobara-onboarding-"));
+  let request: ProcessRequest | undefined;
+  const result = await invoke(
+    root,
+    [
+      "first-run",
+      "--live",
+      "--max-companies",
+      "1",
+      "--max-contacts",
+      "1",
+      "--confirm-provider-credits",
+      "--json",
+    ],
+    {
+      processRunner: (candidate) => {
+        request = candidate;
+        return Promise.resolve({
+          code: 0,
+          stderr: "",
+          stdout: `${JSON.stringify({
+            bounds: {
+              companies: 1,
+              contacts: 1,
+              max_provider_requests: 4,
+            },
+            cleanup: "completed",
+            command: "run",
+            proof: {
+              api: "ready",
+              export: "private-csv-verified",
+              hatchet: "executed",
+              interruption_resume: "verified",
+              play_run: "completed",
+              postgres: "durable-during-run",
+              providers: ["hunter", "prospeo"],
+              workbook: "inspected-and-approved",
+              work_email: "found-and-valid",
+            },
+            status: "passed",
+          })}\n`,
+        });
+      },
+    }
+  );
+  assert.equal(result.exitCode, 0);
+  assert.equal(JSON.parse(result.stdout).receipt.provider_calls.maximum, 4);
+  assert.equal(request?.command, "npm");
+  assert.deepEqual(request?.args, [
+    "run",
+    "b2b:dogfood",
+    "--",
+    "run",
+    "--confirm-provider-calls",
+  ]);
+  assert.equal(request?.environment.KUROBARA_DOGFOOD_MAX_COMPANIES, "1");
+  assert.equal(request?.environment.KUROBARA_DOGFOOD_MAX_CONTACTS, "1");
+});
+
+test("live first run rejects a child success without a verified live receipt", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "kurobara-onboarding-"));
+  const result = await invoke(
+    root,
+    [
+      "first-run",
+      "--live",
+      "--max-companies",
+      "1",
+      "--max-contacts",
+      "1",
+      "--confirm-provider-credits",
+      "--json",
+    ],
+    {
+      processRunner: () =>
+        Promise.resolve({ code: 0, stderr: "", stdout: "Usage: dogfood\n" }),
+    }
+  );
+  assert.equal(result.exitCode, 70);
+  assert.equal(
+    JSON.parse(result.stderr).problem.code,
+    "first-run-contract-invalid"
+  );
+});
+
+test("live first run rejects an incomplete success proof", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "kurobara-onboarding-"));
+  const result = await invoke(
+    root,
+    [
+      "first-run",
+      "--live",
+      "--max-companies",
+      "1",
+      "--max-contacts",
+      "1",
+      "--confirm-provider-credits",
+      "--json",
+    ],
+    {
+      processRunner: () =>
+        Promise.resolve({
+          code: 0,
+          stderr: "",
+          stdout: `${JSON.stringify({
+            bounds: {
+              companies: 1,
+              contacts: 1,
+              max_provider_requests: 4,
+            },
+            cleanup: "completed",
+            command: "run",
+            proof: {},
+            status: "passed",
+          })}\n`,
+        }),
+    }
+  );
+  assert.equal(result.exitCode, 70);
+  assert.equal(
+    JSON.parse(result.stderr).problem.code,
+    "first-run-contract-invalid"
+  );
+});
+
 test("offline first run reports an exact failed stage and a resumable argv", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "kurobara-onboarding-"));
   const result = await invoke(root, ["first-run", "--offline", "--json"], {
@@ -485,6 +644,162 @@ test("human TTY uses the Kurobara visual identity and applies only after yes", a
       .profile,
     "local"
   );
+});
+
+test("guided Context setup plans, reviews, and applies only after explicit human confirmation", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "kurobara-onboarding-"));
+  await configure(root);
+  const fingerprint = `sha256:${"a".repeat(64)}`;
+  const requestBodies: unknown[] = [];
+  const questions = {
+    profile: "agentic_outbound_play",
+    questionnaire_version: "1.0.0",
+    questions: [
+      {
+        answer_schema: { type: "string" },
+        prompt: "What do you sell?",
+        question_id: "offer.summary",
+        required_for: ["agentic_outbound_play"],
+        requires_human_confirmation: false,
+        section: "offer",
+        sensitivity: "business",
+      },
+      {
+        answer_schema: { type: "boolean" },
+        prompt: "Prepare a private export?",
+        question_id: "activation.private_export_requested",
+        required_for: ["agentic_outbound_play"],
+        requires_human_confirmation: true,
+        section: "activation",
+        sensitivity: "policy",
+      },
+      {
+        answer_schema: { type: "boolean" },
+        ask_if: {
+          equals: true,
+          question_id: "activation.private_export_requested",
+        },
+        prompt: "Is the destination approved?",
+        question_id: "policy.export_destination_approved",
+        required_for: ["agentic_outbound_play"],
+        requires_human_confirmation: true,
+        section: "policy",
+        sensitivity: "policy",
+      },
+    ],
+  };
+  const input = Object.assign(
+    Readable.from([
+      "\n",
+      "\n",
+      "Synthetic enrichment service\n",
+      "no\n",
+      "APPLY\n",
+    ]),
+    { isTTY: true }
+  );
+  const result = await invoke(
+    root,
+    ["context", "setup", "--profile", "agentic_outbound_play", "--no-motion"],
+    {
+      environment: { KUROBARA_API_KEY: "synthetic-client-secret" },
+      fetch: (input_, init) => {
+        const url = String(input_);
+        if (init?.body !== undefined) {
+          requestBodies.push(JSON.parse(String(init.body)));
+        }
+        if (url.includes("gtm-context-questionnaires")) {
+          return Promise.resolve(Response.json(questions));
+        }
+        if (url.includes("gtm-context-status")) {
+          return Promise.resolve(
+            Response.json({
+              business_context: "missing",
+              profile: "agentic_outbound_play",
+              ready: false,
+              remediation: ["Create a Context."],
+            })
+          );
+        }
+        if (url.endsWith("/v1/gtm-context-plans")) {
+          const context = (requestBodies.at(-1) as { context: unknown })
+            .context;
+          return Promise.resolve(
+            Response.json({
+              blocking_question_ids: [],
+              context,
+              fingerprint,
+              issues: [],
+              mode: "plan",
+              ready_for: {
+                agentic_outbound_play: true,
+                dataset_import: true,
+                imported_dataset_enrichment: false,
+                offline_fixture: true,
+              },
+            })
+          );
+        }
+        if (url.endsWith("/v1/gtm-context-revisions")) {
+          const context = (requestBodies.at(-1) as { context: unknown })
+            .context;
+          return Promise.resolve(
+            Response.json({
+              active: true,
+              mode: "apply",
+              revision: {
+                context,
+                context_id: "gtm-primary",
+                created_at_ms: 1,
+                created_by_actor_id: "actor-test",
+                fingerprint,
+                revision: 1,
+                workspace_id: "workspace-test",
+              },
+              status: "created",
+            })
+          );
+        }
+        return Promise.resolve(new Response("not found", { status: 404 }));
+      },
+      stdin: input,
+      tty: true,
+    }
+  );
+
+  assert.equal(result.exitCode, 0, result.stderr);
+  assert.match(result.stdout, GTM_CONTEXT_PATTERN);
+  assert.match(result.stdout, FINGERPRINT_PATTERN);
+  assert.match(result.stdout, CONTEXT_STORED_PATTERN);
+  assert.equal(requestBodies.length, 2);
+  const plan = requestBodies[0] as {
+    context: {
+      assertions: readonly {
+        provenance: { source: string };
+        question_id: string;
+        state: string;
+      }[];
+    };
+  };
+  assert.deepEqual(
+    plan.context.assertions.map((answer) => answer.question_id),
+    ["offer.summary", "activation.private_export_requested"]
+  );
+  assert.equal(
+    plan.context.assertions.every(
+      (answer) =>
+        answer.provenance.source === "human" && answer.state === "confirmed"
+    ),
+    true
+  );
+  assert.deepEqual(requestBodies[1], {
+    activate: true,
+    confirm_active_change: false,
+    confirmed: true,
+    context: (requestBodies[0] as { context: unknown }).context,
+    mode: "apply",
+    plan_fingerprint: fingerprint,
+  });
 });
 
 test("masked TTY secret entry never echoes the value", async () => {

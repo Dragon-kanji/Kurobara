@@ -1,0 +1,18 @@
+{
+  "context": {
+    "assertions": [
+      {
+        "provenance": {
+          "recorded_at_ms": 1,
+          "source": "agent"
+        },
+        "question_id": "policy.provider_rights_confirmed",
+        "state": "confirmed"
+      }
+    ],
+    "context_id": "synthetic-context",
+    "name": "Synthetic GTM",
+    "questionnaire_version": "1.0.0"
+  },
+  "mode": "plan"
+}

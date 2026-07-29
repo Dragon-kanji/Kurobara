@@ -6,7 +6,7 @@ import type {
 const hash = (character: string): string => `sha256:${character.repeat(64)}`;
 
 export const FIXTURE_CATALOG_FINGERPRINT =
-  "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4";
+  "sha256:1466e9c9bff8bc3c3f3c5e330a5770cb57429cb03bd9a75cc0701c9a71c9744e";
 export const FIXTURE_OPERATION_KEY = "operation:conformance:exact";
 const FIXTURE_RECORD_SCHEMA_FINGERPRINT =
   "sha256:9c1fed09cc7cc924ac5e824ea07fcefc738fd78265075c7c37e5bd935b2c5d78";
@@ -31,14 +31,14 @@ export const FIXTURE_MANIFEST = Object.freeze({
       capabilityVersion: "1.0.0",
       inputContract: {
         catalogFingerprint: FIXTURE_CATALOG_FINGERPRINT,
-        catalogVersion: "0.12.0",
+        catalogVersion: "0.13.0",
         schemaFingerprint: FIXTURE_RECORD_SCHEMA_FINGERPRINT,
         schemaId: FIXTURE_RECORD_SCHEMA_ID,
         schemaVersion: "1.0.0",
       },
       outputContract: {
         catalogFingerprint: FIXTURE_CATALOG_FINGERPRINT,
-        catalogVersion: "0.12.0",
+        catalogVersion: "0.13.0",
         schemaFingerprint: FIXTURE_RECORD_SCHEMA_FINGERPRINT,
         schemaId: FIXTURE_RECORD_SCHEMA_ID,
         schemaVersion: "1.0.0",

@@ -1310,6 +1310,301 @@
       "success_exit_code": 0
     },
     {
+      "command": "context apply",
+      "idempotence": "required",
+      "input_schema_id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-request/1.0.0",
+      "operation_id": "gtm-contexts.apply",
+      "operation_version": "1.0.0",
+      "required_permissions": [
+        "contexts:write"
+      ],
+      "output_schema_id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-response/1.0.0",
+      "input_mode": "json",
+      "output_mode": "json",
+      "problems": [
+        {
+          "code": "authentication-required",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "internal-error",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "payload-too-large",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 413,
+          "type": "https://problems.kurobara.invalid/payload-too-large"
+        },
+        {
+          "code": "request-invalid",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "revision-conflict",
+          "exit_code": 5,
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/revision-conflict"
+        },
+        {
+          "code": "service-unavailable",
+          "exit_code": 75,
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        },
+        {
+          "code": "unsupported-media-type",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 415,
+          "type": "https://problems.kurobara.invalid/unsupported-media-type"
+        }
+      ],
+      "success_exit_code": 0
+    },
+    {
+      "command": "context plan",
+      "idempotence": "inherent",
+      "input_schema_id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-request/1.0.0",
+      "operation_id": "gtm-contexts.plan",
+      "operation_version": "1.0.0",
+      "required_permissions": [
+        "contexts:read"
+      ],
+      "output_schema_id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-response/1.0.0",
+      "input_mode": "json",
+      "output_mode": "json",
+      "problems": [
+        {
+          "code": "authentication-required",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "internal-error",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "payload-too-large",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 413,
+          "type": "https://problems.kurobara.invalid/payload-too-large"
+        },
+        {
+          "code": "request-invalid",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "service-unavailable",
+          "exit_code": 75,
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        },
+        {
+          "code": "unsupported-media-type",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 415,
+          "type": "https://problems.kurobara.invalid/unsupported-media-type"
+        }
+      ],
+      "success_exit_code": 0
+    },
+    {
+      "command": "context questions",
+      "idempotence": "inherent",
+      "input_schema_id": "https://schemas.kurobara.invalid/schemas/gtm/questionnaire-request/1.0.0",
+      "operation_id": "gtm-contexts.questionnaire.get",
+      "operation_version": "1.0.0",
+      "required_permissions": [
+        "contexts:read"
+      ],
+      "output_schema_id": "https://schemas.kurobara.invalid/schemas/gtm/questionnaire-response/1.0.0",
+      "input_mode": "json",
+      "output_mode": "json",
+      "problems": [
+        {
+          "code": "authentication-required",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "internal-error",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "request-invalid",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "service-unavailable",
+          "exit_code": 75,
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        }
+      ],
+      "success_exit_code": 0
+    },
+    {
+      "command": "context status",
+      "idempotence": "inherent",
+      "input_schema_id": "https://schemas.kurobara.invalid/schemas/gtm/context-status-request/1.0.0",
+      "operation_id": "gtm-contexts.status.get",
+      "operation_version": "1.0.0",
+      "required_permissions": [
+        "contexts:read"
+      ],
+      "output_schema_id": "https://schemas.kurobara.invalid/schemas/gtm/context-status-response/1.0.0",
+      "input_mode": "json",
+      "output_mode": "json",
+      "problems": [
+        {
+          "code": "authentication-required",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "internal-error",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "request-invalid",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "service-unavailable",
+          "exit_code": 75,
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        }
+      ],
+      "success_exit_code": 0
+    },
+    {
       "command": "company results",
       "idempotence": "inherent",
       "input_schema_id": "https://schemas.kurobara.invalid/schemas/organizations/candidates-list-request/1.0.0",
@@ -1641,6 +1936,264 @@
           "retryable": false,
           "status": 403,
           "type": "https://problems.kurobara.invalid/workspace-mismatch"
+        }
+      ],
+      "success_exit_code": 0
+    },
+    {
+      "command": "play run",
+      "idempotence": "inherent",
+      "input_schema_id": "https://schemas.kurobara.invalid/schemas/play-runs/get-request/1.0.0",
+      "operation_id": "play-runs.get",
+      "operation_version": "1.0.0",
+      "required_permissions": [
+        "plays:read"
+      ],
+      "output_schema_id": "https://schemas.kurobara.invalid/schemas/play-runs/get-response/1.0.0",
+      "input_mode": "json",
+      "output_mode": "json",
+      "problems": [
+        {
+          "code": "authentication-required",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "gtm-resource-not-found",
+          "exit_code": 4,
+          "retryable": false,
+          "status": 404,
+          "type": "https://problems.kurobara.invalid/gtm-resource-not-found"
+        },
+        {
+          "code": "internal-error",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "request-invalid",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "service-unavailable",
+          "exit_code": 75,
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        }
+      ],
+      "success_exit_code": 0
+    },
+    {
+      "command": "play apply",
+      "idempotence": "required",
+      "input_schema_id": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0",
+      "operation_id": "plays.apply",
+      "operation_version": "1.0.0",
+      "required_permissions": [
+        "plays:write"
+      ],
+      "output_schema_id": "https://schemas.kurobara.invalid/schemas/plays/command-response/1.0.0",
+      "input_mode": "json",
+      "output_mode": "json",
+      "problems": [
+        {
+          "code": "authentication-required",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "gtm-resource-not-found",
+          "exit_code": 4,
+          "retryable": false,
+          "status": 404,
+          "type": "https://problems.kurobara.invalid/gtm-resource-not-found"
+        },
+        {
+          "code": "idempotency-key-reused",
+          "exit_code": 5,
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/idempotency-key-reused"
+        },
+        {
+          "code": "internal-error",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "payload-too-large",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 413,
+          "type": "https://problems.kurobara.invalid/payload-too-large"
+        },
+        {
+          "code": "request-invalid",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "revision-conflict",
+          "exit_code": 5,
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/revision-conflict"
+        },
+        {
+          "code": "service-unavailable",
+          "exit_code": 75,
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        },
+        {
+          "code": "unsupported-media-type",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 415,
+          "type": "https://problems.kurobara.invalid/unsupported-media-type"
+        }
+      ],
+      "success_exit_code": 0
+    },
+    {
+      "command": "play preview",
+      "idempotence": "inherent",
+      "input_schema_id": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0",
+      "operation_id": "plays.preview",
+      "operation_version": "1.0.0",
+      "required_permissions": [
+        "plays:read"
+      ],
+      "output_schema_id": "https://schemas.kurobara.invalid/schemas/plays/command-response/1.0.0",
+      "input_mode": "json",
+      "output_mode": "json",
+      "problems": [
+        {
+          "code": "authentication-required",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "gtm-resource-not-found",
+          "exit_code": 4,
+          "retryable": false,
+          "status": 404,
+          "type": "https://problems.kurobara.invalid/gtm-resource-not-found"
+        },
+        {
+          "code": "internal-error",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "payload-too-large",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 413,
+          "type": "https://problems.kurobara.invalid/payload-too-large"
+        },
+        {
+          "code": "request-invalid",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "service-unavailable",
+          "exit_code": 75,
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        },
+        {
+          "code": "unsupported-media-type",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 415,
+          "type": "https://problems.kurobara.invalid/unsupported-media-type"
         }
       ],
       "success_exit_code": 0
@@ -2295,9 +2848,167 @@
         }
       ],
       "success_exit_code": 0
+    },
+    {
+      "command": "workbook get",
+      "idempotence": "inherent",
+      "input_schema_id": "https://schemas.kurobara.invalid/schemas/workbooks/get-request/1.0.0",
+      "operation_id": "workbooks.get",
+      "operation_version": "1.0.0",
+      "required_permissions": [
+        "workbooks:read"
+      ],
+      "output_schema_id": "https://schemas.kurobara.invalid/schemas/workbooks/get-response/1.0.0",
+      "input_mode": "json",
+      "output_mode": "json",
+      "problems": [
+        {
+          "code": "authentication-required",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "gtm-resource-not-found",
+          "exit_code": 4,
+          "retryable": false,
+          "status": 404,
+          "type": "https://problems.kurobara.invalid/gtm-resource-not-found"
+        },
+        {
+          "code": "internal-error",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "request-invalid",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "service-unavailable",
+          "exit_code": 75,
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        }
+      ],
+      "success_exit_code": 0
+    },
+    {
+      "command": "workbook update",
+      "idempotence": "required",
+      "input_schema_id": "https://schemas.kurobara.invalid/schemas/workbooks/update-request/1.0.0",
+      "operation_id": "workbooks.update",
+      "operation_version": "1.0.0",
+      "required_permissions": [
+        "workbooks:write"
+      ],
+      "output_schema_id": "https://schemas.kurobara.invalid/schemas/workbooks/update-response/1.0.0",
+      "input_mode": "json",
+      "output_mode": "json",
+      "problems": [
+        {
+          "code": "authentication-required",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "internal-error",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "exit_code": 3,
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "exit_code": 70,
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "payload-too-large",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 413,
+          "type": "https://problems.kurobara.invalid/payload-too-large"
+        },
+        {
+          "code": "request-invalid",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "revision-conflict",
+          "exit_code": 5,
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/revision-conflict"
+        },
+        {
+          "code": "service-unavailable",
+          "exit_code": 75,
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        },
+        {
+          "code": "unsupported-media-type",
+          "exit_code": 2,
+          "retryable": false,
+          "status": 415,
+          "type": "https://problems.kurobara.invalid/unsupported-media-type"
+        }
+      ],
+      "success_exit_code": 0
     }
   ],
   "publication_status": "local-development-only",
   "schema_version": "1.0.0",
-  "source_catalog_fingerprint": "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4"
+  "source_catalog_fingerprint": "sha256:1466e9c9bff8bc3c3f3c5e330a5770cb57429cb03bd9a75cc0701c9a71c9744e"
 }

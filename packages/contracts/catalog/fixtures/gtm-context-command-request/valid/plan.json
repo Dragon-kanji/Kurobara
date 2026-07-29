@@ -1,0 +1,19 @@
+{
+  "context": {
+    "assertions": [
+      {
+        "provenance": {
+          "recorded_at_ms": 1,
+          "source": "human"
+        },
+        "question_id": "offer.summary",
+        "state": "confirmed",
+        "value": "Synthetic analytics service"
+      }
+    ],
+    "context_id": "synthetic-context",
+    "name": "Synthetic GTM",
+    "questionnaire_version": "1.0.0"
+  },
+  "mode": "plan"
+}

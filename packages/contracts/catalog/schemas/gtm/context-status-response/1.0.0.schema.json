@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/gtm/context-status-response/1.0.0",
+  "title": "GtmContextStatusResponse",
+  "description": "Redacted active-context metadata and read-only readiness without business answer contents.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["business_context", "profile", "ready", "remediation"],
+  "properties": {
+    "active_context": { "$ref": "#/$defs/context_reference" },
+    "blocking_question_ids": {
+      "type": "array",
+      "maxItems": 128,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "pattern": "^[a-z][a-z0-9_.-]*$"
+      }
+    },
+    "business_context": {
+      "type": "string",
+      "enum": [
+        "missing",
+        "draft",
+        "incomplete",
+        "ready",
+        "stale",
+        "incompatible"
+      ]
+    },
+    "latest_context": { "$ref": "#/$defs/context_reference" },
+    "profile": {
+      "type": "string",
+      "enum": [
+        "offline_fixture",
+        "dataset_import",
+        "imported_dataset_enrichment",
+        "agentic_outbound_play"
+      ]
+    },
+    "ready": { "type": "boolean" },
+    "remediation": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2048,
+        "pattern": "\\S"
+      }
+    }
+  },
+  "$defs": {
+    "context_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context_id",
+        "fingerprint",
+        "questionnaire_version",
+        "revision"
+      ],
+      "properties": {
+        "context_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "fingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "questionnaire_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32,
+          "pattern": "\\S"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        }
+      }
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.gtm",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-redaction": "question-identifiers-and-context-metadata-only",
+  "x-kurobara-publication-status": "local-development-only"
+}

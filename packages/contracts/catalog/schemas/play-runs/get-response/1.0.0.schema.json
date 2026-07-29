@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/play-runs/get-response/1.0.0",
+  "title": "PlayRunGetResponse",
+  "description": "Durable Play run state and provider-neutral compiled receipt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["run"],
+  "properties": {
+    "run": {
+      "$ref": "https://schemas.kurobara.invalid/schemas/plays/command-response/1.0.0#/$defs/run"
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.gtm",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-redaction": "no-secrets-provider-neutral",
+  "x-kurobara-publication-status": "local-development-only"
+}

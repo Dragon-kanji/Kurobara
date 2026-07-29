@@ -1,0 +1,49 @@
+{
+  "fields": [
+    {
+      "field_id": "field-domain",
+      "key": "domain",
+      "label": "Domain",
+      "value_type": "string"
+    }
+  ],
+  "has_more": false,
+  "next_after_ordinal": null,
+  "records": [
+    {
+      "cells": [
+        {
+          "confidence": null,
+          "cost": null,
+          "error": null,
+          "field_id": "field-domain",
+          "freshness": {
+            "expires_at_ms": null,
+            "observed_at_ms": 1
+          },
+          "provenance": ["dataset-materialization:synthetic-materialization"],
+          "redacted": false,
+          "status": "succeeded",
+          "value": "example.invalid"
+        }
+      ],
+      "ordinal": 1,
+      "record_id": "record-1",
+      "selection_reasons": []
+    }
+  ],
+  "view": {
+    "annotations": [],
+    "approvals": [],
+    "column_order": ["domain"],
+    "dataset_id": "synthetic-dataset",
+    "filters": [],
+    "materialization_id": "synthetic-materialization",
+    "name": "Synthetic Workbook",
+    "revision": 0,
+    "selection_reasons": [],
+    "selected_record_ids": [],
+    "workbook_id": "synthetic-workbook",
+    "workspace_id": "synthetic-workspace"
+  }
+}

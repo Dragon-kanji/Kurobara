@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/workbooks/get-request/1.0.0",
+  "title": "WorkbookGetRequest",
+  "description": "Bounded keyset request for a Workbook projection over one immutable dataset materialization.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "after_ordinal",
+    "dataset_id",
+    "limit",
+    "materialization_id",
+    "workbook_id"
+  ],
+  "properties": {
+    "after_ordinal": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "limit": { "type": "integer", "minimum": 1, "maximum": 100 },
+    "materialization_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "\\S"
+    },
+    "workbook_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.gtm",
+  "x-kurobara-data-classification": "confidential",
+  "x-kurobara-publication-status": "local-development-only"
+}

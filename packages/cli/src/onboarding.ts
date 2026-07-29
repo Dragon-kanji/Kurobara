@@ -3,6 +3,13 @@ import { fileURLToPath } from "node:url";
 import onboardingContract from "@kurobara/contracts/cli-onboarding.json" with {
   type: "json",
 };
+import {
+  createKurobaraClient,
+  type GtmContextCommand,
+  type GtmContextStatus,
+  type GtmQuestionnaire,
+  type GtmQuestionnaireInput,
+} from "@kurobara/sdk";
 
 import packageManifest from "../../../package.json" with { type: "json" };
 import {
@@ -864,6 +871,373 @@ const interactiveSetup = async (
   });
 };
 
+type ContextQuestion = GtmQuestionnaire["questions"][number];
+type ContextAnswer = GtmContextCommand["context"]["assertions"][number];
+type ContextAnswerValue = Exclude<ContextAnswer["value"], undefined>;
+
+const contextAnswerValue = (
+  question: ContextQuestion,
+  rawValue: string
+): ContextAnswerValue => {
+  const value = rawValue.trim();
+  switch (question.answer_schema.type) {
+    case "boolean":
+      if (value === "yes" || value === "true") {
+        return true;
+      }
+      if (value === "no" || value === "false") {
+        return false;
+      }
+      break;
+    case "number": {
+      const number = Number(value);
+      if (Number.isFinite(number) && number >= 0) {
+        return number;
+      }
+      break;
+    }
+    case "string":
+      if (
+        value.length > 0 &&
+        (question.answer_schema.enum_values === undefined ||
+          question.answer_schema.enum_values.includes(value))
+      ) {
+        return value;
+      }
+      break;
+    case "string_array": {
+      const values = [
+        ...new Set(
+          value
+            .split(",")
+            .map((entry) => entry.trim())
+            .filter((entry) => entry.length > 0)
+        ),
+      ];
+      if (values.length > 0) {
+        return values;
+      }
+      break;
+    }
+    default:
+      break;
+  }
+  throw new OnboardingCliError(
+    "cli-input-invalid",
+    `Answer for ${question.question_id} does not match ${question.answer_schema.type}.`,
+    2
+  );
+};
+
+const contextPromptHint = (question: ContextQuestion): string => {
+  if (question.answer_schema.enum_values !== undefined) {
+    return question.answer_schema.enum_values.join("/");
+  }
+  switch (question.answer_schema.type) {
+    case "boolean":
+      return "yes/no";
+    case "number":
+      return "number";
+    case "string_array":
+      return "comma-separated";
+    default:
+      return "text";
+  }
+};
+
+const interactiveContextSetup = async (
+  invocation: OnboardingInvocation,
+  argv: readonly string[],
+  presentation: Presentation
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: The human-only wizard keeps every prompt, confirmation gate, and deterministic plan/apply transition explicit.
+): Promise<MachineResult> => {
+  const parsed = parseOptions(argv, new Set(), new Set(["--profile"]));
+  const profile = (parsed.values.get("--profile") ??
+    "agentic_outbound_play") as GtmQuestionnaireInput["profile"];
+  if (!DOCTOR_PROFILES.has(profile)) {
+    throw new OnboardingCliError(
+      "cli-usage-error",
+      "Context setup --profile must name a canonical readiness profile.",
+      2
+    );
+  }
+  if (
+    presentation.machine ||
+    presentation.nonInteractive ||
+    invocation.stdin.isTTY !== true ||
+    invocation.stdout.isTTY !== true
+  ) {
+    throw new OnboardingCliError(
+      "cli-non-interactive",
+      "Context setup is the human TTY flow. Agents must use questions, plan, and apply with JSON.",
+      2,
+      [
+        action("questions", "Read the canonical questionnaire", [
+          "kurobara",
+          "context",
+          "questions",
+          "--profile",
+          profile,
+        ]),
+        action("plan", "Plan a deterministic Context revision", [
+          "kurobara",
+          "context",
+          "plan",
+          "--request",
+          "<context-plan.json>",
+        ]),
+      ]
+    );
+  }
+  const config = await configOrThrow(invocation.environment);
+  const store = new SecretStore(invocation.environment);
+  const clientKey =
+    invocation.environment.KUROBARA_API_KEY ?? (await store.get("kurobara"));
+  if (clientKey === undefined) {
+    throw new OnboardingCliError(
+      "client-authentication-missing",
+      "Context setup needs the client API key stored as secret kurobara.",
+      3,
+      [
+        action("client-key", "Store the client API key", [
+          "kurobara",
+          "secret",
+          "set",
+          "kurobara",
+          "--stdin",
+        ]),
+      ]
+    );
+  }
+  const client = createKurobaraClient({
+    apiKey: clientKey,
+    baseUrl: config.endpoint,
+    fetch: invocation.fetch ?? fetch,
+  });
+  const [questionnaire, currentStatus] = await Promise.all([
+    client.contexts.questions(
+      { profile },
+      invocation.signal === undefined ? {} : { signal: invocation.signal }
+    ),
+    client.contexts.status(
+      { profile },
+      invocation.signal === undefined ? {} : { signal: invocation.signal }
+    ),
+  ]);
+  const questions = questionnaire.questions.filter((question) =>
+    question.required_for.includes(profile)
+  );
+  if (questions.length === 0) {
+    return success("context.setup", {
+      profile,
+      ready: true,
+      summary: `Profile ${profile} does not require a GTM Context.`,
+    });
+  }
+
+  brand(invocation.stdout, presentation.color);
+  writeLine(invocation.stdout, "GTM CONTEXT");
+  writeLine(
+    invocation.stdout,
+    "Business answers may be drafted. Policy answers stay human-confirmed."
+  );
+  writeLine(invocation.stdout, "Blank answers remain explicitly unknown.");
+  const iterator = invocation.stdin[Symbol.asyncIterator]();
+  const ask = async (prompt: string): Promise<string> => {
+    writeLine(invocation.stdout, prompt);
+    const answer = await iterator.next();
+    return answer.done || answer.value === undefined
+      ? ""
+      : String(answer.value).trim();
+  };
+  try {
+    const contextId =
+      (await ask("Context id (gtm-primary): ")) || "gtm-primary";
+    const contextName =
+      (await ask("Context name (Primary GTM Context): ")) ||
+      "Primary GTM Context";
+    const assertions: ContextAnswer[] = [];
+    const valueByQuestion = new Map<
+      string,
+      boolean | number | string | readonly string[]
+    >();
+    let currentSection = "";
+    for (const question of questions) {
+      if (
+        question.ask_if !== undefined &&
+        valueByQuestion.get(question.ask_if.question_id) !==
+          question.ask_if.equals
+      ) {
+        continue;
+      }
+      if (currentSection !== question.section) {
+        currentSection = question.section;
+        writeLine(invocation.stdout);
+        writeLine(invocation.stdout, currentSection.toUpperCase());
+      }
+      if (question.requires_human_confirmation) {
+        writeLine(invocation.stdout, "! explicit human confirmation required");
+      }
+      const rawValue = await ask(
+        `${question.prompt} [${contextPromptHint(question)}; blank=unknown]: `
+      );
+      const recordedAtMs = Date.now();
+      if (rawValue.length === 0) {
+        assertions.push({
+          provenance: { recorded_at_ms: recordedAtMs, source: "human" },
+          question_id: question.question_id,
+          state: "unknown",
+        });
+        continue;
+      }
+      const value = contextAnswerValue(question, rawValue);
+      valueByQuestion.set(question.question_id, value);
+      assertions.push({
+        provenance: { recorded_at_ms: recordedAtMs, source: "human" },
+        question_id: question.question_id,
+        state: "confirmed",
+        value,
+      });
+    }
+    const expectedBaseRevision =
+      currentStatus.latest_context?.context_id === contextId
+        ? currentStatus.latest_context.revision
+        : undefined;
+    const context: GtmContextCommand["context"] = {
+      assertions,
+      context_id: contextId,
+      name: contextName,
+      questionnaire_version: questionnaire.questionnaire_version,
+    };
+    const plan = await client.contexts.plan(
+      {
+        context,
+        ...(expectedBaseRevision === undefined
+          ? {}
+          : { expected_base_revision: expectedBaseRevision }),
+        mode: "plan",
+      },
+      invocation.signal === undefined ? {} : { signal: invocation.signal }
+    );
+    writeLine(invocation.stdout);
+    writeLine(invocation.stdout, "REVIEW");
+    writeLine(invocation.stdout, `Fingerprint: ${plan.fingerprint}`);
+    writeLine(
+      invocation.stdout,
+      `Ready for ${profile}: ${plan.ready_for[profile] ? "yes" : "no"}`
+    );
+    if (plan.blocking_question_ids.length > 0) {
+      writeLine(
+        invocation.stdout,
+        `Blocking: ${plan.blocking_question_ids.join(", ")}`
+      );
+    }
+    for (const issue of plan.issues) {
+      writeLine(
+        invocation.stdout,
+        `! ${issue.question_id === undefined ? "" : `${issue.question_id}: `}${issue.message}`
+      );
+    }
+    if (!plan.ready_for[profile] || plan.issues.length > 0) {
+      return success("context.setup", {
+        blocked_steps: plan.blocking_question_ids,
+        fingerprint: plan.fingerprint,
+        next_actions: [
+          action("resume", "Resume the human Context interview", [
+            "kurobara",
+            "context",
+            "setup",
+            "--profile",
+            profile,
+          ]),
+        ],
+        profile,
+        ready: false,
+        summary:
+          "The GTM Context draft was planned but not applied because required answers remain unresolved.",
+      });
+    }
+    const activeWillChange =
+      currentStatus.active_context !== undefined &&
+      (currentStatus.active_context.context_id !== contextId ||
+        currentStatus.active_context.fingerprint !== plan.fingerprint);
+    if (activeWillChange) {
+      const change = (
+        await ask("Replace the active Context? Type CHANGE to continue: ")
+      ).toUpperCase();
+      if (change !== "CHANGE") {
+        throw new OnboardingCliError(
+          "confirmation-required",
+          "The active GTM Context was not changed.",
+          2,
+          [
+            action(
+              "resume",
+              "Review the Context again",
+              ["kurobara", "context", "setup", "--profile", profile],
+              true
+            ),
+          ]
+        );
+      }
+    }
+    const apply = (
+      await ask("Apply and activate this exact fingerprint? Type APPLY: ")
+    ).toUpperCase();
+    if (apply !== "APPLY") {
+      throw new OnboardingCliError(
+        "confirmation-required",
+        "The GTM Context plan was not applied.",
+        2,
+        [
+          action(
+            "resume",
+            "Review the Context again",
+            ["kurobara", "context", "setup", "--profile", profile],
+            true
+          ),
+        ]
+      );
+    }
+    const applied = await client.contexts.apply(
+      {
+        activate: true,
+        confirm_active_change: activeWillChange,
+        confirmed: true,
+        context,
+        ...(expectedBaseRevision === undefined
+          ? {}
+          : { expected_base_revision: expectedBaseRevision }),
+        mode: "apply",
+        plan_fingerprint: plan.fingerprint,
+      },
+      invocation.signal === undefined ? {} : { signal: invocation.signal }
+    );
+    writeLine(invocation.stdout, "✓ immutable Context revision stored");
+    writeLine(invocation.stdout, "✓ reviewed Context activated");
+    return success("context.setup", {
+      active: applied.active,
+      completed_steps: ["questions", "plan", "review", "apply", "activate"],
+      context_id: applied.revision.context_id,
+      fingerprint: applied.revision.fingerprint,
+      next_actions: [
+        action("doctor", "Verify business readiness", [
+          "kurobara",
+          "doctor",
+          "--profile",
+          profile,
+        ]),
+      ],
+      profile,
+      ready: true,
+      revision: applied.revision.revision,
+      summary: "The reviewed GTM Context is active.",
+    });
+  } finally {
+    await iterator.return?.();
+  }
+};
+
 const providerFor = (key: string): ProviderCatalogEntry => {
   const provider = PROVIDER_CATALOG.find((candidate) => candidate.key === key);
   if (provider === undefined) {
@@ -1172,19 +1546,71 @@ const fetchCheck = async (
   }
 };
 
+const DOCTOR_PROFILES = new Set<GtmQuestionnaireInput["profile"]>([
+  "offline_fixture",
+  "dataset_import",
+  "imported_dataset_enrichment",
+  "agentic_outbound_play",
+]);
+
 const doctor = async (
-  invocation: OnboardingInvocation
+  invocation: OnboardingInvocation,
+  argv: readonly string[]
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Doctor intentionally composes independent technical, credential, provider, and GTM readiness checks into one read-only receipt.
 ): Promise<MachineResult> => {
+  const parsed = parseOptions(argv, new Set(), new Set(["--profile"]));
+  const requestedProfile =
+    parsed.values.get("--profile") ?? "agentic_outbound_play";
+  if (
+    !DOCTOR_PROFILES.has(requestedProfile as GtmQuestionnaireInput["profile"])
+  ) {
+    throw new OnboardingCliError(
+      "cli-usage-error",
+      "Doctor --profile must name a canonical readiness profile.",
+      2
+    );
+  }
+  const profile = requestedProfile as GtmQuestionnaireInput["profile"];
   const read = await readConfiguration(invocation.environment);
   const config =
     read.kind === "current" || read.kind === "legacy" ? read.config : undefined;
   const store = new SecretStore(invocation.environment);
-  const clientCredential =
-    invocation.environment.KUROBARA_API_KEY !== undefined ||
-    (await store.has("kurobara"));
+  const clientKey =
+    invocation.environment.KUROBARA_API_KEY ?? (await store.get("kurobara"));
+  const clientCredential = clientKey !== undefined;
   const endpoint = config?.endpoint ?? DEFAULT_ENDPOINT;
   const fetchImplementation = invocation.fetch ?? fetch;
-  const [health, readiness, providers] = await Promise.all([
+  const businessReadiness = async (): Promise<
+    Readonly<{
+      questionnaire?: GtmQuestionnaire;
+      status?: GtmContextStatus;
+    }>
+  > => {
+    if (clientKey === undefined) {
+      return {};
+    }
+    try {
+      const client = createKurobaraClient({
+        apiKey: clientKey,
+        baseUrl: endpoint,
+        fetch: fetchImplementation,
+      });
+      const [status, questionnaire] = await Promise.all([
+        client.contexts.status(
+          { profile },
+          invocation.signal === undefined ? {} : { signal: invocation.signal }
+        ),
+        client.contexts.questions(
+          { profile },
+          invocation.signal === undefined ? {} : { signal: invocation.signal }
+        ),
+      ]);
+      return { questionnaire, status };
+    } catch {
+      return {};
+    }
+  };
+  const [health, readiness, providers, business] = await Promise.all([
     fetchCheck(
       fetchImplementation,
       new URL("/healthz", endpoint).href,
@@ -1200,6 +1626,7 @@ const doctor = async (
         providerState(provider, config, invocation.environment, store)
       )
     ),
+    businessReadiness(),
   ]);
   const configPassed = read.kind === "current";
   let configurationDetail: string = read.kind;
@@ -1233,14 +1660,84 @@ const doctor = async (
       impact: "PostgreSQL, Hatchet, and worker readiness",
       status: readiness.status,
     },
+    {
+      detail:
+        business.status === undefined
+          ? "unavailable"
+          : `${business.status.business_context}:${business.status.ready ? "ready" : "blocked"}`,
+      id: "business_context",
+      impact: `GTM readiness for ${profile}`,
+      status: business.status?.ready === true ? "passed" : "failed",
+    },
   ];
-  const ready = checks.every((check) => check.status === "passed");
+  const technicalReady = checks
+    .filter((check) => check.id !== "business_context")
+    .every((check) => check.status === "passed");
+  const profileReady = business.status?.ready === true;
+  const operationalReady = technicalReady && profileReady;
+  const businessNextActions =
+    business.status?.ready === true
+      ? []
+      : [
+          action("context-setup", "Run the guided human GTM interview", [
+            "kurobara",
+            "context",
+            "setup",
+            "--profile",
+            profile,
+          ]),
+          action("questions", "Answer the canonical GTM questions", [
+            "kurobara",
+            "context",
+            "questions",
+            "--profile",
+            profile,
+          ]),
+          action("plan-context", "Plan a reviewed GTM Context revision", [
+            "kurobara",
+            "context",
+            "plan",
+            "--request",
+            "<context-plan.json>",
+          ]),
+        ];
+  let summary = `Kurobara has unresolved technical readiness for ${profile}.`;
+  if (technicalReady) {
+    summary = `Kurobara is technically ready; GTM context remains incomplete for ${profile}.`;
+  }
+  if (operationalReady) {
+    summary = `Kurobara is technically ready and GTM-ready for ${profile}.`;
+  }
   return success("doctor", {
     blocked_steps: checks
-      .filter((check) => check.status === "failed")
+      .filter(
+        (check) => check.id !== "business_context" && check.status === "failed"
+      )
       .map((check) => check.id),
     checks,
-    next_actions: ready
+    business_context: {
+      active: business.status?.active_context ?? null,
+      blocking_question_ids: business.status?.blocking_question_ids ?? [],
+      profile,
+      questionnaire_version:
+        business.questionnaire?.questionnaire_version ?? null,
+      ready: profileReady,
+      remediation: business.status?.remediation ?? [
+        "Authenticate and inspect the GTM Context endpoint.",
+      ],
+    },
+    agent_intake: {
+      questions: business.questionnaire?.questions ?? [],
+      rules: {
+        agent_may_infer_business_answers: true,
+        human_confirmation_fields:
+          business.questionnaire?.questions
+            .filter((question) => question.requires_human_confirmation)
+            .map((question) => question.question_id) ?? [],
+        policy_answers_must_be_human_confirmed: true,
+      },
+    },
+    next_actions: operationalReady
       ? [
           action("first-run", "Run the zero-credit fixture", [
             "kurobara",
@@ -1250,6 +1747,7 @@ const doctor = async (
           ]),
         ]
       : [
+          ...businessNextActions,
           action("inspect", "Inspect setup state", [
             "kurobara",
             "setup",
@@ -1266,10 +1764,13 @@ const doctor = async (
           ]),
         ],
     providers,
-    ready,
-    summary: ready
-      ? "Kurobara is ready for a first run."
-      : "Kurobara needs the listed remediations.",
+    provider_credit_spend: 0,
+    operational_ready: operationalReady,
+    profile_ready: profileReady,
+    ready: technicalReady,
+    side_effects: "read_only",
+    summary,
+    technical_ready: technicalReady,
   });
 };
 
@@ -1359,6 +1860,57 @@ type OfflineFirstRunReceipt = Readonly<{
   }>;
 }>;
 
+type LiveFirstRunReceipt = Readonly<{
+  bounds: Readonly<{
+    companies: number;
+    contacts: number;
+    max_provider_requests: number;
+  }>;
+  cleanup: string;
+  command: string;
+  proof: Readonly<{
+    api: string;
+    export: string;
+    hatchet: string;
+    interruption_resume: string;
+    play_run: string;
+    postgres: string;
+    providers: readonly string[];
+    workbook: string;
+    work_email: string;
+  }>;
+  status: string;
+}>;
+
+const LIVE_FIRST_RUN_PROOF = Object.freeze({
+  api: "ready",
+  export: "private-csv-verified",
+  hatchet: "executed",
+  interruption_resume: "verified",
+  play_run: "completed",
+  postgres: "durable-during-run",
+  workbook: "inspected-and-approved",
+  work_email: "found-and-valid",
+});
+
+const isLiveFirstRunProof = (
+  candidate: unknown
+): candidate is LiveFirstRunReceipt["proof"] => {
+  if (typeof candidate !== "object" || candidate === null) {
+    return false;
+  }
+  const proof = candidate as Readonly<Record<string, unknown>>;
+  return (
+    Object.entries(LIVE_FIRST_RUN_PROOF).every(
+      ([key, value]) => proof[key] === value
+    ) &&
+    Array.isArray(proof.providers) &&
+    proof.providers.length === 2 &&
+    proof.providers.includes("hunter") &&
+    proof.providers.includes("prospeo")
+  );
+};
+
 const jsonValuesFromOutput = (output: string): readonly unknown[] => {
   const values: unknown[] = [];
   for (const line of output.split(LINE_BREAK_PATTERN)) {
@@ -1413,6 +1965,91 @@ const offlineFirstRunReceipt = (stdout: string): OfflineFirstRunReceipt => {
   return candidate as OfflineFirstRunReceipt;
 };
 
+const liveFirstRunReceipt = (stdout: string): LiveFirstRunReceipt => {
+  const candidate = [...jsonValuesFromOutput(stdout)]
+    .reverse()
+    .find(
+      (value) =>
+        typeof value === "object" &&
+        value !== null &&
+        (value as { command?: unknown }).command === "run"
+    );
+  if (
+    typeof candidate !== "object" ||
+    candidate === null ||
+    (candidate as { status?: unknown }).status !== "passed" ||
+    (candidate as { cleanup?: unknown }).cleanup !== "completed" ||
+    typeof (candidate as { bounds?: unknown }).bounds !== "object" ||
+    (candidate as { bounds?: unknown }).bounds === null ||
+    (candidate as { bounds: { companies?: unknown } }).bounds.companies !== 1 ||
+    (candidate as { bounds: { contacts?: unknown } }).bounds.contacts !== 1 ||
+    (candidate as { bounds: { max_provider_requests?: unknown } }).bounds
+      .max_provider_requests !== 4 ||
+    !isLiveFirstRunProof((candidate as { proof?: unknown }).proof)
+  ) {
+    throw new OnboardingCliError(
+      "first-run-contract-invalid",
+      "The live harness succeeded without the expected bounded, cleaned-up metadata receipt.",
+      70
+    );
+  }
+  return candidate as LiveFirstRunReceipt;
+};
+
+const requiredFirstRunCap = (
+  values: ReadonlyMap<string, string>,
+  name: string
+): number => {
+  const value = values.get(name);
+  if (value === undefined || value !== "1") {
+    throw new OnboardingCliError(
+      "cli-usage-error",
+      `Live onboarding requires ${name} 1.`,
+      2
+    );
+  }
+  return 1;
+};
+
+const assertFirstRunSucceeded = (
+  result: ProcessResult,
+  live: boolean
+): void => {
+  if (result.code === 0) {
+    return;
+  }
+  const failedStage = firstRunFailureStage(result.stderr);
+  throw new OnboardingCliError(
+    "first-run-failed",
+    live
+      ? `The bounded live first run failed at ${failedStage}. Inspect provider admission and retry with the same bounds.`
+      : `The offline first run failed at ${failedStage}. The self-host harness cleaned up its temporary stack and the same command can resume safely.`,
+    75,
+    [
+      action(
+        "resume",
+        "Resume the bounded first run",
+        live
+          ? [
+              "kurobara",
+              "first-run",
+              "--live",
+              "--max-companies",
+              "1",
+              "--max-contacts",
+              "1",
+              "--confirm-provider-credits",
+              "--json",
+            ]
+          : ["kurobara", "first-run", "--offline", "--json"],
+        live
+      ),
+    ],
+    true,
+    [`first_run:${failedStage}`]
+  );
+};
+
 const firstRun = async (
   invocation: OnboardingInvocation,
   argv: readonly string[]
@@ -1456,71 +2093,32 @@ const firstRun = async (
       ]
     );
   }
-  const parseCap = (name: string): number => {
-    const value = parsed.values.get(name);
-    if (value === undefined || value !== "1") {
-      throw new OnboardingCliError(
-        "cli-usage-error",
-        `Live onboarding requires ${name} 1.`,
-        2
-      );
-    }
-    return 1;
-  };
   const environment: Record<string, string | undefined> = {
     ...invocation.environment,
   };
   if (live) {
     environment.KUROBARA_DOGFOOD_MAX_COMPANIES = String(
-      parseCap("--max-companies")
+      requiredFirstRunCap(parsed.values, "--max-companies")
     );
     environment.KUROBARA_DOGFOOD_MAX_CONTACTS = String(
-      parseCap("--max-contacts")
+      requiredFirstRunCap(parsed.values, "--max-contacts")
     );
   }
   const repositoryRoot = fileURLToPath(new URL("../../../", import.meta.url));
   const runner = invocation.processRunner ?? defaultProcessRunner;
   const result = await runner({
-    args: live ? ["run", "b2b:dogfood"] : ["deploy/self-host/harness.sh"],
+    args: live
+      ? ["run", "b2b:dogfood", "--", "run", "--confirm-provider-calls"]
+      : ["deploy/self-host/harness.sh"],
     command: live ? "npm" : "bash",
     cwd: repositoryRoot,
     environment,
   });
-  if (result.code !== 0) {
-    const failedStage = firstRunFailureStage(result.stderr);
-    throw new OnboardingCliError(
-      "first-run-failed",
-      live
-        ? `The bounded live first run failed at ${failedStage}. Inspect provider admission and retry with the same bounds.`
-        : `The offline first run failed at ${failedStage}. The self-host harness cleaned up its temporary stack and the same command can resume safely.`,
-      75,
-      [
-        action(
-          "resume",
-          "Resume the bounded first run",
-          live
-            ? [
-                "kurobara",
-                "first-run",
-                "--live",
-                "--max-companies",
-                "1",
-                "--max-contacts",
-                "1",
-                "--confirm-provider-credits",
-                "--json",
-              ]
-            : ["kurobara", "first-run", "--offline", "--json"],
-          live
-        ),
-      ],
-      true,
-      [`first_run:${failedStage}`]
-    );
-  }
+  assertFirstRunSucceeded(result, live);
   const offlineReceipt = live
     ? undefined
     : offlineFirstRunReceipt(result.stdout);
+  const liveReceipt = live ? liveFirstRunReceipt(result.stdout) : undefined;
   return success("first-run", {
     completed_steps: [
       "import",
@@ -1563,7 +2161,13 @@ const firstRun = async (
     receipt: {
       durable_path:
         "CLI -> HTTP API -> PostgreSQL -> Hatchet -> worker -> export",
-      provider_calls: live ? "bounded" : 0,
+      provider_calls:
+        liveReceipt === undefined
+          ? 0
+          : {
+              maximum: liveReceipt.bounds.max_provider_requests,
+              providers: liveReceipt.proof.providers,
+            },
       synthetic: !live,
     },
     summary: live
@@ -1693,6 +2297,27 @@ const dispatchSetup = (
   }
 };
 
+const dispatchContext = (
+  invocation: OnboardingInvocation,
+  verb: string | undefined,
+  subject: string | undefined,
+  rest: readonly string[],
+  presentation: Presentation
+): Promise<MachineResult> => {
+  if (verb === "setup") {
+    return interactiveContextSetup(
+      invocation,
+      remainingArguments(subject, rest),
+      presentation
+    );
+  }
+  throw new OnboardingCliError(
+    "cli-usage-error",
+    "The guided onboarding command is context setup. Agents use context questions, plan, apply, and status.",
+    2
+  );
+};
+
 const dispatchProvider = (
   invocation: OnboardingInvocation,
   verb: string | undefined,
@@ -1759,14 +2384,12 @@ const dispatch = (
         version: packageManifest.version,
       });
     case "doctor":
-      if (verb === undefined) {
-        return doctor(invocation);
-      }
-      throw new OnboardingCliError(
-        "cli-usage-error",
-        "doctor accepts only global presentation flags.",
-        2
+      return doctor(
+        invocation,
+        remainingArguments(verb, remainingArguments(subject, rest))
       );
+    case "context":
+      return dispatchContext(invocation, verb, subject, rest, presentation);
     case "first-run":
       return firstRun(
         invocation,
@@ -1820,6 +2443,7 @@ const ONBOARDING_GROUPS = new Set([
 
 export const isOnboardingCommand = (argv: readonly string[]): boolean =>
   argv.length === 0 ||
+  (argv[0] === "context" && argv[1] === "setup") ||
   (argv.some((argument) => ONBOARDING_GROUPS.has(argument)) &&
     !["company", "contact", "dataset", "recipe", "run"].includes(
       argv[0] ?? ""

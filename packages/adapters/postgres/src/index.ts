@@ -39,6 +39,7 @@ export {
   RunAggregateConflictError,
 } from "./errors.ts";
 export { createPostgresExportDeliveryPersistence } from "./export-delivery.ts";
+export { createPostgresGtmPersistence } from "./gtm.ts";
 export {
   applyPostgresMigrations,
   verifyPostgresMigrations,

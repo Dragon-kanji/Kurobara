@@ -1,0 +1,62 @@
+{
+  "action": "preview",
+  "play": {
+    "approvals": {
+      "export": false,
+      "provider_spend": false,
+      "reveal": false
+    },
+    "authority_envelope_id": "authority-synthetic-play",
+    "audience": {
+      "company_countries": ["FR"],
+      "departments": ["sales"],
+      "person_countries": ["FR"],
+      "seniorities": ["director"],
+      "titles": ["Sales Director"]
+    },
+    "broadening": "forbidden",
+    "budget": {
+      "limit": 4,
+      "unit": "credits"
+    },
+    "capabilities": ["contacts.discover"],
+    "context_ref": {
+      "context_id": "synthetic-context",
+      "fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "revision": 1
+    },
+    "deadline_ms": 2000000000000,
+    "delivery": {
+      "mode": "no_send",
+      "private_export": true
+    },
+    "exclusions": ["existing customers"],
+    "objective": {
+      "metric": "qualified_contacts",
+      "target": 3,
+      "text": "Find three synthetic qualified contacts"
+    },
+    "play_id": "synthetic-play",
+    "preview": {
+      "max_companies": 3,
+      "max_contacts_per_company": 1,
+      "max_contacts_total": 3,
+      "max_provider_calls": 4,
+      "sample_size": 3
+    },
+    "selection": {
+      "minimum_score": 0,
+      "required_signals": []
+    },
+    "source": {
+      "dataset_id": "synthetic-companies",
+      "field_mapping": {
+        "domain": "domain",
+        "name": "company_name"
+      },
+      "kind": "imported_dataset",
+      "materialization_id": "synthetic-materialization"
+    },
+    "stop_conditions": ["budget_exhausted"]
+  }
+}

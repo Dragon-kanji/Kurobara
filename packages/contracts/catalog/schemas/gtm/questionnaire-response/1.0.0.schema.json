@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/gtm/questionnaire-response/1.0.0",
+  "title": "GtmQuestionnaireResponse",
+  "description": "Versioned agent-neutral GTM questions with conditional and human-confirmation metadata.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profile", "questionnaire_version", "questions"],
+  "properties": {
+    "profile": {
+      "type": "string",
+      "enum": [
+        "offline_fixture",
+        "dataset_import",
+        "imported_dataset_enrichment",
+        "agentic_outbound_play"
+      ]
+    },
+    "questionnaire_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "questions": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "answer_schema",
+          "prompt",
+          "question_id",
+          "required_for",
+          "requires_human_confirmation",
+          "section",
+          "sensitivity"
+        ],
+        "properties": {
+          "answer_schema": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type"],
+            "properties": {
+              "enum_values": {
+                "type": "array",
+                "maxItems": 64,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": ["boolean", "number", "string", "string_array"]
+              }
+            }
+          },
+          "ask_if": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["equals", "question_id"],
+            "properties": {
+              "equals": {
+                "oneOf": [
+                  { "type": "boolean" },
+                  { "type": "number" },
+                  { "type": "string", "maxLength": 255 }
+                ]
+              },
+              "question_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[a-z][a-z0-9_.-]*$"
+              }
+            }
+          },
+          "prompt": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048,
+            "pattern": "\\S"
+          },
+          "question_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[a-z][a-z0-9_.-]*$"
+          },
+          "required_for": {
+            "type": "array",
+            "maxItems": 4,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "offline_fixture",
+                "dataset_import",
+                "imported_dataset_enrichment",
+                "agentic_outbound_play"
+              ]
+            }
+          },
+          "requires_human_confirmation": { "type": "boolean" },
+          "section": {
+            "type": "string",
+            "enum": [
+              "offer",
+              "audience",
+              "qualification",
+              "data",
+              "policy",
+              "activation"
+            ]
+          },
+          "sensitivity": {
+            "type": "string",
+            "enum": ["business", "policy"]
+          }
+        }
+      }
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.gtm",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}

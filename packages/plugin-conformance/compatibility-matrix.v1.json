@@ -1,5 +1,5 @@
 {
-  "fingerprint": "sha256:6d75e76e535769d12ecf5ad063727cb1efec9b3fca6e74fdabd3ad6b1f5281e7",
+  "fingerprint": "sha256:6528363a883a41738400e7e0a62133875a75b6b3b11c732c9556c7ea5ed714f1",
   "profile": {
     "id": "dev.kurobara.plugin-conformance/local-v1",
     "version": "1.1.0",
@@ -10,8 +10,8 @@
     {
       "combination_id": "node24.14.0-darwin-arm64",
       "architecture": "arm64",
-      "catalog_version": "0.12.0",
-      "catalog_fingerprint": "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4",
+      "catalog_version": "0.13.0",
+      "catalog_fingerprint": "sha256:1466e9c9bff8bc3c3f3c5e330a5770cb57429cb03bd9a75cc0701c9a71c9744e",
       "contracts_package_version": "0.1.0",
       "conformance_kit_version": "0.1.0",
       "conformance_report_schema_version": "1.0.0",
@@ -31,8 +31,8 @@
     {
       "combination_id": "node24.14.0-linux-x64",
       "architecture": "x64",
-      "catalog_version": "0.12.0",
-      "catalog_fingerprint": "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4",
+      "catalog_version": "0.13.0",
+      "catalog_fingerprint": "sha256:1466e9c9bff8bc3c3f3c5e330a5770cb57429cb03bd9a75cc0701c9a71c9744e",
       "contracts_package_version": "0.1.0",
       "conformance_kit_version": "0.1.0",
       "conformance_report_schema_version": "1.0.0",

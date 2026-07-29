@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { describe, test } from "node:test";
 
 import {
@@ -168,6 +169,66 @@ type QuoteRunPlanValue = Extract<
   QuoteRunPlanResult,
   Readonly<{ ok: true }>
 >["value"];
+type Gtm = NonNullable<HttpAdapterDependencies["gtm"]>;
+type PlayRun = NonNullable<Awaited<ReturnType<Gtm["getPlayRun"]>>>;
+
+const camelCaseKey = (key: string): string =>
+  key.replace(/_([a-z])/gu, (_match, character: string) =>
+    character.toUpperCase()
+  );
+
+const toInternalProjection = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    return value.map(toInternalProjection);
+  }
+  if (value !== null && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [
+        camelCaseKey(key),
+        toInternalProjection(entry),
+      ])
+    );
+  }
+  return value;
+};
+
+const validPlayRunContractFixture: unknown = JSON.parse(
+  await readFile(
+    new URL(
+      "../../../contracts/catalog/fixtures/play-run-get-response/valid/minimal.json",
+      import.meta.url
+    ),
+    "utf8"
+  )
+);
+
+const storedPlayRunFromContractFixture = (): PlayRun => {
+  if (
+    validPlayRunContractFixture === null ||
+    typeof validPlayRunContractFixture !== "object" ||
+    !("run" in validPlayRunContractFixture)
+  ) {
+    throw new TypeError("The Play run contract fixture must contain a run");
+  }
+  const internalRun = toInternalProjection(validPlayRunContractFixture.run);
+  if (
+    internalRun === null ||
+    typeof internalRun !== "object" ||
+    !("play" in internalRun)
+  ) {
+    throw new TypeError("The Play run contract fixture must contain a play");
+  }
+  const { play, ...run } = internalRun;
+  return {
+    ...run,
+    definition: play,
+    executionActor: {
+      actorId: "actor-synthetic",
+      authenticationMode: "api-key",
+      permissions: ["plays:execute"],
+    },
+  } as unknown as PlayRun;
+};
 
 const actor = {
   actorId: "actor-synthetic",
@@ -864,6 +925,29 @@ const makeDependencies = (
   ...overrides,
 });
 
+test("projects a durable Play run through its public contract", async () => {
+  const playActor = {
+    ...actor,
+    permissions: [...actor.permissions, "plays:read"],
+  } as unknown as Actor;
+  const gtm = {
+    getPlayRun: () => Promise.resolve(storedPlayRunFromContractFixture()),
+  } as unknown as Gtm;
+  const app = createHttpApp(
+    makeDependencies({
+      authenticateApiKey: () => Promise.resolve({ ok: true, value: playActor }),
+      gtm,
+    })
+  );
+
+  const response = await app.request("/v1/play-runs/play-run-1", {
+    headers: { authorization: AUTHORIZATION },
+  });
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), validPlayRunContractFixture);
+});
+
 test("projects one bounded organization discovery through the application facade", async () => {
   let captured:
     | Parameters<
@@ -1166,14 +1250,14 @@ describe("selected-contact derived dataset routes", () => {
 
     assert.deepEqual(contactIdentityExecutionQueryContract, {
       catalogFingerprint,
-      catalogVersion: "0.12.0",
+      catalogVersion: "0.13.0",
       schemaFingerprint: schemaFingerprints.ContactIdentityExecutionQuery,
       schemaId: schemaIds.ContactIdentityExecutionQuery,
       schemaVersion: "1.0.0",
     });
     assert.deepEqual(contactWorkEmailExecutionQueryContract, {
       catalogFingerprint,
-      catalogVersion: "0.12.0",
+      catalogVersion: "0.13.0",
       schemaFingerprint: schemaFingerprints.ContactWorkEmailExecutionQuery,
       schemaId: schemaIds.ContactWorkEmailExecutionQuery,
       schemaVersion: "1.0.0",

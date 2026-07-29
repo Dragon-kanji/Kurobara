@@ -20,8 +20,28 @@ const DEFAULT_PROVIDER_ENV_FILE = path.join(REPOSITORY_ROOT, ".env.local");
 const MAX_CAPTURE_BYTES = 256 * 1024;
 const MAX_ENV_FILE_BYTES = 64 * 1024;
 const MAX_PLANNING_FILE_BYTES = 1024 * 1024;
-const MAX_DOGFOOD_COMPANIES = 3;
-const MAX_DOGFOOD_CONTACTS = 3;
+const HARD_MAX_DOGFOOD_COMPANIES = 3;
+const HARD_MAX_DOGFOOD_CONTACTS = 3;
+const configuredDogfoodCap = (name, fallback, maximum) => {
+  const value = process.env[name];
+  if (value === undefined) {
+    return fallback;
+  }
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) && parsed >= 1 && parsed <= maximum
+    ? parsed
+    : Number.NaN;
+};
+const MAX_DOGFOOD_COMPANIES = configuredDogfoodCap(
+  "KUROBARA_DOGFOOD_MAX_COMPANIES",
+  HARD_MAX_DOGFOOD_COMPANIES,
+  HARD_MAX_DOGFOOD_COMPANIES
+);
+const MAX_DOGFOOD_CONTACTS = configuredDogfoodCap(
+  "KUROBARA_DOGFOOD_MAX_CONTACTS",
+  HARD_MAX_DOGFOOD_CONTACTS,
+  HARD_MAX_DOGFOOD_CONTACTS
+);
 const COMMAND_TERMINATION_GRACE_MS = 2000;
 const COMMAND_FORCE_SETTLEMENT_GRACE_MS = 1000;
 const COUNTRY_PATTERN = /^[A-Z]{2}$/u;
@@ -44,11 +64,18 @@ const API_KEY_PERMISSIONS = [
   "contacts:discover",
   "contacts:enrich",
   "contacts:export",
+  "contexts:read",
+  "contexts:write",
   "datasets:export",
   "datasets:generate",
   "datasets:read",
   "plans:quote",
+  "plays:execute",
+  "plays:read",
+  "plays:write",
   "steps:execute",
+  "workbooks:read",
+  "workbooks:write",
 ];
 const EXIT = Object.freeze({
   configuration: 3,
@@ -880,6 +907,17 @@ const preflight = async () => {
       `npm 10.9.4 is required; detected ${npmVersion || "unknown"}.`
     );
   }
+  if (
+    !(
+      Number.isSafeInteger(MAX_DOGFOOD_COMPANIES) &&
+      Number.isSafeInteger(MAX_DOGFOOD_CONTACTS)
+    )
+  ) {
+    throw configurationError(
+      "dogfood-cap-invalid",
+      `KUROBARA_DOGFOOD_MAX_COMPANIES and KUROBARA_DOGFOOD_MAX_CONTACTS must be integers from 1 to ${HARD_MAX_DOGFOOD_COMPANIES}.`
+    );
+  }
   const providerEnvironment = await loadProviderEnvironment();
   const planning = inspectPlanningManifest(await readPlanningManifest());
   await runNpmCommand(
@@ -1217,6 +1255,244 @@ const remainingTime = (deadline) => {
   return remaining;
 };
 
+const answerGtmQuestion = (question, options) => {
+  switch (question.question_id) {
+    case "activation.mode":
+      return "no_send";
+    case "audience.company_countries":
+    case "audience.person_countries":
+      return [options.country];
+    case "policy.initial_budget_limit":
+      return 4;
+    case "policy.initial_budget_unit":
+      return "requests";
+    case "policy.retention_days":
+      return 1;
+    case "data.prohibited_fields":
+      return [];
+    case "activation.private_export_requested":
+    case "policy.export_destination_approved":
+    case "policy.provider_rights_confirmed":
+      return true;
+    default:
+      break;
+  }
+  const answerType = question.answer_schema?.type;
+  if (answerType === "boolean") {
+    return true;
+  }
+  if (answerType === "number" || answerType === "integer") {
+    return 1;
+  }
+  if (answerType === "string_array") {
+    return [`synthetic-${question.question_id}`];
+  }
+  return `Synthetic ${question.question_id}`;
+};
+
+const assertGtmQuestionnaire = (questionnaire) => {
+  if (
+    questionnaire?.questionnaire_version !== "1.0.0" ||
+    !Array.isArray(questionnaire?.questions) ||
+    questionnaire.questions.length === 0
+  ) {
+    throw new DogfoodError(
+      "gtm-questionnaire-invalid",
+      "The canonical GTM questionnaire could not be read.",
+      EXIT.liveFailure
+    );
+  }
+};
+
+const buildGtmContextPlanRequest = (context) => ({
+  context,
+  expected_base_revision: 0,
+  mode: "plan",
+});
+
+const assertGtmContextPlan = (contextPlan) => {
+  if (
+    typeof contextPlan?.fingerprint !== "string" ||
+    contextPlan?.ready_for?.agentic_outbound_play !== true ||
+    contextPlan?.issues?.length !== 0
+  ) {
+    throw new DogfoodError(
+      "gtm-context-plan-invalid",
+      "The bounded GTM Context did not qualify for an agentic outbound Play.",
+      EXIT.liveFailure
+    );
+  }
+};
+
+const readAppliedContextRevision = (contextApply) => {
+  const contextRevision = contextApply?.revision;
+  if (
+    contextApply?.active !== true ||
+    typeof contextRevision?.fingerprint !== "string" ||
+    !Number.isSafeInteger(contextRevision?.revision)
+  ) {
+    throw new DogfoodError(
+      "gtm-context-apply-invalid",
+      "The bounded GTM Context was not activated durably.",
+      EXIT.liveFailure
+    );
+  }
+  return contextRevision;
+};
+
+const assertPlayPreview = (preview) => {
+  if (
+    typeof preview?.fingerprint !== "string" ||
+    preview?.issues?.length !== 0
+  ) {
+    throw new DogfoodError(
+      "play-preview-invalid",
+      "The bounded Play preview did not pass provider-free admission.",
+      EXIT.liveFailure
+    );
+  }
+};
+
+const readStartedPlayRunId = (started, providerCallsMayHaveOccurred) => {
+  const playRunId = started?.run?.run_id;
+  if (typeof playRunId !== "string") {
+    throw new DogfoodError(
+      "play-run-invalid",
+      "The bounded Play start returned no durable run.",
+      EXIT.liveFailure,
+      { providerCallsMayHaveOccurred }
+    );
+  }
+  return playRunId;
+};
+
+const assertInitialPlayRun = (
+  initialRun,
+  playRunId,
+  providerCallsMayHaveOccurred
+) => {
+  if (initialRun?.run?.run_id !== playRunId) {
+    throw new DogfoodError(
+      "play-resume-invalid",
+      "The first bounded Play checkpoint could not be read.",
+      EXIT.liveFailure,
+      { providerCallsMayHaveOccurred }
+    );
+  }
+};
+
+const readCompletedPlayResult = (completed, providerCallsMayHaveOccurred) => {
+  const completedRun = completed?.run;
+  const playResult = completedRun?.execution?.result;
+  if (
+    completedRun?.state !== "completed" ||
+    completedRun?.execution?.provider_calls > 4 ||
+    playResult?.export_ready !== true ||
+    typeof playResult?.dataset_id !== "string" ||
+    typeof playResult?.materialization_id !== "string" ||
+    typeof playResult?.workbook_id !== "string"
+  ) {
+    const stageStates = Array.isArray(completedRun?.execution?.stages)
+      ? completedRun.execution.stages
+          .filter(
+            (stage) =>
+              Number.isSafeInteger(stage?.ordinal) &&
+              typeof stage?.operation_id === "string" &&
+              typeof stage?.state === "string"
+          )
+          .map(
+            (stage) => `${stage.ordinal}:${stage.operation_id}:${stage.state}`
+          )
+          .join(",")
+      : "unavailable";
+    const diagnostic = JSON.stringify({
+      error_code: completedRun?.execution?.error?.code ?? null,
+      provider_calls: completedRun?.execution?.provider_calls ?? null,
+      stage_states: stageStates,
+      state: completedRun?.state ?? null,
+    });
+    throw new DogfoodError(
+      "play-completion-invalid",
+      `The bounded Play did not produce an export-ready Workbook receipt. ${diagnostic}`,
+      EXIT.liveFailure,
+      { providerCallsMayHaveOccurred }
+    );
+  }
+  return playResult;
+};
+
+const readWorkbookSelection = (workbook, providerCallsMayHaveOccurred) => {
+  const view = workbook?.view;
+  const selectedRecordId =
+    view?.selected_record_ids?.[0] ?? workbook?.records?.[0]?.record_id;
+  if (
+    typeof selectedRecordId !== "string" ||
+    typeof view?.revision !== "number" ||
+    workbook?.records?.length < 1
+  ) {
+    throw new DogfoodError(
+      "workbook-inspect-invalid",
+      "The Play Workbook did not expose a bounded review row.",
+      EXIT.liveFailure,
+      { providerCallsMayHaveOccurred }
+    );
+  }
+  return { selectedRecordId, view };
+};
+
+const assertWorkbookApproval = (
+  approved,
+  selectedRecordId,
+  providerCallsMayHaveOccurred
+) => {
+  if (
+    approved?.view?.approvals?.at(-1)?.decision !== "approved" ||
+    approved?.view?.approvals?.at(-1)?.record_id !== selectedRecordId
+  ) {
+    throw new DogfoodError(
+      "workbook-approval-invalid",
+      "The Workbook approval was not persisted durably.",
+      EXIT.liveFailure,
+      { providerCallsMayHaveOccurred }
+    );
+  }
+};
+
+const cleanupDogfoodRuntime = async (state) => {
+  const failures = [];
+  let stateDirectoryRemoved = false;
+  for (const service of [state.worker, state.api]) {
+    try {
+      await stopService(service);
+    } catch (error) {
+      failures.push(error);
+    }
+  }
+  let infrastructureRemoved = false;
+  try {
+    await runCommand(
+      "docker",
+      composeArguments(state, ["down", "--volumes", "--remove-orphans"]),
+      {
+        label: "isolated infrastructure cleanup",
+        timeoutMs: 120_000,
+      }
+    );
+    infrastructureRemoved = true;
+  } catch (error) {
+    failures.push(error);
+  }
+  if (infrastructureRemoved) {
+    try {
+      await rm(state.stateDirectory, { force: true, recursive: true });
+      stateDirectoryRemoved = true;
+    } catch (error) {
+      failures.push(error);
+    }
+  }
+  return { failures, stateDirectoryRemoved };
+};
+
 const runDogfood = async (options, preflightResult) => {
   const state = await createRunState();
   const controller = new AbortController();
@@ -1224,8 +1500,7 @@ const runDogfood = async (options, preflightResult) => {
   const timeout = setTimeout(() => controller.abort(), options.timeoutMs);
   const interruptGuard = installInterruptGuard(controller);
   let providerCallsMayHaveOccurred = false;
-  const cleanupFailures = [];
-  let stateDirectoryRemoved = false;
+  let cleanupResult = { failures: [], stateDirectoryRemoved: false };
   let runFailure;
   let report;
   try {
@@ -1401,6 +1676,327 @@ const runDogfood = async (options, preflightResult) => {
         requiredService: state.worker,
         requiredServiceLabel: "Kurobara worker",
       });
+    const runAgentFirstPlayPipeline = async () => {
+      const suffix = randomBytes(8).toString("hex");
+      const operationDeadline = deadline - 5000;
+      const commonArguments = [
+        "--api-key-file",
+        apiKeyFile,
+        "--endpoint",
+        endpoint,
+      ];
+      const runAgentCommand = (command, requestFile, label) =>
+        runRuntimeCli(
+          [...command, ...commonArguments, "--request", requestFile],
+          {
+            label,
+            providerCallsMayHaveOccurred,
+            signal: controller.signal,
+            timeoutMs: Math.min(30_000, remainingTime(deadline)),
+          }
+        );
+      const questionnaire = await runRuntimeCli(
+        [
+          "context",
+          "questions",
+          ...commonArguments,
+          "--profile",
+          "agentic_outbound_play",
+        ],
+        {
+          label: "GTM Context questionnaire",
+          signal: controller.signal,
+          timeoutMs: Math.min(30_000, remainingTime(deadline)),
+        }
+      );
+      assertGtmQuestionnaire(questionnaire);
+      const contextDocument = {
+        assertions: questionnaire.questions.map((question) => ({
+          provenance: {
+            actor_id: preflightResult.planning.actorId,
+            recorded_at_ms: Date.now(),
+            source: "human",
+          },
+          question_id: question.question_id,
+          state: "confirmed",
+          value: answerGtmQuestion(question, options),
+        })),
+        context_id: `gtm-dogfood-${suffix}`,
+        name: "Bounded B2B dogfood",
+        questionnaire_version: questionnaire.questionnaire_version,
+      };
+      const contextPlanFile = path.join(
+        state.stateDirectory,
+        "context-plan.json"
+      );
+      await writePrivateFile(
+        contextPlanFile,
+        `${JSON.stringify(buildGtmContextPlanRequest(contextDocument))}\n`
+      );
+      const contextPlan = await runAgentCommand(
+        ["context", "plan"],
+        contextPlanFile,
+        "GTM Context plan"
+      );
+      assertGtmContextPlan(contextPlan);
+      const contextApplyFile = path.join(
+        state.stateDirectory,
+        "context-apply.json"
+      );
+      await writePrivateFile(
+        contextApplyFile,
+        `${JSON.stringify({
+          activate: true,
+          confirm_active_change: false,
+          confirmed: true,
+          context: contextDocument,
+          expected_base_revision: 0,
+          mode: "apply",
+          plan_fingerprint: contextPlan.fingerprint,
+        })}\n`
+      );
+      const contextApply = await runAgentCommand(
+        ["context", "apply"],
+        contextApplyFile,
+        "GTM Context apply"
+      );
+      const contextRevision = readAppliedContextRevision(contextApply);
+      const play = {
+        approvals: {
+          export: true,
+          provider_spend: true,
+          reveal: true,
+        },
+        authority_envelope_id:
+          preflightResult.planning.authorities["organizations.discover"],
+        audience: {
+          company_countries: [options.country],
+          departments: [],
+          person_countries: [],
+          seniorities: [],
+          titles: options.title === undefined ? [] : [options.title],
+        },
+        broadening: "forbidden",
+        budget: { limit: 4, unit: "requests" },
+        capabilities: ["contacts.discover", "contacts.work-email.resolve"],
+        context_ref: {
+          context_id: contextRevision.context_id,
+          fingerprint: contextRevision.fingerprint,
+          revision: contextRevision.revision,
+        },
+        deadline_ms: operationDeadline,
+        delivery: { mode: "no_send", private_export: true },
+        exclusions: [],
+        objective: {
+          metric: "qualified_contacts",
+          target: 1,
+          text: "Produce one bounded contact for human review.",
+        },
+        play_id: `play-dogfood-${suffix}`,
+        preview: {
+          max_companies: MAX_DOGFOOD_COMPANIES,
+          max_contacts_per_company: 1,
+          max_contacts_total: MAX_DOGFOOD_CONTACTS,
+          max_provider_calls: 4,
+          sample_size: 1,
+        },
+        selection: { minimum_score: 0, required_signals: [] },
+        source: {
+          countries: [options.country],
+          industries: [options.industry],
+          keywords: [],
+          kind: "organization_search",
+        },
+        stop_conditions: ["budget_exhausted", "deadline_elapsed"],
+      };
+      const playPreviewFile = path.join(
+        state.stateDirectory,
+        "play-preview.json"
+      );
+      await writePrivateFile(
+        playPreviewFile,
+        `${JSON.stringify({ action: "preview", play })}\n`
+      );
+      const preview = await runAgentCommand(
+        ["play", "preview"],
+        playPreviewFile,
+        "Play preview"
+      );
+      assertPlayPreview(preview);
+      const playStartFile = path.join(state.stateDirectory, "play-start.json");
+      await writePrivateFile(
+        playStartFile,
+        `${JSON.stringify({
+          action: "start",
+          approved_by_human: true,
+          expected_base_revision: 0,
+          idempotency_key: `play-start-${suffix}`,
+          play,
+          preview_fingerprint: preview.fingerprint,
+        })}\n`
+      );
+      providerCallsMayHaveOccurred = true;
+      const started = await runAgentCommand(
+        ["play", "start"],
+        playStartFile,
+        "Play start"
+      );
+      const playRunId = readStartedPlayRunId(
+        started,
+        providerCallsMayHaveOccurred
+      );
+      const initialRun = await runRuntimeCli(
+        [
+          "play",
+          "run",
+          ...commonArguments,
+          "--run-id",
+          playRunId,
+          "--timeout-ms",
+          "0",
+        ],
+        {
+          label: "Play interruption checkpoint",
+          providerCallsMayHaveOccurred,
+          signal: controller.signal,
+          timeoutMs: Math.min(30_000, remainingTime(deadline)),
+        }
+      );
+      assertInitialPlayRun(initialRun, playRunId, providerCallsMayHaveOccurred);
+      const completed = await runRuntimeCli(
+        [
+          "play",
+          "run",
+          ...commonArguments,
+          "--run-id",
+          playRunId,
+          "--poll-interval-ms",
+          "1000",
+          "--timeout-ms",
+          String(Math.min(360_000, remainingTime(deadline))),
+        ],
+        {
+          label: "Play resume and watch",
+          providerCallsMayHaveOccurred,
+          signal: controller.signal,
+          timeoutMs: Math.min(370_000, remainingTime(deadline)),
+        }
+      );
+      const playResult = readCompletedPlayResult(
+        completed,
+        providerCallsMayHaveOccurred
+      );
+      const workbookGetFile = path.join(
+        state.stateDirectory,
+        "workbook-get.json"
+      );
+      await writePrivateFile(
+        workbookGetFile,
+        `${JSON.stringify({
+          after_ordinal: 0,
+          dataset_id: playResult.dataset_id,
+          limit: 3,
+          materialization_id: playResult.materialization_id,
+          workbook_id: playResult.workbook_id,
+        })}\n`
+      );
+      const workbook = await runAgentCommand(
+        ["workbook", "inspect"],
+        workbookGetFile,
+        "Workbook inspect"
+      );
+      const { selectedRecordId, view } = readWorkbookSelection(
+        workbook,
+        providerCallsMayHaveOccurred
+      );
+      const workbookApproveFile = path.join(
+        state.stateDirectory,
+        "workbook-approve.json"
+      );
+      await writePrivateFile(
+        workbookApproveFile,
+        `${JSON.stringify({
+          annotations: view.annotations,
+          approvals: [
+            ...view.approvals,
+            {
+              created_at_ms: Date.now(),
+              created_by_actor_id: preflightResult.planning.actorId,
+              decision: "approved",
+              record_id: selectedRecordId,
+            },
+          ],
+          column_order: view.column_order,
+          context_ref: view.context_ref,
+          dataset_id: view.dataset_id,
+          expected_revision: view.revision,
+          filters: view.filters,
+          materialization_id: view.materialization_id,
+          name: view.name,
+          play_id: view.play_id,
+          play_revision: view.play_revision,
+          play_run_id: view.play_run_id,
+          selection_reasons: view.selection_reasons,
+          selected_record_ids: view.selected_record_ids,
+          workbook_id: view.workbook_id,
+        })}\n`
+      );
+      const approved = await runAgentCommand(
+        ["workbook", "approve"],
+        workbookApproveFile,
+        "Workbook approve"
+      );
+      assertWorkbookApproval(
+        approved,
+        selectedRecordId,
+        providerCallsMayHaveOccurred
+      );
+      await runRuntimeCli(
+        [
+          "dataset",
+          "export",
+          ...commonArguments,
+          "--dataset-id",
+          playResult.dataset_id,
+          "--format",
+          "csv",
+          "--output",
+          state.exportFile,
+          "--max-bytes",
+          "1048576",
+          "--timeout-ms",
+          String(Math.min(120_000, remainingTime(deadline))),
+        ],
+        {
+          label: "Play result private export",
+          providerCallsMayHaveOccurred,
+          signal: controller.signal,
+          timeoutMs: Math.min(130_000, remainingTime(deadline)),
+        }
+      );
+      await verifyContactExport(state.exportFile);
+      return {
+        bounds: {
+          companies: MAX_DOGFOOD_COMPANIES,
+          contacts: MAX_DOGFOOD_CONTACTS,
+          max_provider_requests: 4,
+        },
+        command: "run",
+        cleanup: "pending",
+        proof: {
+          api: "ready",
+          export: "private-csv-verified",
+          hatchet: "executed",
+          interruption_resume: "verified",
+          play_run: "completed",
+          postgres: "durable-during-run",
+          providers: ["hunter", "prospeo"],
+          workbook: "inspected-and-approved",
+          work_email: "found-and-valid",
+        },
+        status: "passed",
+      };
+    };
     const runCompanyDiscovery = async () => {
       const suffix = randomBytes(8).toString("hex");
       const operationDeadline = deadline - 5000;
@@ -1534,8 +2130,14 @@ const runDogfood = async (options, preflightResult) => {
       }
       return { companyCount, companyStart, operationDeadline, suffix };
     };
-    const { companyCount, companyStart, operationDeadline, suffix } =
-      await runCompanyDiscovery();
+    const legacyCompany =
+      process.env.KUROBARA_DOGFOOD_EXECUTION_SURFACE === "legacy"
+        ? await runCompanyDiscovery()
+        : undefined;
+    const companyCount = legacyCompany?.companyCount ?? 0;
+    const companyStart = legacyCompany?.companyStart;
+    const operationDeadline = legacyCompany?.operationDeadline ?? 0;
+    const suffix = legacyCompany?.suffix ?? "unused";
     const runContactPipeline = async () => {
       const contactDatasetId = `dataset-contact-dogfood-${suffix}`;
       const contactArguments = [
@@ -1847,47 +2449,22 @@ const runDogfood = async (options, preflightResult) => {
         status: "passed",
       };
     };
-    report = await runContactPipeline();
+    report =
+      legacyCompany === undefined
+        ? await runAgentFirstPlayPipeline()
+        : await runContactPipeline();
   } catch (error) {
     runFailure = error;
   } finally {
     clearTimeout(timeout);
-    for (const service of [state.worker, state.api]) {
-      try {
-        await stopService(service);
-      } catch (error) {
-        cleanupFailures.push(error);
-      }
-    }
-    let infrastructureRemoved = false;
-    try {
-      await runCommand(
-        "docker",
-        composeArguments(state, ["down", "--volumes", "--remove-orphans"]),
-        {
-          label: "isolated infrastructure cleanup",
-          timeoutMs: 120_000,
-        }
-      );
-      infrastructureRemoved = true;
-    } catch (error) {
-      cleanupFailures.push(error);
-    }
-    if (infrastructureRemoved) {
-      try {
-        await rm(state.stateDirectory, { force: true, recursive: true });
-        stateDirectoryRemoved = true;
-      } catch (error) {
-        cleanupFailures.push(error);
-      }
-    }
-    if (cleanupFailures.length === 0 && report !== undefined) {
+    cleanupResult = await cleanupDogfoodRuntime(state);
+    if (cleanupResult.failures.length === 0 && report !== undefined) {
       report.cleanup = "completed";
     }
     interruptGuard.dispose();
   }
-  if (cleanupFailures.length > 0) {
-    const recovery = stateDirectoryRemoved
+  if (cleanupResult.failures.length > 0) {
+    const recovery = cleanupResult.stateDirectoryRemoved
       ? "The private state directory was removed, but local process or infrastructure shutdown was not fully proven."
       : `Private recovery state remains at ${state.stateDirectory}.`;
     throw new DogfoodError(
@@ -1949,11 +2526,14 @@ const main = async () => {
 export const dogfoodTestHelpers =
   process.env.KUROBARA_DOGFOOD_ENABLE_TEST_HELPERS === "1"
     ? Object.freeze({
+        answerGtmQuestion,
+        buildGtmContextPlanRequest,
         composeRuntimeEnvironments,
         createRunState,
         installInterruptGuard,
         parseArguments,
         processGroupExists,
+        readCompletedPlayResult,
         runCommand,
         startService,
         stopService,

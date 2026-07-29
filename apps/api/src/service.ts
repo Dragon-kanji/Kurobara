@@ -40,6 +40,7 @@ import {
   type ContactPrivacyHmacSecret,
   createContactExportPolicyResolver,
   createContactPrivacyTombstoneGuard,
+  createGtmService,
   createHmacContactPrivacySubjectKeyDeriver,
   makeAuthorizeContactEffect,
 } from "@kurobara/application";
@@ -137,6 +138,29 @@ export const createApiService = ({
       const datasetGenerationIdentifiers =
         createRandomDatasetGenerationIdentifiers();
       const runIdentifiers = createRandomIdentifiers();
+      const recipes = runtime.recipes;
+      const gtm = createGtmService({
+        clock,
+        datasetRecords: runtime.datasetRecordPages,
+        identifiers: {
+          nextPlayRunId: () => `play_run_${globalThis.crypto.randomUUID()}`,
+        },
+        persistence: runtime.gtm,
+        recipeProjection: {
+          getMany: (scope, recipeApplicationId, recordIds) =>
+            recipes.transaction(scope, (unitOfWork) =>
+              Promise.all(
+                recordIds.map((recordId) =>
+                  unitOfWork.applicationCells.get(
+                    scope,
+                    recipeApplicationId,
+                    recordId
+                  )
+                )
+              )
+            ),
+        },
+      });
       const privacySubjectKeys =
         contactPrivacyHmacSecrets === undefined
           ? {
@@ -356,6 +380,7 @@ export const createApiService = ({
           getExportDelivery: composition.getExportDelivery,
           getRecipeApplicationStatus: composition.getRecipeApplicationStatus,
           getRun: composition.getRun,
+          gtm,
           importDataset: composition.importDataset,
           listCapabilities: composition.listCapabilities,
           listContactCandidates: composition.listContactCandidates,

@@ -86,11 +86,11 @@ const invalidResponseResult = {
   status: "outcome-unknown",
 } as const;
 
-test("pins the generated 0.12.0 recipe contract references", () => {
+test("pins the generated 0.13.0 recipe contract references", () => {
   assert.deepEqual(SEARCH_CONTRACTS, {
     input: {
       catalogFingerprint: SEARCH_CATALOG_FINGERPRINT,
-      catalogVersion: "0.12.0",
+      catalogVersion: "0.13.0",
       schemaFingerprint:
         "sha256:c40a6d60340e2fcc29415f4594b5b3f951da7a798d41a245bb63cecd1600eccd",
       schemaId:
@@ -99,7 +99,7 @@ test("pins the generated 0.12.0 recipe contract references", () => {
     },
     output: {
       catalogFingerprint: SEARCH_CATALOG_FINGERPRINT,
-      catalogVersion: "0.12.0",
+      catalogVersion: "0.13.0",
       schemaFingerprint:
         "sha256:a131ddf91ef2314dbaf7af91f3ba56eec4adf766d557a70185b0bbc320d13e9d",
       schemaId:

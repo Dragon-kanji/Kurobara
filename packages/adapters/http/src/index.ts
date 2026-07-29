@@ -4,6 +4,7 @@ import Busboy, { type BusboyFileStream } from "@fastify/busboy";
 import {
   type ApplyRecipeDependencies,
   exportDeliveryEffectiveExpiresAt,
+  type GtmService,
   type makeApplyRecipe,
   type makeAuthenticateApiKey,
   type makeCancelDatasetGeneration,
@@ -37,13 +38,20 @@ import {
   type DatasetsExportRequest,
   type ExportDeliveriesGetRequest,
   type ExportDeliveriesRevokeRequest,
+  type GtmContextCommandRequest,
+  type GtmContextStatusRequest,
+  type GtmQuestionnaireRequest,
   type OrganizationsCandidatesListRequest,
   type OrganizationsDiscoverRequest,
+  type PlayCommandRequest,
+  type PlayRunGetRequest,
   type RecipeApplicationsExportRequest,
   type RecipeApplicationsGetRequest,
   type RecipesApplyRequest,
   type SelectedContactDerivedDatasetRequest,
   schemaIds,
+  type WorkbookGetRequest,
+  type WorkbookUpdateRequest,
 } from "@kurobara/contracts";
 import catalogManifest from "@kurobara/contracts/catalog-manifest.json" with {
   type: "json",
@@ -147,6 +155,24 @@ import exportDeliveryStateResponseSchema from "@kurobara/contracts/schemas/expor
 import fieldSchema from "@kurobara/contracts/schemas/field.json" with {
   type: "json",
 };
+import gtmContextCommandRequestSchema from "@kurobara/contracts/schemas/gtm-context-command-request.json" with {
+  type: "json",
+};
+import gtmContextCommandResponseSchema from "@kurobara/contracts/schemas/gtm-context-command-response.json" with {
+  type: "json",
+};
+import gtmContextStatusRequestSchema from "@kurobara/contracts/schemas/gtm-context-status-request.json" with {
+  type: "json",
+};
+import gtmContextStatusResponseSchema from "@kurobara/contracts/schemas/gtm-context-status-response.json" with {
+  type: "json",
+};
+import gtmQuestionnaireRequestSchema from "@kurobara/contracts/schemas/gtm-questionnaire-request.json" with {
+  type: "json",
+};
+import gtmQuestionnaireResponseSchema from "@kurobara/contracts/schemas/gtm-questionnaire-response.json" with {
+  type: "json",
+};
 import organizationDiscoveryQuerySchema from "@kurobara/contracts/schemas/organization-discovery-query.json" with {
   type: "json",
 };
@@ -166,6 +192,18 @@ import plansQuoteRequestSchema from "@kurobara/contracts/schemas/plans-quote-req
   type: "json",
 };
 import plansQuoteResponseSchema from "@kurobara/contracts/schemas/plans-quote-response.json" with {
+  type: "json",
+};
+import playCommandRequestSchema from "@kurobara/contracts/schemas/play-command-request.json" with {
+  type: "json",
+};
+import playCommandResponseSchema from "@kurobara/contracts/schemas/play-command-response.json" with {
+  type: "json",
+};
+import playRunGetRequestSchema from "@kurobara/contracts/schemas/play-run-get-request.json" with {
+  type: "json",
+};
+import playRunGetResponseSchema from "@kurobara/contracts/schemas/play-run-get-response.json" with {
   type: "json",
 };
 import recipeApplicationsExportRequestSchema from "@kurobara/contracts/schemas/recipe-applications-export-request.json" with {
@@ -210,6 +248,18 @@ import selectedContactDerivedDatasetRequestSchema from "@kurobara/contracts/sche
 import selectedContactDerivedDatasetResponseSchema from "@kurobara/contracts/schemas/selected-contact-derived-dataset-response.json" with {
   type: "json",
 };
+import workbookGetRequestSchema from "@kurobara/contracts/schemas/workbook-get-request.json" with {
+  type: "json",
+};
+import workbookGetResponseSchema from "@kurobara/contracts/schemas/workbook-get-response.json" with {
+  type: "json",
+};
+import workbookUpdateRequestSchema from "@kurobara/contracts/schemas/workbook-update-request.json" with {
+  type: "json",
+};
+import workbookUpdateResponseSchema from "@kurobara/contracts/schemas/workbook-update-response.json" with {
+  type: "json",
+};
 import Ajv2020, { type ValidateFunction } from "ajv/dist/2020.js";
 import { type Context, Hono } from "hono";
 
@@ -239,6 +289,7 @@ const PROBLEM_CODES = [
   "domain-rejected",
   "export-too-large",
   "export-delivery-not-found",
+  "gtm-resource-not-found",
   "idempotency-key-reused",
   "intention-hash-mismatch",
   "internal-error",
@@ -250,6 +301,7 @@ const PROBLEM_CODES = [
   "quote-expired",
   "quote-unit-mismatch",
   "request-invalid",
+  "revision-conflict",
   "recipe-application-export-unavailable",
   "recipe-application-not-found",
   "route-not-found",
@@ -331,6 +383,9 @@ type ListCapabilities = ReturnType<typeof makeListCapabilities>;
 type ListCompanyCandidates = ReturnType<typeof makeListCompanyCandidates>;
 type ListContactCandidates = ReturnType<typeof makeListContactCandidates>;
 type QuoteRunPlan = ReturnType<typeof makeQuoteRunPlan>;
+type GtmContextDocument = Parameters<GtmService["planContext"]>[0];
+type GtmPlayDefinition = Parameters<GtmService["previewPlay"]>[1];
+type GtmWorkbookViewWrite = Parameters<GtmService["saveWorkbook"]>[1];
 
 type AdapterEnvironment = Readonly<{
   Variables: {
@@ -356,6 +411,7 @@ export type HttpAdapterDependencies = Readonly<{
   getRecipeApplicationStatus: GetRecipeApplicationStatus;
   getRun: GetRunById;
   getDatasetGeneration?: GetDatasetGeneration;
+  gtm?: GtmService;
   importDataset: ImportDataset;
   listCapabilities: ListCapabilities;
   listContactCandidates?: ListContactCandidates;
@@ -479,6 +535,7 @@ const ajv = new Ajv2020({
   allErrors: true,
   allowUnionTypes: true,
   strict: true,
+  strictRequired: false,
   validateFormats: false,
 });
 for (const keyword of [
@@ -500,6 +557,30 @@ ajv.addSchema(contactCandidateSchema);
 ajv.addSchema(organizationDiscoveryQuerySchema);
 ajv.addSchema(companyCandidateSchema);
 ajv.addSchema(recipeCellInputSchema);
+ajv.addSchema(gtmQuestionnaireRequestSchema);
+ajv.addSchema(gtmQuestionnaireResponseSchema);
+ajv.addSchema(gtmContextCommandRequestSchema);
+ajv.addSchema(gtmContextCommandResponseSchema);
+ajv.addSchema(gtmContextStatusRequestSchema);
+ajv.addSchema(gtmContextStatusResponseSchema);
+ajv.addSchema(playCommandRequestSchema);
+ajv.addSchema(playCommandResponseSchema);
+ajv.addSchema(playRunGetRequestSchema);
+ajv.addSchema(playRunGetResponseSchema);
+ajv.addSchema(workbookGetRequestSchema);
+ajv.addSchema(workbookGetResponseSchema);
+ajv.addSchema(workbookUpdateRequestSchema);
+ajv.addSchema(workbookUpdateResponseSchema);
+
+const validatorFor = <T>(schemaId: string): ValidateFunction<T> => {
+  const validator = ajv.getSchema<T>(schemaId);
+  if (validator === undefined) {
+    throw new Error(
+      `The generated contract validator is unavailable: ${schemaId}`
+    );
+  }
+  return validator;
+};
 
 const validateOrganizationsDiscoverRequest =
   ajv.compile<OrganizationsDiscoverRequest>(organizationsDiscoverRequestSchema);
@@ -629,6 +710,42 @@ const validateRecipeApplicationsGetRequest =
   ajv.compile<RecipeApplicationsGetRequest>(recipeApplicationsGetRequestSchema);
 const validateRecipeApplicationsGetResponse = ajv.compile(
   recipeApplicationsGetResponseSchema
+);
+const validateGtmQuestionnaireRequest = validatorFor<GtmQuestionnaireRequest>(
+  gtmQuestionnaireRequestSchema.$id
+);
+const validateGtmQuestionnaireResponse = validatorFor(
+  gtmQuestionnaireResponseSchema.$id
+);
+const validateGtmContextCommandRequest = validatorFor<GtmContextCommandRequest>(
+  gtmContextCommandRequestSchema.$id
+);
+const validateGtmContextCommandResponse = validatorFor(
+  gtmContextCommandResponseSchema.$id
+);
+const validateGtmContextStatusRequest = validatorFor<GtmContextStatusRequest>(
+  gtmContextStatusRequestSchema.$id
+);
+const validateGtmContextStatusResponse = validatorFor(
+  gtmContextStatusResponseSchema.$id
+);
+const validatePlayCommandRequest = validatorFor<PlayCommandRequest>(
+  playCommandRequestSchema.$id
+);
+const validatePlayCommandResponse = validatorFor(playCommandResponseSchema.$id);
+const validatePlayRunGetRequest = validatorFor<PlayRunGetRequest>(
+  playRunGetRequestSchema.$id
+);
+const validatePlayRunGetResponse = validatorFor(playRunGetResponseSchema.$id);
+const validateWorkbookGetRequest = validatorFor<WorkbookGetRequest>(
+  workbookGetRequestSchema.$id
+);
+const validateWorkbookGetResponse = validatorFor(workbookGetResponseSchema.$id);
+const validateWorkbookUpdateRequest = validatorFor<WorkbookUpdateRequest>(
+  workbookUpdateRequestSchema.$id
+);
+const validateWorkbookUpdateResponse = validatorFor(
+  workbookUpdateResponseSchema.$id
 );
 const validateRecipeCellInput = ajv.getSchema(schemaIds.RecipeCellInput);
 
@@ -842,6 +959,8 @@ const safeDetailByCode: Readonly<Record<ProblemCode, string>> = {
   "domain-rejected": "The run plan was rejected.",
   "export-delivery-not-found": "The export delivery was not found.",
   "export-too-large": "The requested export exceeds the configured limit.",
+  "gtm-resource-not-found":
+    "The requested GTM context, Play, run, or Workbook was not found.",
   "idempotency-key-reused":
     "The idempotency key was already used for another intention.",
   "intention-hash-mismatch":
@@ -859,6 +978,8 @@ const safeDetailByCode: Readonly<Record<ProblemCode, string>> = {
     "The recipe application cannot be exported in its current state.",
   "recipe-application-not-found": "The recipe application was not found.",
   "request-invalid": "The request does not match its public contract.",
+  "revision-conflict":
+    "The resource changed since it was inspected; re-plan against the latest revision.",
   "route-not-found": "The requested route does not exist.",
   "run-not-found": "The run was not found.",
   "run-plan-already-consumed": "The run plan was already consumed.",
@@ -2482,6 +2603,244 @@ const candidatesListRequestFromUrl = <
   return validateRequest(request) ? request : null;
 };
 
+const workbookGetRequestFromUrl = (
+  requestUrl: string,
+  workbookId: string
+): WorkbookGetRequest | null => {
+  const searchParams = new URL(requestUrl).searchParams;
+  const allowed = new Set([
+    "after_ordinal",
+    "dataset_id",
+    "limit",
+    "materialization_id",
+  ]);
+  if (
+    [...searchParams.keys()].some((name) => !allowed.has(name)) ||
+    [...allowed].some((name) => searchParams.getAll(name).length !== 1)
+  ) {
+    return null;
+  }
+  const afterOrdinal = searchParams.get("after_ordinal") ?? "";
+  const limit = searchParams.get("limit") ?? "";
+  if (
+    !(
+      UNSIGNED_INTEGER_PATTERN.test(afterOrdinal) &&
+      UNSIGNED_INTEGER_PATTERN.test(limit)
+    )
+  ) {
+    return null;
+  }
+  const request = {
+    after_ordinal: Number(afterOrdinal),
+    dataset_id: searchParams.get("dataset_id") ?? "",
+    limit: Number(limit),
+    materialization_id: searchParams.get("materialization_id") ?? "",
+    workbook_id: workbookId,
+  };
+  return validateWorkbookGetRequest(request) ? request : null;
+};
+
+const contextDocumentFromContract = (
+  document: GtmContextCommandRequest["context"]
+): GtmContextDocument =>
+  ({
+    assertions: document.assertions.map((assertion) => ({
+      provenance: {
+        ...(assertion.provenance.actor_id === undefined
+          ? {}
+          : { actorId: assertion.provenance.actor_id }),
+        recordedAtMs: assertion.provenance.recorded_at_ms,
+        source: assertion.provenance.source,
+      },
+      questionId: assertion.question_id,
+      state: assertion.state,
+      ...("value" in assertion ? { value: assertion.value } : {}),
+    })),
+    contextId: document.context_id,
+    name: document.name,
+    questionnaireVersion: document.questionnaire_version,
+  }) as GtmContextDocument;
+
+const playDefinitionFromContract = (
+  play: PlayCommandRequest["play"]
+): GtmPlayDefinition => {
+  const source =
+    play.source.kind === "organization_search"
+      ? {
+          countries: play.source.countries,
+          industries: play.source.industries,
+          keywords: play.source.keywords,
+          kind: play.source.kind,
+        }
+      : {
+          datasetId: play.source.dataset_id,
+          ...(play.source.default_country_code === undefined
+            ? {}
+            : { defaultCountryCode: play.source.default_country_code }),
+          fieldMapping: {
+            ...(play.source.field_mapping.country_code === undefined
+              ? {}
+              : {
+                  countryCode: play.source.field_mapping.country_code,
+                }),
+            domain: play.source.field_mapping.domain,
+            ...(play.source.field_mapping.name === undefined
+              ? {}
+              : { name: play.source.field_mapping.name }),
+          },
+          kind: play.source.kind,
+          materializationId: play.source.materialization_id,
+        };
+  return {
+    approvals: {
+      export: play.approvals.export,
+      providerSpend: play.approvals.provider_spend,
+      reveal: play.approvals.reveal,
+    },
+    authorityEnvelopeId: play.authority_envelope_id,
+    audience: {
+      companyCountries: play.audience.company_countries,
+      departments: play.audience.departments,
+      personCountries: play.audience.person_countries,
+      seniorities: play.audience.seniorities,
+      titles: play.audience.titles,
+    },
+    broadening: play.broadening,
+    budget: play.budget,
+    capabilities: play.capabilities,
+    contextRef: {
+      contextId: play.context_ref.context_id,
+      fingerprint: play.context_ref.fingerprint,
+      revision: play.context_ref.revision,
+    },
+    deadlineMs: play.deadline_ms,
+    delivery: {
+      mode: play.delivery.mode,
+      privateExport: play.delivery.private_export,
+    },
+    exclusions: play.exclusions,
+    objective: play.objective,
+    playId: play.play_id,
+    preview: {
+      maxCompanies: play.preview.max_companies,
+      maxContactsPerCompany: play.preview.max_contacts_per_company,
+      maxContactsTotal: play.preview.max_contacts_total,
+      maxProviderCalls: play.preview.max_provider_calls,
+      sampleSize: play.preview.sample_size,
+    },
+    selection: {
+      minimumScore: play.selection.minimum_score,
+      requiredSignals: play.selection.required_signals,
+    },
+    source,
+    stopConditions: play.stop_conditions,
+  } as GtmPlayDefinition;
+};
+
+const workbookViewWriteFromContract = (
+  request: WorkbookUpdateRequest
+): GtmWorkbookViewWrite =>
+  ({
+    annotations: request.annotations.map((annotation) => ({
+      createdAtMs: annotation.created_at_ms,
+      createdByActorId: annotation.created_by_actor_id,
+      note: annotation.note,
+      recordId: annotation.record_id,
+    })),
+    approvals: request.approvals.map((approval) => ({
+      createdAtMs: approval.created_at_ms,
+      createdByActorId: approval.created_by_actor_id,
+      decision: approval.decision,
+      recordId: approval.record_id,
+    })),
+    columnOrder: request.column_order,
+    ...(request.context_ref === undefined
+      ? {}
+      : {
+          contextRef: {
+            contextId: request.context_ref.context_id,
+            fingerprint: request.context_ref.fingerprint,
+            revision: request.context_ref.revision,
+          },
+        }),
+    datasetId: request.dataset_id,
+    expectedRevision: request.expected_revision,
+    filters: request.filters.map((filter) => ({
+      fieldKey: filter.field_key,
+      operator: filter.operator,
+      ...(filter.value === undefined ? {} : { value: filter.value }),
+    })),
+    materializationId: request.materialization_id,
+    name: request.name,
+    ...(request.play_id === undefined ? {} : { playId: request.play_id }),
+    ...(request.play_revision === undefined
+      ? {}
+      : { playRevision: request.play_revision }),
+    ...(request.play_run_id === undefined
+      ? {}
+      : { playRunId: request.play_run_id }),
+    ...(request.recipe_application_id === undefined
+      ? {}
+      : { recipeApplicationId: request.recipe_application_id }),
+    selectionReasons: request.selection_reasons.map((selection) => ({
+      reasons: selection.reasons,
+      recordId: selection.record_id,
+    })),
+    selectedRecordIds: request.selected_record_ids,
+    workbookId: request.workbook_id,
+  }) as unknown as GtmWorkbookViewWrite;
+
+const snakeCaseKey = (key: string): string =>
+  key.replace(/[A-Z]/gu, (character) => `_${character.toLowerCase()}`);
+
+const toContractProjection = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    return value.map(toContractProjection);
+  }
+  if (value !== null && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [
+        snakeCaseKey(key),
+        toContractProjection(entry),
+      ])
+    );
+  }
+  return value;
+};
+
+const playRunProjection = (
+  run: NonNullable<Awaited<ReturnType<GtmService["getPlayRun"]>>>
+): unknown => {
+  const { definition, executionActor: _executionActor, ...publicRun } = run;
+  return toContractProjection({ ...publicRun, play: definition });
+};
+
+const hasActorPermission = (
+  actor: AuthenticatedActor,
+  permission: string
+): boolean => actor.permissions.includes(permission);
+
+const gtmFailureProblem = (
+  issues: readonly Readonly<{ code: string }>[]
+): ProblemCode => {
+  if (issues.some((issue) => issue.code === "permission-missing")) {
+    return "authority-permission-missing";
+  }
+  if (issues.some((issue) => issue.code === "revision-conflict")) {
+    return "revision-conflict";
+  }
+  if (
+    issues.some(
+      (issue) =>
+        issue.code === "context-not-found" ||
+        issue.code === "workbook-not-found"
+    )
+  ) {
+    return "gtm-resource-not-found";
+  }
+  return "request-invalid";
+};
+
 const validateOutput = (
   context: AdapterContext,
   validate: ValidateFunction,
@@ -2674,6 +3033,480 @@ export const createHttpApp = (
     const contractFailure = validateOutput(
       context,
       validateCapabilitiesListResponse,
+      responseBody
+    );
+    return contractFailure ?? context.json(responseBody);
+  });
+
+  app.get("/v1/gtm-context-questionnaires/:profile", async (context) => {
+    context.header("cache-control", "private, no-store");
+    const authentication = await authenticate(
+      context,
+      dependencies.authenticateApiKey,
+      maxAuthorizationHeaderBytes
+    );
+    if (!authentication.ok) {
+      return authentication.response;
+    }
+    if (dependencies.gtm === undefined) {
+      return problemResponse(context, "service-unavailable");
+    }
+    if (!hasActorPermission(authentication.actor, "contexts:read")) {
+      return problemResponse(context, "authority-permission-missing");
+    }
+    const requestValue: unknown = { profile: context.req.param("profile") };
+    if (!validateGtmQuestionnaireRequest(requestValue)) {
+      return problemResponse(context, "request-invalid");
+    }
+    const responseBody = {
+      profile: requestValue.profile,
+      questionnaire_version: "1.0.0",
+      questions: dependencies.gtm
+        .questionnaire()
+        .filter((question) =>
+          question.requiredFor.includes(requestValue.profile)
+        )
+        .map((question) => ({
+          answer_schema: {
+            ...(question.enumValues === undefined
+              ? {}
+              : { enum_values: question.enumValues }),
+            type: question.answerType,
+          },
+          ...(question.askIf === undefined
+            ? {}
+            : {
+                ask_if: {
+                  equals: question.askIf.equals,
+                  question_id: question.askIf.questionId,
+                },
+              }),
+          prompt: question.prompt,
+          question_id: question.questionId,
+          required_for: question.requiredFor,
+          requires_human_confirmation: question.requiresHumanConfirmation,
+          section: question.section,
+          sensitivity: question.sensitivity,
+        })),
+    };
+    const contractFailure = validateOutput(
+      context,
+      validateGtmQuestionnaireResponse,
+      responseBody
+    );
+    return contractFailure ?? context.json(responseBody);
+  });
+
+  app.post("/v1/gtm-context-plans", async (context) => {
+    context.header("cache-control", "private, no-store");
+    const authentication = await authenticate(
+      context,
+      dependencies.authenticateApiKey,
+      maxAuthorizationHeaderBytes
+    );
+    if (!authentication.ok) {
+      return authentication.response;
+    }
+    if (dependencies.gtm === undefined) {
+      return problemResponse(context, "service-unavailable");
+    }
+    if (!hasActorPermission(authentication.actor, "contexts:read")) {
+      return problemResponse(context, "authority-permission-missing");
+    }
+    if (!hasJsonMediaType(context.req.header("content-type"))) {
+      return problemResponse(context, "unsupported-media-type");
+    }
+    const parsed = await readJsonBody(context.req.raw, maxBodyBytes);
+    if (
+      !(
+        parsed.ok &&
+        validateGtmContextCommandRequest(parsed.value) &&
+        parsed.value.mode === "plan"
+      )
+    ) {
+      return problemResponse(
+        context,
+        parsed.ok ? "request-invalid" : parsed.code
+      );
+    }
+    const result = dependencies.gtm.planContext(
+      contextDocumentFromContract(parsed.value.context),
+      parsed.value.expected_base_revision
+    );
+    const responseBody = {
+      blocking_question_ids: result.blockingQuestionIds,
+      context: toContractProjection(result.context),
+      ...(result.expectedBaseRevision === undefined
+        ? {}
+        : { expected_base_revision: result.expectedBaseRevision }),
+      fingerprint: result.fingerprint,
+      issues: toContractProjection(result.issues),
+      mode: "plan",
+      ready_for: result.readyFor,
+    };
+    const contractFailure = validateOutput(
+      context,
+      validateGtmContextCommandResponse,
+      responseBody
+    );
+    return contractFailure ?? context.json(responseBody);
+  });
+
+  app.post("/v1/gtm-context-revisions", async (context) => {
+    context.header("cache-control", "private, no-store");
+    const authentication = await authenticate(
+      context,
+      dependencies.authenticateApiKey,
+      maxAuthorizationHeaderBytes
+    );
+    if (!authentication.ok) {
+      return authentication.response;
+    }
+    if (dependencies.gtm === undefined) {
+      return problemResponse(context, "service-unavailable");
+    }
+    if (!hasJsonMediaType(context.req.header("content-type"))) {
+      return problemResponse(context, "unsupported-media-type");
+    }
+    const parsed = await readJsonBody(context.req.raw, maxBodyBytes);
+    if (
+      !(
+        parsed.ok &&
+        validateGtmContextCommandRequest(parsed.value) &&
+        parsed.value.mode === "apply"
+      )
+    ) {
+      return problemResponse(
+        context,
+        parsed.ok ? "request-invalid" : parsed.code
+      );
+    }
+    const result = await dependencies.gtm.applyContext(authentication.actor, {
+      activate: parsed.value.activate,
+      confirmActiveChange: parsed.value.confirm_active_change,
+      confirmed: parsed.value.confirmed,
+      document: contextDocumentFromContract(parsed.value.context),
+      ...(parsed.value.expected_base_revision === undefined
+        ? {}
+        : { expectedBaseRevision: parsed.value.expected_base_revision }),
+      planFingerprint: parsed.value.plan_fingerprint,
+    });
+    if (!result.ok) {
+      return problemResponse(context, gtmFailureProblem(result.issues));
+    }
+    const responseBody = {
+      active: result.active,
+      mode: "apply",
+      revision: {
+        context: toContractProjection(result.revision.document),
+        context_id: result.revision.contextId,
+        created_at_ms: result.revision.createdAtMs,
+        created_by_actor_id: result.revision.createdByActorId,
+        fingerprint: result.revision.fingerprint,
+        revision: result.revision.revision,
+        workspace_id: result.revision.workspaceId,
+      },
+      status: result.status,
+    };
+    const contractFailure = validateOutput(
+      context,
+      validateGtmContextCommandResponse,
+      responseBody
+    );
+    return contractFailure ?? context.json(responseBody);
+  });
+
+  app.get("/v1/gtm-context-status/:profile", async (context) => {
+    context.header("cache-control", "private, no-store");
+    const authentication = await authenticate(
+      context,
+      dependencies.authenticateApiKey,
+      maxAuthorizationHeaderBytes
+    );
+    if (!authentication.ok) {
+      return authentication.response;
+    }
+    if (dependencies.gtm === undefined) {
+      return problemResponse(context, "service-unavailable");
+    }
+    if (!hasActorPermission(authentication.actor, "contexts:read")) {
+      return problemResponse(context, "authority-permission-missing");
+    }
+    const requestValue: unknown = { profile: context.req.param("profile") };
+    if (!validateGtmContextStatusRequest(requestValue)) {
+      return problemResponse(context, "request-invalid");
+    }
+    const result = await dependencies.gtm.status(authentication.actor);
+    const readiness = result.readiness.find(
+      (candidate) => candidate.profile === requestValue.profile
+    );
+    if (readiness === undefined) {
+      return problemResponse(context, "output-contract-violation");
+    }
+    const revisionSummary = (revision: NonNullable<typeof result.active>) => ({
+      context_id: revision.contextId,
+      fingerprint: revision.fingerprint,
+      questionnaire_version: revision.document.questionnaireVersion,
+      revision: revision.revision,
+    });
+    const responseBody = {
+      ...(result.active === undefined
+        ? {}
+        : { active_context: revisionSummary(result.active) }),
+      blocking_question_ids: readiness.blockingQuestionIds,
+      business_context: readiness.businessContext,
+      ...(result.latest === undefined
+        ? {}
+        : { latest_context: revisionSummary(result.latest) }),
+      profile: readiness.profile,
+      ready: readiness.ready,
+      remediation: readiness.remediation,
+    };
+    const contractFailure = validateOutput(
+      context,
+      validateGtmContextStatusResponse,
+      responseBody
+    );
+    return contractFailure ?? context.json(responseBody);
+  });
+
+  app.post("/v1/play-previews", async (context) => {
+    context.header("cache-control", "private, no-store");
+    const authentication = await authenticate(
+      context,
+      dependencies.authenticateApiKey,
+      maxAuthorizationHeaderBytes
+    );
+    if (!authentication.ok) {
+      return authentication.response;
+    }
+    if (dependencies.gtm === undefined) {
+      return problemResponse(context, "service-unavailable");
+    }
+    if (!hasActorPermission(authentication.actor, "plays:read")) {
+      return problemResponse(context, "authority-permission-missing");
+    }
+    if (!hasJsonMediaType(context.req.header("content-type"))) {
+      return problemResponse(context, "unsupported-media-type");
+    }
+    const parsed = await readJsonBody(context.req.raw, maxBodyBytes);
+    if (
+      !(
+        parsed.ok &&
+        validatePlayCommandRequest(parsed.value) &&
+        parsed.value.action === "preview"
+      )
+    ) {
+      return problemResponse(
+        context,
+        parsed.ok ? "request-invalid" : parsed.code
+      );
+    }
+    const result = await dependencies.gtm.previewPlay(
+      authentication.actor,
+      playDefinitionFromContract(parsed.value.play)
+    );
+    const responseBody = {
+      action: "preview",
+      compilation: toContractProjection(result.compilation),
+      fingerprint: result.fingerprint,
+      issues: toContractProjection(result.issues),
+      lifecycle: result.lifecycle,
+      play: toContractProjection(result.definition),
+      requires_human_approval: result.requiresHumanApproval,
+    };
+    const contractFailure = validateOutput(
+      context,
+      validatePlayCommandResponse,
+      responseBody
+    );
+    return contractFailure ?? context.json(responseBody);
+  });
+
+  app.post("/v1/play-revisions", async (context) => {
+    context.header("cache-control", "private, no-store");
+    const authentication = await authenticate(
+      context,
+      dependencies.authenticateApiKey,
+      maxAuthorizationHeaderBytes
+    );
+    if (!authentication.ok) {
+      return authentication.response;
+    }
+    if (dependencies.gtm === undefined) {
+      return problemResponse(context, "service-unavailable");
+    }
+    if (!hasJsonMediaType(context.req.header("content-type"))) {
+      return problemResponse(context, "unsupported-media-type");
+    }
+    const parsed = await readJsonBody(context.req.raw, maxBodyBytes);
+    if (
+      !(
+        parsed.ok &&
+        validatePlayCommandRequest(parsed.value) &&
+        parsed.value.action !== "preview"
+      )
+    ) {
+      return problemResponse(
+        context,
+        parsed.ok ? "request-invalid" : parsed.code
+      );
+    }
+    const result = await dependencies.gtm.applyPlay(authentication.actor, {
+      action: parsed.value.action,
+      approvedByHuman: parsed.value.approved_by_human,
+      definition: playDefinitionFromContract(parsed.value.play),
+      ...(parsed.value.expected_base_revision === undefined
+        ? {}
+        : { expectedBaseRevision: parsed.value.expected_base_revision }),
+      idempotencyKey: parsed.value.idempotency_key,
+      previewFingerprint: parsed.value.preview_fingerprint,
+    });
+    if (!result.ok) {
+      return problemResponse(context, gtmFailureProblem(result.issues));
+    }
+    const revision = {
+      compilation: toContractProjection(result.revision.compilation),
+      created_at_ms: result.revision.createdAtMs,
+      created_by_actor_id: result.revision.createdByActorId,
+      fingerprint: result.revision.fingerprint,
+      lifecycle: result.revision.lifecycle,
+      play: toContractProjection(result.revision.definition),
+      play_id: result.revision.playId,
+      revision: result.revision.revision,
+      workspace_id: result.revision.workspaceId,
+    };
+    const responseBody = {
+      action: parsed.value.action,
+      revision,
+      ...(result.run === undefined
+        ? {}
+        : { run: playRunProjection(result.run) }),
+    };
+    const contractFailure = validateOutput(
+      context,
+      validatePlayCommandResponse,
+      responseBody
+    );
+    return contractFailure ?? context.json(responseBody);
+  });
+
+  app.get("/v1/play-runs/:run_id", async (context) => {
+    context.header("cache-control", "private, no-store");
+    const authentication = await authenticate(
+      context,
+      dependencies.authenticateApiKey,
+      maxAuthorizationHeaderBytes
+    );
+    if (!authentication.ok) {
+      return authentication.response;
+    }
+    if (dependencies.gtm === undefined) {
+      return problemResponse(context, "service-unavailable");
+    }
+    if (!hasActorPermission(authentication.actor, "plays:read")) {
+      return problemResponse(context, "authority-permission-missing");
+    }
+    const requestValue: unknown = { run_id: context.req.param("run_id") };
+    if (!validatePlayRunGetRequest(requestValue)) {
+      return problemResponse(context, "request-invalid");
+    }
+    const run = await dependencies.gtm.getPlayRun(
+      authentication.actor,
+      requestValue.run_id
+    );
+    if (run === undefined) {
+      return problemResponse(context, "gtm-resource-not-found");
+    }
+    const responseBody = { run: playRunProjection(run) };
+    const contractFailure = validateOutput(
+      context,
+      validatePlayRunGetResponse,
+      responseBody
+    );
+    return contractFailure ?? context.json(responseBody);
+  });
+
+  app.get("/v1/workbooks/:workbook_id", async (context) => {
+    context.header("cache-control", "private, no-store");
+    const authentication = await authenticate(
+      context,
+      dependencies.authenticateApiKey,
+      maxAuthorizationHeaderBytes
+    );
+    if (!authentication.ok) {
+      return authentication.response;
+    }
+    if (dependencies.gtm === undefined) {
+      return problemResponse(context, "service-unavailable");
+    }
+    const requestValue = workbookGetRequestFromUrl(
+      context.req.url,
+      context.req.param("workbook_id")
+    );
+    if (requestValue === null) {
+      return problemResponse(context, "request-invalid");
+    }
+    const result = await dependencies.gtm.getWorkbook(authentication.actor, {
+      afterOrdinal: requestValue.after_ordinal,
+      datasetId: requestValue.dataset_id as Parameters<
+        GtmService["getWorkbook"]
+      >[1]["datasetId"],
+      limit: requestValue.limit,
+      materializationId: requestValue.materialization_id as Parameters<
+        GtmService["getWorkbook"]
+      >[1]["materializationId"],
+      workbookId: requestValue.workbook_id,
+    });
+    if (!result.ok) {
+      return problemResponse(context, gtmFailureProblem(result.issues));
+    }
+    const responseBody = toContractProjection(result.page);
+    const contractFailure = validateOutput(
+      context,
+      validateWorkbookGetResponse,
+      responseBody
+    );
+    return contractFailure ?? context.json(responseBody);
+  });
+
+  app.put("/v1/workbooks/:workbook_id", async (context) => {
+    context.header("cache-control", "private, no-store");
+    const authentication = await authenticate(
+      context,
+      dependencies.authenticateApiKey,
+      maxAuthorizationHeaderBytes
+    );
+    if (!authentication.ok) {
+      return authentication.response;
+    }
+    if (dependencies.gtm === undefined) {
+      return problemResponse(context, "service-unavailable");
+    }
+    if (!hasJsonMediaType(context.req.header("content-type"))) {
+      return problemResponse(context, "unsupported-media-type");
+    }
+    const parsed = await readJsonBody(context.req.raw, maxBodyBytes);
+    if (!(parsed.ok && validateWorkbookUpdateRequest(parsed.value))) {
+      return problemResponse(
+        context,
+        parsed.ok ? "request-invalid" : parsed.code
+      );
+    }
+    if (parsed.value.workbook_id !== context.req.param("workbook_id")) {
+      return problemResponse(context, "request-invalid");
+    }
+    const result = await dependencies.gtm.saveWorkbook(
+      authentication.actor,
+      workbookViewWriteFromContract(parsed.value)
+    );
+    if (!result.ok) {
+      return problemResponse(context, gtmFailureProblem(result.issues));
+    }
+    const responseBody = { view: toContractProjection(result.view) };
+    const contractFailure = validateOutput(
+      context,
+      validateWorkbookUpdateResponse,
       responseBody
     );
     return contractFailure ?? context.json(responseBody);
@@ -3820,6 +4653,14 @@ export const createHttpApp = (
   app.all("/healthz", methodNotAllowed("GET"));
   app.all("/readyz", methodNotAllowed("GET"));
   app.all("/v1/capabilities", methodNotAllowed("GET"));
+  app.all("/v1/gtm-context-questionnaires/:profile", methodNotAllowed("GET"));
+  app.all("/v1/gtm-context-plans", methodNotAllowed("POST"));
+  app.all("/v1/gtm-context-revisions", methodNotAllowed("POST"));
+  app.all("/v1/gtm-context-status/:profile", methodNotAllowed("GET"));
+  app.all("/v1/play-previews", methodNotAllowed("POST"));
+  app.all("/v1/play-revisions", methodNotAllowed("POST"));
+  app.all("/v1/play-runs/:run_id", methodNotAllowed("GET"));
+  app.all("/v1/workbooks/:workbook_id", methodNotAllowed("GET, PUT"));
   app.all("/v1/plans", methodNotAllowed("POST"));
   app.all("/v1/runs", methodNotAllowed("POST"));
   app.all("/v1/runs/:run_id", methodNotAllowed("GET"));

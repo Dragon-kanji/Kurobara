@@ -1,0 +1,86 @@
+{
+  "action": "preview",
+  "compilation": {
+    "assumptions": [],
+    "authority": {
+      "human_gates": [],
+      "permissions": ["plays:execute"]
+    },
+    "budget": {
+      "limit": 1,
+      "quoted_upper_bound": 1,
+      "unit": "credits"
+    },
+    "deadline_ms": 2000000000000,
+    "export_mode": "no_send",
+    "intention_hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "stages": [
+      {
+        "input_fingerprint": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "operation_id": "runs.create",
+        "ordinal": 1
+      }
+    ]
+  },
+  "fingerprint": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+  "issues": [],
+  "lifecycle": "previewed",
+  "play": {
+    "approvals": {
+      "export": false,
+      "provider_spend": false,
+      "reveal": false
+    },
+    "authority_envelope_id": "authority-synthetic-play",
+    "audience": {
+      "company_countries": ["FR"],
+      "departments": [],
+      "person_countries": [],
+      "seniorities": [],
+      "titles": []
+    },
+    "broadening": "forbidden",
+    "budget": {
+      "limit": 1,
+      "unit": "credits"
+    },
+    "capabilities": ["contacts.discover"],
+    "context_ref": {
+      "context_id": "synthetic-context",
+      "fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "revision": 1
+    },
+    "deadline_ms": 2000000000000,
+    "delivery": {
+      "mode": "no_send",
+      "private_export": false
+    },
+    "exclusions": [],
+    "objective": {
+      "metric": "contacts",
+      "target": 1,
+      "text": "Find one contact"
+    },
+    "play_id": "synthetic-play",
+    "preview": {
+      "max_companies": 1,
+      "max_contacts_per_company": 1,
+      "max_contacts_total": 1,
+      "max_provider_calls": 0,
+      "sample_size": 1
+    },
+    "selection": {
+      "minimum_score": 0,
+      "required_signals": []
+    },
+    "source": {
+      "countries": ["FR"],
+      "industries": [],
+      "keywords": [],
+      "kind": "organization_search"
+    },
+    "stop_conditions": ["done"]
+  },
+  "requires_human_approval": false,
+  "run": {}
+}

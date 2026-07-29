@@ -32,12 +32,12 @@ const MAX_CONTACTS_PER_COMPANY = 2;
 const MAX_CONTACTS_TOTAL = 12;
 const MAX_IDENTITY_SELECTION = 3;
 const MAX_FILTER_VALUES = 32;
-const CATALOG_VERSION = "0.12.0";
+const CATALOG_VERSION = "0.13.0";
 
 // Build-time bindings to the canonical dataset-generation page contracts.
 // They intentionally avoid a runtime dependency on the contracts workspace.
 export const APOLLO_CATALOG_FINGERPRINT =
-  "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4";
+  "sha256:1466e9c9bff8bc3c3f3c5e330a5770cb57429cb03bd9a75cc0701c9a71c9744e";
 const DATASET_GENERATION_PAGE_INPUT_SCHEMA_FINGERPRINT =
   "sha256:40153b13ed33d9bf086dcfde537ce1e17946b0e82b6e0461683c42c24a382a55";
 const DATASET_GENERATION_PAGE_INPUT_SCHEMA_ID =

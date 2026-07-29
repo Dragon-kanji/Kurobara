@@ -3,6 +3,7 @@
   "publication_status": "source-preview",
   "commands": [
     "doctor",
+    "context setup",
     "first-run",
     "provider configure",
     "provider disable",
@@ -21,6 +22,10 @@
     "update check"
   ],
   "product_commands": [
+    "context apply",
+    "context plan",
+    "context questions",
+    "context status",
     "contact restrict",
     "contact results",
     "contact search",
@@ -35,10 +40,15 @@
     "dataset import",
     "dataset export-status",
     "dataset export-revoke",
+    "play apply",
+    "play preview",
+    "play run",
     "recipe export",
     "recipe watch",
     "recipe apply",
-    "run cancel"
+    "run cancel",
+    "workbook get",
+    "workbook update"
   ],
   "setup_phases": ["detect", "plan", "confirm", "apply", "verify"],
   "profiles": ["local", "remote"],
@@ -66,5 +76,16 @@
     "provider_keys_server_side_only": true,
     "remote_provider_secret_writes_forbidden": true,
     "fallback_file_mode": "0600"
+  },
+  "doctor": {
+    "business_profiles": [
+      "offline_fixture",
+      "dataset_import",
+      "imported_dataset_enrichment",
+      "agentic_outbound_play"
+    ],
+    "default_profile": "agentic_outbound_play",
+    "provider_credit_spend": 0,
+    "side_effects": "read_only"
   }
 }

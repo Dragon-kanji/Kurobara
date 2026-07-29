@@ -1,0 +1,41 @@
+{
+  "operation_id": "workbooks.update",
+  "operation_version": "1.0.0",
+  "action_ref": "UpdateWorkbook",
+  "kind": "mutation",
+  "auth_profile": "http-bearer",
+  "idempotence": "required",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/workbooks/update-request/1.0.0",
+  "output_schema_id": "https://schemas.kurobara.invalid/schemas/workbooks/update-response/1.0.0",
+  "problem_codes": [
+    "authentication-required",
+    "authority-permission-missing",
+    "internal-error",
+    "invalid-credential",
+    "output-contract-violation",
+    "payload-too-large",
+    "request-invalid",
+    "revision-conflict",
+    "service-unavailable",
+    "unsupported-media-type"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["workbooks:write"],
+  "human_gates": [],
+  "accepted_data_classes": ["confidential"],
+  "produced_data_classes": ["confidential"],
+  "status": "experimental",
+  "projections": {
+    "rest": {
+      "method": "PUT",
+      "path": "/v1/workbooks/{workbook_id}",
+      "path_parameters": ["workbook_id"]
+    },
+    "sdk_ts": { "method": "workbooks.update" },
+    "cli": { "command": "workbook update", "output_mode": "json" },
+    "mcp": {
+      "availability": "available",
+      "tool": "kurobara_workbook_update"
+    }
+  }
+}

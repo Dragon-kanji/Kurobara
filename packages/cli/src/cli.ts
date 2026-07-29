@@ -18,18 +18,31 @@ import {
   type DatasetImportMetadata,
   type DatasetImportSource,
   type ExportDeliveryState,
+  type GtmContextCommand,
+  type GtmContextStatusInput,
+  type GtmQuestionnaireInput,
   KurobaraConfigError,
   type KurobaraExportStream,
   KurobaraProblemError,
   KurobaraTransportError,
   type OrganizationCandidatesListResponse,
   type OrganizationDiscoverRequest,
+  type PlayCommand,
+  type PlayRun,
+  type PlayRunGetInput,
   parseRecipeApplyRequest,
   type RecipeApplicationExportRequest,
   type RecipeApplicationGetResponse,
   type RecipeApplyRequest,
   type SelectedContactDerivationRequest,
+  type WorkbookGetInput,
+  type WorkbookUpdateInput,
 } from "@kurobara/sdk";
+import {
+  clearHumanPlayRunProgress,
+  renderHumanCommandResult,
+  renderHumanPlayRunProgress,
+} from "./human-output.ts";
 import { runOnboardingCli } from "./onboarding.ts";
 
 const DEFAULT_ENDPOINT = "http://127.0.0.1:3000";
@@ -105,6 +118,33 @@ const EXPORT_DELIVERY_GET_COMMAND = cliCommands.commands.find(
 const EXPORT_DELIVERY_REVOKE_COMMAND = cliCommands.commands.find(
   (command) => command.operation_id === "export-deliveries.revoke"
 );
+const GTM_QUESTIONS_COMMAND = cliCommands.commands.find(
+  (command) => command.operation_id === "gtm-contexts.questionnaire.get"
+);
+const GTM_CONTEXT_PLAN_COMMAND = cliCommands.commands.find(
+  (command) => command.operation_id === "gtm-contexts.plan"
+);
+const GTM_CONTEXT_APPLY_COMMAND = cliCommands.commands.find(
+  (command) => command.operation_id === "gtm-contexts.apply"
+);
+const GTM_CONTEXT_STATUS_COMMAND = cliCommands.commands.find(
+  (command) => command.operation_id === "gtm-contexts.status.get"
+);
+const PLAY_PREVIEW_COMMAND = cliCommands.commands.find(
+  (command) => command.operation_id === "plays.preview"
+);
+const PLAY_APPLY_COMMAND = cliCommands.commands.find(
+  (command) => command.operation_id === "plays.apply"
+);
+const PLAY_RUN_COMMAND = cliCommands.commands.find(
+  (command) => command.operation_id === "play-runs.get"
+);
+const WORKBOOK_GET_COMMAND = cliCommands.commands.find(
+  (command) => command.operation_id === "workbooks.get"
+);
+const WORKBOOK_UPDATE_COMMAND = cliCommands.commands.find(
+  (command) => command.operation_id === "workbooks.update"
+);
 
 if (
   DATASET_IMPORT_COMMAND === undefined ||
@@ -124,7 +164,16 @@ if (
   DATASET_GENERATION_CANCEL_COMMAND === undefined ||
   DATASET_GENERATION_WATCH_COMMAND === undefined ||
   EXPORT_DELIVERY_GET_COMMAND === undefined ||
-  EXPORT_DELIVERY_REVOKE_COMMAND === undefined
+  EXPORT_DELIVERY_REVOKE_COMMAND === undefined ||
+  GTM_QUESTIONS_COMMAND === undefined ||
+  GTM_CONTEXT_PLAN_COMMAND === undefined ||
+  GTM_CONTEXT_APPLY_COMMAND === undefined ||
+  GTM_CONTEXT_STATUS_COMMAND === undefined ||
+  PLAY_PREVIEW_COMMAND === undefined ||
+  PLAY_APPLY_COMMAND === undefined ||
+  PLAY_RUN_COMMAND === undefined ||
+  WORKBOOK_GET_COMMAND === undefined ||
+  WORKBOOK_UPDATE_COMMAND === undefined
 ) {
   throw new Error("The generated Kurobara CLI contracts are unavailable.");
 }
@@ -340,7 +389,35 @@ type ContactDerivationArguments = Readonly<{
     | Readonly<{ command: "contacts.work-email.verify" }>
   );
 
+type AgentSurfaceArguments = Readonly<{
+  apiKeyFile?: string;
+  endpoint: string;
+}> &
+  (
+    | Readonly<{
+        command: "gtm-contexts.questionnaire.get" | "gtm-contexts.status.get";
+        profile: GtmQuestionnaireInput["profile"];
+      }>
+    | Readonly<{
+        command:
+          | "gtm-contexts.apply"
+          | "gtm-contexts.plan"
+          | "plays.apply"
+          | "plays.preview"
+          | "workbooks.get"
+          | "workbooks.update";
+        requestFile: string;
+      }>
+    | Readonly<{
+        command: "play-runs.get";
+        pollIntervalMs: number;
+        runId: string;
+        timeoutMs: number;
+      }>
+  );
+
 type CliArguments =
+  | AgentSurfaceArguments
   | ContactPrivacyRestrictArguments
   | ContactResultsArguments
   | ContactSearchArguments
@@ -1449,11 +1526,150 @@ const parseRunCancelArguments = (
   };
 };
 
+const GTM_PROFILES = new Set<GtmQuestionnaireInput["profile"]>([
+  "offline_fixture",
+  "dataset_import",
+  "imported_dataset_enrichment",
+  "agentic_outbound_play",
+]);
+
+const parseGtmProfileArguments = (
+  argv: readonly string[],
+  environment: Readonly<Record<string, string | undefined>>,
+  command: "gtm-contexts.questionnaire.get" | "gtm-contexts.status.get"
+): AgentSurfaceArguments => {
+  const { values } = parseFlagValues(
+    argv,
+    new Set(["--api-key-file", "--endpoint", "--profile"]),
+    "Context profile arguments are invalid."
+  );
+  const profile = values.get("--profile");
+  if (
+    profile === undefined ||
+    !GTM_PROFILES.has(profile as GtmQuestionnaireInput["profile"])
+  ) {
+    throw new CliInputError(
+      "cli-usage-error",
+      "Context command requires a canonical --profile."
+    );
+  }
+  return {
+    ...commonArguments(values, environment),
+    command,
+    profile: profile as GtmQuestionnaireInput["profile"],
+  };
+};
+
+const parseAgentFileArguments = (
+  argv: readonly string[],
+  environment: Readonly<Record<string, string | undefined>>,
+  command:
+    | "gtm-contexts.apply"
+    | "gtm-contexts.plan"
+    | "plays.apply"
+    | "plays.preview"
+    | "workbooks.get"
+    | "workbooks.update"
+): AgentSurfaceArguments => {
+  const { values } = parseFlagValues(
+    argv,
+    new Set(["--api-key-file", "--endpoint", "--request"]),
+    "Agent command arguments are invalid."
+  );
+  const requestFile = values.get("--request");
+  if (requestFile === undefined || requestFile.length === 0) {
+    throw new CliInputError(
+      "cli-usage-error",
+      "Agent command requires --request <json-file>."
+    );
+  }
+  return {
+    ...commonArguments(values, environment),
+    command,
+    requestFile,
+  };
+};
+
+const parsePlayRunArguments = (
+  argv: readonly string[],
+  environment: Readonly<Record<string, string | undefined>>
+): AgentSurfaceArguments => {
+  const { values } = parseFlagValues(
+    argv,
+    new Set([
+      "--api-key-file",
+      "--endpoint",
+      "--poll-interval-ms",
+      "--run-id",
+      "--timeout-ms",
+    ]),
+    "Play run arguments are invalid."
+  );
+  const runId = values.get("--run-id");
+  if (runId === undefined || runId.length === 0) {
+    throw new CliInputError("cli-usage-error", "Play run requires --run-id.");
+  }
+  return {
+    ...commonArguments(values, environment),
+    command: "play-runs.get",
+    pollIntervalMs: parseBoundedInteger(
+      values.get("--poll-interval-ms") ??
+        String(DEFAULT_WATCH_POLL_INTERVAL_MS),
+      MIN_WATCH_POLL_INTERVAL_MS,
+      MAX_WATCH_POLL_INTERVAL_MS,
+      "Play run --poll-interval-ms must be an integer from 100 to 60000."
+    ),
+    runId,
+    timeoutMs: parseBoundedInteger(
+      values.get("--timeout-ms") ?? "0",
+      0,
+      MAX_WATCH_TIMEOUT_MS,
+      "Play run --timeout-ms must be an integer from 0 to 86400000."
+    ),
+  };
+};
+
 const parseArguments = (
   argv: readonly string[],
   environment: Readonly<Record<string, string | undefined>>
 ): CliArguments => {
   switch (`${argv[0]}:${argv[1]}`) {
+    case "context:questions":
+      return parseGtmProfileArguments(
+        argv,
+        environment,
+        "gtm-contexts.questionnaire.get"
+      );
+    case "context:inspect":
+    case "context:status":
+      return parseGtmProfileArguments(
+        argv,
+        environment,
+        "gtm-contexts.status.get"
+      );
+    case "context:validate":
+    case "context:plan":
+      return parseAgentFileArguments(argv, environment, "gtm-contexts.plan");
+    case "context:apply":
+      return parseAgentFileArguments(argv, environment, "gtm-contexts.apply");
+    case "play:validate":
+    case "play:preview":
+      return parseAgentFileArguments(argv, environment, "plays.preview");
+    case "play:apply":
+    case "play:start":
+    case "play:pause":
+    case "play:retire":
+      return parseAgentFileArguments(argv, environment, "plays.apply");
+    case "play:run":
+      return parsePlayRunArguments(argv, environment);
+    case "workbook:get":
+    case "workbook:inspect":
+      return parseAgentFileArguments(argv, environment, "workbooks.get");
+    case "workbook:update":
+    case "workbook:select":
+    case "workbook:approve":
+    case "workbook:reject":
+      return parseAgentFileArguments(argv, environment, "workbooks.update");
     case "contact:search":
       return parseContactSearchArguments(argv, environment);
     case "contact:results":
@@ -1513,7 +1729,7 @@ const parseArguments = (
     default:
       throw new CliInputError(
         "cli-usage-error",
-        "Expected command: contact search, contact results, contact reveal-identity, contact enrich-email, contact verify-email, contact restrict, company search, company results, company watch, company cancel, dataset import, dataset export, dataset export-status, dataset export-revoke, recipe apply, recipe export, recipe watch, or run cancel."
+        "Expected a generated command such as context questions, play preview, workbook inspect, workbook select, workbook approve, workbook reject, contact reveal-identity, contact enrich-email, company search, dataset import, recipe apply, or run cancel."
       );
   }
 };
@@ -1748,6 +1964,24 @@ const readRecipeRequest = async (path: string): Promise<RecipeApplyRequest> => {
   }
 };
 
+const readAgentRequest = async (path: string): Promise<unknown> => {
+  const bytes = await readBoundedFile(
+    path,
+    MAX_RECIPE_REQUEST_FILE_BYTES,
+    "Agent request file"
+  );
+  try {
+    return JSON.parse(
+      new TextDecoder("utf-8", { fatal: true }).decode(bytes)
+    ) as unknown;
+  } catch {
+    throw new CliInputError(
+      "cli-input-invalid",
+      "Agent request file must contain bounded UTF-8 JSON."
+    );
+  }
+};
+
 const readApiKey = async (
   apiKeyFile: string | undefined,
   environment: Readonly<Record<string, string | undefined>>
@@ -1845,6 +2079,24 @@ const problemExitCode = (
 ): number => {
   const metadata = (() => {
     switch (command) {
+      case "gtm-contexts.questionnaire.get":
+        return GTM_QUESTIONS_COMMAND;
+      case "gtm-contexts.plan":
+        return GTM_CONTEXT_PLAN_COMMAND;
+      case "gtm-contexts.apply":
+        return GTM_CONTEXT_APPLY_COMMAND;
+      case "gtm-contexts.status.get":
+        return GTM_CONTEXT_STATUS_COMMAND;
+      case "plays.preview":
+        return PLAY_PREVIEW_COMMAND;
+      case "plays.apply":
+        return PLAY_APPLY_COMMAND;
+      case "play-runs.get":
+        return PLAY_RUN_COMMAND;
+      case "workbooks.get":
+        return WORKBOOK_GET_COMMAND;
+      case "workbooks.update":
+        return WORKBOOK_UPDATE_COMMAND;
       case "contact-privacy.restrict":
         return CONTACT_PRIVACY_RESTRICT_COMMAND;
       case "contacts.discover":
@@ -1890,7 +2142,17 @@ const problemExitCode = (
   );
 };
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Each generated command family keeps one stable, human-readable input error title.
 const invalidInputTitle = (command: CliArguments["command"]): string => {
+  if (command.startsWith("gtm-contexts.")) {
+    return "GTM Context input is invalid.";
+  }
+  if (command.startsWith("plays.") || command === "play-runs.get") {
+    return "Play input is invalid.";
+  }
+  if (command.startsWith("workbooks.")) {
+    return "Workbook input is invalid.";
+  }
   if (command === "contact-privacy.restrict") {
     return "Contact restriction input is invalid.";
   }
@@ -1973,6 +2235,7 @@ const waitFor = (milliseconds: number, signal?: AbortSignal): Promise<void> =>
 
 type WatchRuntime = Readonly<{
   now: () => number;
+  onPlayRunSnapshot?: (snapshot: PlayRun, pollCount: number) => void;
   signal?: AbortSignal;
   wait: (milliseconds: number, signal?: AbortSignal) => Promise<void>;
 }>;
@@ -2161,6 +2424,85 @@ const watchDatasetGeneration = async (
       if (snapshot.terminal) {
         return snapshot;
       }
+    }
+  } catch (error) {
+    if (deadline.elapsed()) {
+      throw timedOut();
+    }
+    if (runtime.signal?.aborted) {
+      throw aborted();
+    }
+    throw error;
+  } finally {
+    deadline.dispose();
+  }
+};
+
+const watchPlayRun = async (
+  parsed: Extract<
+    AgentSurfaceArguments,
+    Readonly<{ command: "play-runs.get" }>
+  >,
+  client: ReturnType<typeof createKurobaraClient>,
+  runtime: WatchRuntime
+): Promise<PlayRun> => {
+  const deadline = createWatchDeadline(parsed.timeoutMs, runtime.signal);
+  const startedAt = runtime.now();
+  const timedOut = (): CliWatchError =>
+    new CliWatchError("cli-watch-timeout", "Play run watch timed out.");
+  const aborted = (): CliWatchError =>
+    new CliWatchError("cli-watch-aborted", "Play run watch was aborted.");
+  const getSnapshot = async (): Promise<PlayRun> => {
+    if (deadline.signal.aborted) {
+      throw aborted();
+    }
+    try {
+      return await client.playRuns.get(
+        { run_id: parsed.runId } satisfies PlayRunGetInput,
+        requestOptions(deadline.signal)
+      );
+    } catch (error) {
+      if (deadline.signal.aborted) {
+        throw aborted();
+      }
+      throw error;
+    }
+  };
+  const shouldReturn = (snapshot: PlayRun): boolean =>
+    parsed.timeoutMs === 0 ||
+    snapshot.run.state === "paused" ||
+    snapshot.run.state === "completed" ||
+    snapshot.run.state === "failed" ||
+    snapshot.run.state === "cancelled";
+
+  try {
+    let pollCount = 1;
+    let snapshot = await getSnapshot();
+    if (shouldReturn(snapshot)) {
+      return snapshot;
+    }
+    runtime.onPlayRunSnapshot?.(snapshot, pollCount);
+    while (true) {
+      const remainingMs = parsed.timeoutMs - (runtime.now() - startedAt);
+      if (remainingMs <= 0) {
+        throw timedOut();
+      }
+      await runtime.wait(
+        Math.min(parsed.pollIntervalMs, remainingMs),
+        deadline.signal
+      );
+      if (runtime.signal?.aborted) {
+        throw aborted();
+      }
+      if (runtime.now() - startedAt >= parsed.timeoutMs) {
+        throw timedOut();
+      }
+      pollCount += 1;
+      snapshot = await getSnapshot();
+      if (shouldReturn(snapshot)) {
+        return snapshot;
+      }
+      runtime.onPlayRunSnapshot?.(snapshot, pollCount);
     }
   } catch (error) {
     if (deadline.elapsed()) {
@@ -2936,7 +3278,71 @@ const executeCommand = async (
   stdin: ReadableSource,
   stdout: WritableTarget,
   watchRuntime: WatchRuntime
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: This is the explicit generated-command dispatcher; each branch delegates to one bounded operation.
 ): Promise<unknown> => {
+  if (parsed.command === "gtm-contexts.questionnaire.get") {
+    return client.contexts.questions(
+      { profile: parsed.profile },
+      requestOptions(watchRuntime.signal)
+    );
+  }
+  if (parsed.command === "gtm-contexts.status.get") {
+    return client.contexts.status(
+      { profile: parsed.profile } satisfies GtmContextStatusInput,
+      requestOptions(watchRuntime.signal)
+    );
+  }
+  if (parsed.command === "gtm-contexts.plan") {
+    return client.contexts.plan(
+      (await readAgentRequest(parsed.requestFile)) as Extract<
+        GtmContextCommand,
+        Readonly<{ mode: "plan" }>
+      >,
+      requestOptions(watchRuntime.signal)
+    );
+  }
+  if (parsed.command === "gtm-contexts.apply") {
+    return client.contexts.apply(
+      (await readAgentRequest(parsed.requestFile)) as Extract<
+        GtmContextCommand,
+        Readonly<{ mode: "apply" }>
+      >,
+      requestOptions(watchRuntime.signal)
+    );
+  }
+  if (parsed.command === "plays.preview") {
+    return client.plays.preview(
+      (await readAgentRequest(parsed.requestFile)) as Extract<
+        PlayCommand,
+        Readonly<{ action: "preview" }>
+      >,
+      requestOptions(watchRuntime.signal)
+    );
+  }
+  if (parsed.command === "plays.apply") {
+    return client.plays.apply(
+      (await readAgentRequest(parsed.requestFile)) as Exclude<
+        PlayCommand,
+        Readonly<{ action: "preview" }>
+      >,
+      requestOptions(watchRuntime.signal)
+    );
+  }
+  if (parsed.command === "play-runs.get") {
+    return watchPlayRun(parsed, client, watchRuntime);
+  }
+  if (parsed.command === "workbooks.get") {
+    return client.workbooks.get(
+      (await readAgentRequest(parsed.requestFile)) as WorkbookGetInput,
+      requestOptions(watchRuntime.signal)
+    );
+  }
+  if (parsed.command === "workbooks.update") {
+    return client.workbooks.update(
+      (await readAgentRequest(parsed.requestFile)) as WorkbookUpdateInput,
+      requestOptions(watchRuntime.signal)
+    );
+  }
   if (parsed.command === "contact-privacy.restrict") {
     return executeContactPrivacyRestriction(
       parsed,
@@ -3053,11 +3459,14 @@ const executeCommand = async (
       requestOptions(watchRuntime.signal)
     );
   }
-  const [metadata, source] = await Promise.all([
-    readMetadata(parsed.metadataFile),
-    openSource(parsed.sourceFile, stdin),
-  ]);
-  return client.datasets.import({ metadata, source });
+  if (parsed.command === "datasets.import") {
+    const [metadata, source] = await Promise.all([
+      readMetadata(parsed.metadataFile),
+      openSource(parsed.sourceFile, stdin),
+    ]);
+    return client.datasets.import({ metadata, source });
+  }
+  throw new Error("Unsupported generated CLI command.");
 };
 
 const handleCliError = (
@@ -3133,15 +3542,60 @@ const handleCliError = (
   return 70;
 };
 
+const humanOutputCommand = (
+  command: CliArguments["command"],
+  argv: readonly string[]
+): string => {
+  if (command !== "workbooks.update") {
+    return command;
+  }
+  const alias = argv[1];
+  if (alias === "select" || alias === "approve" || alias === "reject") {
+    return `workbooks.${alias}`;
+  }
+  return command;
+};
+
+const isHumanSurfaceCommand = (command: CliArguments["command"]): boolean =>
+  command.startsWith("gtm-contexts.") ||
+  command.startsWith("plays.") ||
+  command === "play-runs.get" ||
+  command.startsWith("workbooks.");
+
 export const runCli = async (invocation: CliInvocation): Promise<number> => {
   const onboardingExitCode = await runOnboardingCli(invocation);
   if (onboardingExitCode !== undefined) {
     return onboardingExitCode;
   }
   let selectedCommand: CliArguments["command"] | undefined;
+  let clearWatchProgress: (() => void) | undefined;
   try {
-    const parsed = parseArguments(invocation.argv, invocation.environment);
+    const machineRequested = invocation.argv.includes("--json");
+    const noColor =
+      invocation.argv.includes("--no-color") ||
+      invocation.environment.NO_COLOR !== undefined ||
+      invocation.environment.TERM === "dumb";
+    const argv = invocation.argv.filter(
+      (argument) => argument !== "--json" && argument !== "--no-color"
+    );
+    const parsed = parseArguments(argv, invocation.environment);
     selectedCommand = parsed.command;
+    const humanSurface =
+      !machineRequested &&
+      invocation.stdout.isTTY === true &&
+      isHumanSurfaceCommand(parsed.command);
+    const watchProgressEnabled =
+      humanSurface &&
+      invocation.environment.CI === undefined &&
+      invocation.environment.TERM !== "dumb";
+    let watchProgressVisible = false;
+    const clearProgress = (): void => {
+      if (watchProgressVisible) {
+        clearHumanPlayRunProgress(invocation.stdout);
+        watchProgressVisible = false;
+      }
+    };
+    clearWatchProgress = clearProgress;
     const apiKey = await readApiKey(parsed.apiKeyFile, invocation.environment);
     const client = createKurobaraClient({
       apiKey,
@@ -3158,14 +3612,39 @@ export const runCli = async (invocation: CliInvocation): Promise<number> => {
         ...(invocation.signal === undefined
           ? {}
           : { signal: invocation.signal }),
+        ...(watchProgressEnabled && parsed.command === "play-runs.get"
+          ? {
+              onPlayRunSnapshot: (snapshot: PlayRun, pollCount: number) => {
+                watchProgressVisible = true;
+                renderHumanPlayRunProgress(
+                  invocation.stdout,
+                  snapshot,
+                  pollCount,
+                  !noColor
+                );
+              },
+            }
+          : {}),
         wait: invocation.wait ?? waitFor,
       }
     );
+    clearProgress();
+    clearWatchProgress = undefined;
     if (result !== DATASET_EXPORT_STDOUT_COMPLETE) {
-      writeJson(invocation.stdout, result);
+      if (humanSurface) {
+        renderHumanCommandResult(
+          invocation.stdout,
+          humanOutputCommand(parsed.command, argv),
+          result,
+          !noColor
+        );
+      } else {
+        writeJson(invocation.stdout, result);
+      }
     }
     return 0;
   } catch (error) {
+    clearWatchProgress?.();
     return handleCliError(error, selectedCommand, invocation.stderr);
   }
 };

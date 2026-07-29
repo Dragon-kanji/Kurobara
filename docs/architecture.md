@@ -66,8 +66,9 @@ authority envelope containing:
 - stop conditions.
 
 Delegation must reduce authority. The current preview exposes this model through
-CLI, REST, and SDK. MCP and native multi-agent orchestration are future
-projections, not current runtime claims.
+CLI, REST, SDK, and an optional local stdio MCP projection. Native multi-agent
+orchestration remains outside the Kurobara runtime; external agents coordinate
+through the same generated contracts.
 
 ## Repository map
 

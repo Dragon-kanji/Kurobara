@@ -1,0 +1,7 @@
+{
+  "after_ordinal": 0,
+  "dataset_id": "synthetic-dataset",
+  "limit": 1000,
+  "materialization_id": "synthetic-materialization",
+  "workbook_id": "synthetic-workbook"
+}

@@ -1,7 +1,7 @@
 {
   "protocol_version": "2025-11-25",
   "publication_status": "local-development-only",
-  "source_catalog_fingerprint": "sha256:c3cb2220664b2b8a0357c2a51c2eb5db398994c746bf89fb23c83398703425f4",
+  "source_catalog_fingerprint": "sha256:1466e9c9bff8bc3c3f3c5e330a5770cb57429cb03bd9a75cc0701c9a71c9744e",
   "tools": [
     {
       "idempotence": "inherent",
@@ -152,6 +152,1517 @@
       ],
       "required_permissions": [
         "capabilities:list"
+      ],
+      "structuredContent": true
+    },
+    {
+      "idempotence": "required",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-request/1.0.0",
+        "title": "GtmContextCommandRequest",
+        "description": "Deterministic plan or explicitly confirmed apply command for one workspace GTM Context revision.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "context",
+          "mode"
+        ],
+        "properties": {
+          "activate": {
+            "type": "boolean"
+          },
+          "confirm_active_change": {
+            "type": "boolean"
+          },
+          "confirmed": {
+            "type": "boolean"
+          },
+          "context": {
+            "$ref": "#/$defs/context"
+          },
+          "expected_base_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "apply",
+              "plan"
+            ]
+          },
+          "plan_fingerprint": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        },
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "mode"
+            ],
+            "properties": {
+              "mode": {
+                "const": "plan"
+              },
+              "activate": false,
+              "confirm_active_change": false,
+              "confirmed": false,
+              "plan_fingerprint": false
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "activate",
+              "confirm_active_change",
+              "confirmed",
+              "mode",
+              "plan_fingerprint"
+            ],
+            "properties": {
+              "mode": {
+                "const": "apply"
+              }
+            }
+          }
+        ],
+        "$defs": {
+          "answer_value": {
+            "oneOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000000
+              },
+              {
+                "type": "string",
+                "maxLength": 16384
+              },
+              {
+                "type": "array",
+                "maxItems": 128,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 16384,
+                  "pattern": "\\S"
+                }
+              }
+            ]
+          },
+          "assertion": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "provenance",
+              "question_id",
+              "state"
+            ],
+            "properties": {
+              "provenance": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "recorded_at_ms",
+                  "source"
+                ],
+                "properties": {
+                  "actor_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "\\S"
+                  },
+                  "recorded_at_ms": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "source": {
+                    "type": "string",
+                    "enum": [
+                      "agent",
+                      "human",
+                      "import"
+                    ]
+                  }
+                }
+              },
+              "question_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[a-z][a-z0-9_.-]*$"
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "confirmed",
+                  "inferred",
+                  "unknown",
+                  "not_applicable",
+                  "imported_unverified"
+                ]
+              },
+              "value": {
+                "$ref": "#/$defs/answer_value"
+              }
+            },
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "value"
+                ],
+                "properties": {
+                  "state": {
+                    "enum": [
+                      "confirmed",
+                      "inferred",
+                      "imported_unverified"
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "enum": [
+                      "unknown",
+                      "not_applicable"
+                    ]
+                  },
+                  "value": false
+                }
+              }
+            ]
+          },
+          "context": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "assertions",
+              "context_id",
+              "name",
+              "questionnaire_version"
+            ],
+            "properties": {
+              "assertions": {
+                "type": "array",
+                "maxItems": 128,
+                "items": {
+                  "$ref": "#/$defs/assertion"
+                }
+              },
+              "context_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "questionnaire_version": {
+                "type": "string",
+                "const": "1.0.0"
+              }
+            }
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "confidential",
+        "x-kurobara-redaction": "no-secrets-policy-answers-only",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "name": "kurobara_context_apply",
+      "operation_id": "gtm-contexts.apply",
+      "operation_version": "1.0.0",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-response/1.0.0",
+        "title": "GtmContextCommandResponse",
+        "description": "Fingerprintable GTM Context plan or durable immutable revision readback.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "mode"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "blocking_question_ids": {
+            "type": "array",
+            "maxItems": 128,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "pattern": "^[a-z][a-z0-9_.-]*$"
+            }
+          },
+          "context": {
+            "$ref": "https://schemas.kurobara.invalid/schemas/gtm/context-command-request/1.0.0#/$defs/context"
+          },
+          "expected_base_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "fingerprint": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "issues": {
+            "type": "array",
+            "maxItems": 256,
+            "items": {
+              "$ref": "#/$defs/issue"
+            }
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "apply",
+              "plan"
+            ]
+          },
+          "ready_for": {
+            "$ref": "#/$defs/ready_for"
+          },
+          "revision": {
+            "$ref": "#/$defs/revision"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "created",
+              "existing"
+            ]
+          }
+        },
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "blocking_question_ids",
+              "context",
+              "fingerprint",
+              "issues",
+              "mode",
+              "ready_for"
+            ],
+            "properties": {
+              "mode": {
+                "const": "plan"
+              },
+              "active": false,
+              "revision": false,
+              "status": false
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "active",
+              "mode",
+              "revision",
+              "status"
+            ],
+            "properties": {
+              "mode": {
+                "const": "apply"
+              },
+              "blocking_question_ids": false,
+              "context": false,
+              "expected_base_revision": false,
+              "fingerprint": false,
+              "issues": false,
+              "ready_for": false
+            }
+          }
+        ],
+        "$defs": {
+          "issue": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "answer-invalid",
+                  "confirmation-required",
+                  "context-incompatible",
+                  "context-not-found",
+                  "duplicate-answer",
+                  "permission-missing",
+                  "play-invalid",
+                  "revision-conflict",
+                  "workbook-not-found"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048,
+                "pattern": "\\S"
+              },
+              "question_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[a-z][a-z0-9_.-]*$"
+              }
+            }
+          },
+          "ready_for": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "agentic_outbound_play",
+              "dataset_import",
+              "imported_dataset_enrichment",
+              "offline_fixture"
+            ],
+            "properties": {
+              "agentic_outbound_play": {
+                "type": "boolean"
+              },
+              "dataset_import": {
+                "type": "boolean"
+              },
+              "imported_dataset_enrichment": {
+                "type": "boolean"
+              },
+              "offline_fixture": {
+                "type": "boolean"
+              }
+            }
+          },
+          "revision": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "context",
+              "context_id",
+              "created_at_ms",
+              "created_by_actor_id",
+              "fingerprint",
+              "revision",
+              "workspace_id"
+            ],
+            "properties": {
+              "context": {
+                "$ref": "https://schemas.kurobara.invalid/schemas/gtm/context-command-request/1.0.0#/$defs/context"
+              },
+              "context_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "created_at_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "created_by_actor_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              },
+              "workspace_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              }
+            }
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "confidential",
+        "x-kurobara-redaction": "no-secrets-policy-answers-only",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "problemCodes": [
+        "authentication-required",
+        "authority-permission-missing",
+        "internal-error",
+        "invalid-credential",
+        "output-contract-violation",
+        "payload-too-large",
+        "request-invalid",
+        "revision-conflict",
+        "service-unavailable",
+        "unsupported-media-type"
+      ],
+      "problems": [
+        {
+          "code": "authentication-required",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "internal-error",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "payload-too-large",
+          "retryable": false,
+          "status": 413,
+          "type": "https://problems.kurobara.invalid/payload-too-large"
+        },
+        {
+          "code": "request-invalid",
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "revision-conflict",
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/revision-conflict"
+        },
+        {
+          "code": "service-unavailable",
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        },
+        {
+          "code": "unsupported-media-type",
+          "retryable": false,
+          "status": 415,
+          "type": "https://problems.kurobara.invalid/unsupported-media-type"
+        }
+      ],
+      "required_permissions": [
+        "contexts:write"
+      ],
+      "structuredContent": true
+    },
+    {
+      "idempotence": "inherent",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-request/1.0.0",
+        "title": "GtmContextCommandRequest",
+        "description": "Deterministic plan or explicitly confirmed apply command for one workspace GTM Context revision.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "context",
+          "mode"
+        ],
+        "properties": {
+          "activate": {
+            "type": "boolean"
+          },
+          "confirm_active_change": {
+            "type": "boolean"
+          },
+          "confirmed": {
+            "type": "boolean"
+          },
+          "context": {
+            "$ref": "#/$defs/context"
+          },
+          "expected_base_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "apply",
+              "plan"
+            ]
+          },
+          "plan_fingerprint": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        },
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "mode"
+            ],
+            "properties": {
+              "mode": {
+                "const": "plan"
+              },
+              "activate": false,
+              "confirm_active_change": false,
+              "confirmed": false,
+              "plan_fingerprint": false
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "activate",
+              "confirm_active_change",
+              "confirmed",
+              "mode",
+              "plan_fingerprint"
+            ],
+            "properties": {
+              "mode": {
+                "const": "apply"
+              }
+            }
+          }
+        ],
+        "$defs": {
+          "answer_value": {
+            "oneOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000000
+              },
+              {
+                "type": "string",
+                "maxLength": 16384
+              },
+              {
+                "type": "array",
+                "maxItems": 128,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 16384,
+                  "pattern": "\\S"
+                }
+              }
+            ]
+          },
+          "assertion": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "provenance",
+              "question_id",
+              "state"
+            ],
+            "properties": {
+              "provenance": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "recorded_at_ms",
+                  "source"
+                ],
+                "properties": {
+                  "actor_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "\\S"
+                  },
+                  "recorded_at_ms": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "source": {
+                    "type": "string",
+                    "enum": [
+                      "agent",
+                      "human",
+                      "import"
+                    ]
+                  }
+                }
+              },
+              "question_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[a-z][a-z0-9_.-]*$"
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "confirmed",
+                  "inferred",
+                  "unknown",
+                  "not_applicable",
+                  "imported_unverified"
+                ]
+              },
+              "value": {
+                "$ref": "#/$defs/answer_value"
+              }
+            },
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "value"
+                ],
+                "properties": {
+                  "state": {
+                    "enum": [
+                      "confirmed",
+                      "inferred",
+                      "imported_unverified"
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "enum": [
+                      "unknown",
+                      "not_applicable"
+                    ]
+                  },
+                  "value": false
+                }
+              }
+            ]
+          },
+          "context": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "assertions",
+              "context_id",
+              "name",
+              "questionnaire_version"
+            ],
+            "properties": {
+              "assertions": {
+                "type": "array",
+                "maxItems": 128,
+                "items": {
+                  "$ref": "#/$defs/assertion"
+                }
+              },
+              "context_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "questionnaire_version": {
+                "type": "string",
+                "const": "1.0.0"
+              }
+            }
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "confidential",
+        "x-kurobara-redaction": "no-secrets-policy-answers-only",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "name": "kurobara_context_plan",
+      "operation_id": "gtm-contexts.plan",
+      "operation_version": "1.0.0",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-response/1.0.0",
+        "title": "GtmContextCommandResponse",
+        "description": "Fingerprintable GTM Context plan or durable immutable revision readback.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "mode"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "blocking_question_ids": {
+            "type": "array",
+            "maxItems": 128,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "pattern": "^[a-z][a-z0-9_.-]*$"
+            }
+          },
+          "context": {
+            "$ref": "https://schemas.kurobara.invalid/schemas/gtm/context-command-request/1.0.0#/$defs/context"
+          },
+          "expected_base_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "fingerprint": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "issues": {
+            "type": "array",
+            "maxItems": 256,
+            "items": {
+              "$ref": "#/$defs/issue"
+            }
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "apply",
+              "plan"
+            ]
+          },
+          "ready_for": {
+            "$ref": "#/$defs/ready_for"
+          },
+          "revision": {
+            "$ref": "#/$defs/revision"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "created",
+              "existing"
+            ]
+          }
+        },
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "blocking_question_ids",
+              "context",
+              "fingerprint",
+              "issues",
+              "mode",
+              "ready_for"
+            ],
+            "properties": {
+              "mode": {
+                "const": "plan"
+              },
+              "active": false,
+              "revision": false,
+              "status": false
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "active",
+              "mode",
+              "revision",
+              "status"
+            ],
+            "properties": {
+              "mode": {
+                "const": "apply"
+              },
+              "blocking_question_ids": false,
+              "context": false,
+              "expected_base_revision": false,
+              "fingerprint": false,
+              "issues": false,
+              "ready_for": false
+            }
+          }
+        ],
+        "$defs": {
+          "issue": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "answer-invalid",
+                  "confirmation-required",
+                  "context-incompatible",
+                  "context-not-found",
+                  "duplicate-answer",
+                  "permission-missing",
+                  "play-invalid",
+                  "revision-conflict",
+                  "workbook-not-found"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048,
+                "pattern": "\\S"
+              },
+              "question_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[a-z][a-z0-9_.-]*$"
+              }
+            }
+          },
+          "ready_for": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "agentic_outbound_play",
+              "dataset_import",
+              "imported_dataset_enrichment",
+              "offline_fixture"
+            ],
+            "properties": {
+              "agentic_outbound_play": {
+                "type": "boolean"
+              },
+              "dataset_import": {
+                "type": "boolean"
+              },
+              "imported_dataset_enrichment": {
+                "type": "boolean"
+              },
+              "offline_fixture": {
+                "type": "boolean"
+              }
+            }
+          },
+          "revision": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "context",
+              "context_id",
+              "created_at_ms",
+              "created_by_actor_id",
+              "fingerprint",
+              "revision",
+              "workspace_id"
+            ],
+            "properties": {
+              "context": {
+                "$ref": "https://schemas.kurobara.invalid/schemas/gtm/context-command-request/1.0.0#/$defs/context"
+              },
+              "context_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "created_at_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "created_by_actor_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              },
+              "workspace_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              }
+            }
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "confidential",
+        "x-kurobara-redaction": "no-secrets-policy-answers-only",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "problemCodes": [
+        "authentication-required",
+        "authority-permission-missing",
+        "internal-error",
+        "invalid-credential",
+        "output-contract-violation",
+        "payload-too-large",
+        "request-invalid",
+        "service-unavailable",
+        "unsupported-media-type"
+      ],
+      "problems": [
+        {
+          "code": "authentication-required",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "internal-error",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "payload-too-large",
+          "retryable": false,
+          "status": 413,
+          "type": "https://problems.kurobara.invalid/payload-too-large"
+        },
+        {
+          "code": "request-invalid",
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "service-unavailable",
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        },
+        {
+          "code": "unsupported-media-type",
+          "retryable": false,
+          "status": 415,
+          "type": "https://problems.kurobara.invalid/unsupported-media-type"
+        }
+      ],
+      "required_permissions": [
+        "contexts:read"
+      ],
+      "structuredContent": true
+    },
+    {
+      "idempotence": "inherent",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/gtm/questionnaire-request/1.0.0",
+        "title": "GtmQuestionnaireRequest",
+        "description": "Read-only request for the canonical progressive GTM questionnaire.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "profile"
+        ],
+        "properties": {
+          "profile": {
+            "type": "string",
+            "enum": [
+              "offline_fixture",
+              "dataset_import",
+              "imported_dataset_enrichment",
+              "agentic_outbound_play"
+            ]
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "name": "kurobara_context_questions",
+      "operation_id": "gtm-contexts.questionnaire.get",
+      "operation_version": "1.0.0",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/gtm/questionnaire-response/1.0.0",
+        "title": "GtmQuestionnaireResponse",
+        "description": "Versioned agent-neutral GTM questions with conditional and human-confirmation metadata.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "profile",
+          "questionnaire_version",
+          "questions"
+        ],
+        "properties": {
+          "profile": {
+            "type": "string",
+            "enum": [
+              "offline_fixture",
+              "dataset_import",
+              "imported_dataset_enrichment",
+              "agentic_outbound_play"
+            ]
+          },
+          "questionnaire_version": {
+            "type": "string",
+            "const": "1.0.0"
+          },
+          "questions": {
+            "type": "array",
+            "maxItems": 128,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "answer_schema",
+                "prompt",
+                "question_id",
+                "required_for",
+                "requires_human_confirmation",
+                "section",
+                "sensitivity"
+              ],
+              "properties": {
+                "answer_schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "enum_values": {
+                      "type": "array",
+                      "maxItems": 64,
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255
+                      }
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "boolean",
+                        "number",
+                        "string",
+                        "string_array"
+                      ]
+                    }
+                  }
+                },
+                "ask_if": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "equals",
+                    "question_id"
+                  ],
+                  "properties": {
+                    "equals": {
+                      "oneOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "maxLength": 255
+                        }
+                      ]
+                    },
+                    "question_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[a-z][a-z0-9_.-]*$"
+                    }
+                  }
+                },
+                "prompt": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048,
+                  "pattern": "\\S"
+                },
+                "question_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "^[a-z][a-z0-9_.-]*$"
+                },
+                "required_for": {
+                  "type": "array",
+                  "maxItems": 4,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "offline_fixture",
+                      "dataset_import",
+                      "imported_dataset_enrichment",
+                      "agentic_outbound_play"
+                    ]
+                  }
+                },
+                "requires_human_confirmation": {
+                  "type": "boolean"
+                },
+                "section": {
+                  "type": "string",
+                  "enum": [
+                    "offer",
+                    "audience",
+                    "qualification",
+                    "data",
+                    "policy",
+                    "activation"
+                  ]
+                },
+                "sensitivity": {
+                  "type": "string",
+                  "enum": [
+                    "business",
+                    "policy"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "problemCodes": [
+        "authentication-required",
+        "authority-permission-missing",
+        "internal-error",
+        "invalid-credential",
+        "output-contract-violation",
+        "request-invalid",
+        "service-unavailable"
+      ],
+      "problems": [
+        {
+          "code": "authentication-required",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "internal-error",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "request-invalid",
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "service-unavailable",
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        }
+      ],
+      "required_permissions": [
+        "contexts:read"
+      ],
+      "structuredContent": true
+    },
+    {
+      "idempotence": "inherent",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/gtm/context-status-request/1.0.0",
+        "title": "GtmContextStatusRequest",
+        "description": "Read-only business readiness request for one canonical usage profile.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "profile"
+        ],
+        "properties": {
+          "profile": {
+            "type": "string",
+            "enum": [
+              "offline_fixture",
+              "dataset_import",
+              "imported_dataset_enrichment",
+              "agentic_outbound_play"
+            ]
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "name": "kurobara_context_status",
+      "operation_id": "gtm-contexts.status.get",
+      "operation_version": "1.0.0",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/gtm/context-status-response/1.0.0",
+        "title": "GtmContextStatusResponse",
+        "description": "Redacted active-context metadata and read-only readiness without business answer contents.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "business_context",
+          "profile",
+          "ready",
+          "remediation"
+        ],
+        "properties": {
+          "active_context": {
+            "$ref": "#/$defs/context_reference"
+          },
+          "blocking_question_ids": {
+            "type": "array",
+            "maxItems": 128,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "pattern": "^[a-z][a-z0-9_.-]*$"
+            }
+          },
+          "business_context": {
+            "type": "string",
+            "enum": [
+              "missing",
+              "draft",
+              "incomplete",
+              "ready",
+              "stale",
+              "incompatible"
+            ]
+          },
+          "latest_context": {
+            "$ref": "#/$defs/context_reference"
+          },
+          "profile": {
+            "type": "string",
+            "enum": [
+              "offline_fixture",
+              "dataset_import",
+              "imported_dataset_enrichment",
+              "agentic_outbound_play"
+            ]
+          },
+          "ready": {
+            "type": "boolean"
+          },
+          "remediation": {
+            "type": "array",
+            "maxItems": 128,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "pattern": "\\S"
+            }
+          }
+        },
+        "$defs": {
+          "context_reference": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "context_id",
+              "fingerprint",
+              "questionnaire_version",
+              "revision"
+            ],
+            "properties": {
+              "context_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "questionnaire_version": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 32,
+                "pattern": "\\S"
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              }
+            }
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-redaction": "question-identifiers-and-context-metadata-only",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "problemCodes": [
+        "authentication-required",
+        "authority-permission-missing",
+        "internal-error",
+        "invalid-credential",
+        "output-contract-violation",
+        "request-invalid",
+        "service-unavailable"
+      ],
+      "problems": [
+        {
+          "code": "authentication-required",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "internal-error",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "request-invalid",
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "service-unavailable",
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        }
+      ],
+      "required_permissions": [
+        "contexts:read"
       ],
       "structuredContent": true
     },
@@ -478,6 +1989,2572 @@
       ],
       "required_permissions": [
         "plans:quote"
+      ],
+      "structuredContent": true
+    },
+    {
+      "idempotence": "inherent",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/play-runs/get-request/1.0.0",
+        "title": "PlayRunGetRequest",
+        "description": "Read-only lookup of one workspace-scoped durable Play run.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_id"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "name": "kurobara_play_run",
+      "operation_id": "play-runs.get",
+      "operation_version": "1.0.0",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/play-runs/get-response/1.0.0",
+        "title": "PlayRunGetResponse",
+        "description": "Durable Play run state and provider-neutral compiled receipt.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run"
+        ],
+        "properties": {
+          "run": {
+            "$ref": "https://schemas.kurobara.invalid/schemas/plays/command-response/1.0.0#/$defs/run"
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "internal",
+        "x-kurobara-redaction": "no-secrets-provider-neutral",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "problemCodes": [
+        "authentication-required",
+        "authority-permission-missing",
+        "gtm-resource-not-found",
+        "internal-error",
+        "invalid-credential",
+        "output-contract-violation",
+        "request-invalid",
+        "service-unavailable"
+      ],
+      "problems": [
+        {
+          "code": "authentication-required",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "gtm-resource-not-found",
+          "retryable": false,
+          "status": 404,
+          "type": "https://problems.kurobara.invalid/gtm-resource-not-found"
+        },
+        {
+          "code": "internal-error",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "request-invalid",
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "service-unavailable",
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        }
+      ],
+      "required_permissions": [
+        "plays:read"
+      ],
+      "structuredContent": true
+    },
+    {
+      "idempotence": "required",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0",
+        "title": "PlayCommandRequest",
+        "description": "Provider-neutral Play preview or explicitly approved lifecycle command.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action",
+          "play"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "preview",
+              "approve",
+              "start",
+              "pause",
+              "retire"
+            ]
+          },
+          "approved_by_human": {
+            "type": "boolean"
+          },
+          "expected_base_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "play": {
+            "$ref": "#/$defs/play"
+          },
+          "preview_fingerprint": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        },
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "action"
+            ],
+            "properties": {
+              "action": {
+                "const": "preview"
+              },
+              "approved_by_human": false,
+              "expected_base_revision": false,
+              "idempotency_key": false,
+              "preview_fingerprint": false
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "action",
+              "approved_by_human",
+              "idempotency_key",
+              "preview_fingerprint"
+            ],
+            "properties": {
+              "action": {
+                "enum": [
+                  "approve",
+                  "start",
+                  "pause",
+                  "retire"
+                ]
+              }
+            }
+          }
+        ],
+        "$defs": {
+          "context_ref": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "context_id",
+              "fingerprint",
+              "revision"
+            ],
+            "properties": {
+              "context_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              }
+            }
+          },
+          "play": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "approvals",
+              "authority_envelope_id",
+              "audience",
+              "broadening",
+              "budget",
+              "capabilities",
+              "context_ref",
+              "deadline_ms",
+              "delivery",
+              "exclusions",
+              "objective",
+              "play_id",
+              "preview",
+              "selection",
+              "source",
+              "stop_conditions"
+            ],
+            "properties": {
+              "approvals": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "export",
+                  "provider_spend",
+                  "reveal"
+                ],
+                "properties": {
+                  "export": {
+                    "type": "boolean"
+                  },
+                  "provider_spend": {
+                    "type": "boolean"
+                  },
+                  "reveal": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "authority_envelope_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "audience": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "company_countries",
+                  "departments",
+                  "person_countries",
+                  "seniorities",
+                  "titles"
+                ],
+                "properties": {
+                  "company_countries": {
+                    "$ref": "#/$defs/country_list"
+                  },
+                  "departments": {
+                    "$ref": "#/$defs/text_list"
+                  },
+                  "person_countries": {
+                    "$ref": "#/$defs/country_list"
+                  },
+                  "seniorities": {
+                    "$ref": "#/$defs/text_list"
+                  },
+                  "titles": {
+                    "$ref": "#/$defs/text_list"
+                  }
+                }
+              },
+              "broadening": {
+                "type": "string",
+                "enum": [
+                  "forbidden",
+                  "human_approval"
+                ]
+              },
+              "budget": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "limit",
+                  "unit"
+                ],
+                "properties": {
+                  "limit": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 1000000000000000
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64,
+                    "pattern": "^[a-z][a-z0-9._-]*$"
+                  }
+                }
+              },
+              "capabilities": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 64,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "^[a-z][a-z0-9.-]*$"
+                }
+              },
+              "context_ref": {
+                "$ref": "#/$defs/context_ref"
+              },
+              "deadline_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "delivery": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "mode",
+                  "private_export"
+                ],
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "const": "no_send"
+                  },
+                  "private_export": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "exclusions": {
+                "$ref": "#/$defs/text_list"
+              },
+              "objective": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "metric",
+                  "target",
+                  "text"
+                ],
+                "properties": {
+                  "metric": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "\\S"
+                  },
+                  "target": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 1000000000000000
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048,
+                    "pattern": "\\S"
+                  }
+                }
+              },
+              "play_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "preview": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "max_companies",
+                  "max_contacts_per_company",
+                  "max_contacts_total",
+                  "max_provider_calls",
+                  "sample_size"
+                ],
+                "properties": {
+                  "max_companies": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100
+                  },
+                  "max_contacts_per_company": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10
+                  },
+                  "max_contacts_total": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  "max_provider_calls": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000
+                  },
+                  "sample_size": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100
+                  }
+                }
+              },
+              "selection": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "minimum_score",
+                  "required_signals"
+                ],
+                "properties": {
+                  "minimum_score": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "required_signals": {
+                    "$ref": "#/$defs/text_list"
+                  }
+                }
+              },
+              "source": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/organization_search_source"
+                  },
+                  {
+                    "$ref": "#/$defs/imported_dataset_source"
+                  }
+                ]
+              },
+              "stop_conditions": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 128,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048,
+                  "pattern": "\\S"
+                }
+              }
+            }
+          },
+          "organization_search_source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "countries",
+              "industries",
+              "keywords",
+              "kind"
+            ],
+            "properties": {
+              "countries": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 64,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{2}$"
+                }
+              },
+              "industries": {
+                "$ref": "#/$defs/text_list"
+              },
+              "keywords": {
+                "$ref": "#/$defs/text_list"
+              },
+              "kind": {
+                "type": "string",
+                "const": "organization_search"
+              }
+            }
+          },
+          "imported_dataset_source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "dataset_id",
+              "field_mapping",
+              "kind",
+              "materialization_id"
+            ],
+            "properties": {
+              "dataset_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "default_country_code": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$"
+              },
+              "field_mapping": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "domain"
+                ],
+                "properties": {
+                  "country_code": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{0,127}$"
+                  },
+                  "domain": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{0,127}$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{0,127}$"
+                  }
+                }
+              },
+              "kind": {
+                "type": "string",
+                "const": "imported_dataset"
+              },
+              "materialization_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              }
+            }
+          },
+          "country_list": {
+            "type": "array",
+            "maxItems": 64,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z]{2}$"
+            }
+          },
+          "text_list": {
+            "type": "array",
+            "maxItems": 256,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "pattern": "\\S"
+            }
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "confidential",
+        "x-kurobara-redaction": "no-secrets-provider-neutral",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "name": "kurobara_play_apply",
+      "operation_id": "plays.apply",
+      "operation_version": "1.0.0",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/plays/command-response/1.0.0",
+        "title": "PlayCommandResponse",
+        "description": "Compiled Play preview or immutable Play revision and durable run receipt.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "preview",
+              "approve",
+              "start",
+              "pause",
+              "retire"
+            ]
+          },
+          "compilation": {
+            "$ref": "#/$defs/compilation"
+          },
+          "fingerprint": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "issues": {
+            "type": "array",
+            "maxItems": 256,
+            "items": {
+              "$ref": "https://schemas.kurobara.invalid/schemas/gtm/context-command-response/1.0.0#/$defs/issue"
+            }
+          },
+          "lifecycle": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "validated",
+              "previewed",
+              "awaiting_approval",
+              "approved",
+              "active",
+              "paused",
+              "retired"
+            ]
+          },
+          "play": {
+            "$ref": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0#/$defs/play"
+          },
+          "requires_human_approval": {
+            "type": "boolean"
+          },
+          "revision": {
+            "$ref": "#/$defs/revision"
+          },
+          "run": {
+            "$ref": "#/$defs/run"
+          }
+        },
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "action",
+              "compilation",
+              "fingerprint",
+              "issues",
+              "lifecycle",
+              "play",
+              "requires_human_approval"
+            ],
+            "properties": {
+              "action": {
+                "const": "preview"
+              },
+              "revision": false,
+              "run": false
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "action",
+              "revision"
+            ],
+            "properties": {
+              "action": {
+                "enum": [
+                  "approve",
+                  "pause",
+                  "retire"
+                ]
+              },
+              "compilation": false,
+              "fingerprint": false,
+              "issues": false,
+              "lifecycle": false,
+              "play": false,
+              "requires_human_approval": false,
+              "run": false
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "action",
+              "revision",
+              "run"
+            ],
+            "properties": {
+              "action": {
+                "const": "start"
+              },
+              "compilation": false,
+              "fingerprint": false,
+              "issues": false,
+              "lifecycle": false,
+              "play": false,
+              "requires_human_approval": false
+            }
+          }
+        ],
+        "$defs": {
+          "compilation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "assumptions",
+              "authority",
+              "budget",
+              "deadline_ms",
+              "export_mode",
+              "intention_hash",
+              "stages"
+            ],
+            "properties": {
+              "assumptions": {
+                "type": "array",
+                "maxItems": 64,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048,
+                  "pattern": "\\S"
+                }
+              },
+              "authority": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "human_gates",
+                  "permissions"
+                ],
+                "properties": {
+                  "human_gates": {
+                    "type": "array",
+                    "maxItems": 32,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[a-z][a-z0-9_:-]*$"
+                    }
+                  },
+                  "permissions": {
+                    "type": "array",
+                    "maxItems": 64,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[a-z][a-z0-9-]*:[a-z][a-z0-9-]*$"
+                    }
+                  }
+                }
+              },
+              "budget": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "limit",
+                  "quoted_upper_bound",
+                  "unit"
+                ],
+                "properties": {
+                  "limit": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 1000000000000000
+                  },
+                  "quoted_upper_bound": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1000000000000000
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64,
+                    "pattern": "^[a-z][a-z0-9._-]*$"
+                  }
+                }
+              },
+              "deadline_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "export_mode": {
+                "type": "string",
+                "const": "no_send"
+              },
+              "intention_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "stages": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 128,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "input_fingerprint",
+                    "operation_id",
+                    "ordinal"
+                  ],
+                  "properties": {
+                    "capability": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[a-z][a-z0-9.-]*$"
+                    },
+                    "input_fingerprint": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "operation_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$"
+                    },
+                    "ordinal": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 128
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "revision": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "compilation",
+              "created_at_ms",
+              "created_by_actor_id",
+              "fingerprint",
+              "lifecycle",
+              "play",
+              "play_id",
+              "revision",
+              "workspace_id"
+            ],
+            "properties": {
+              "compilation": {
+                "$ref": "#/$defs/compilation"
+              },
+              "created_at_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "created_by_actor_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "lifecycle": {
+                "type": "string",
+                "enum": [
+                  "draft",
+                  "validated",
+                  "previewed",
+                  "awaiting_approval",
+                  "approved",
+                  "active",
+                  "paused",
+                  "retired"
+                ]
+              },
+              "play": {
+                "$ref": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0#/$defs/play"
+              },
+              "play_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              },
+              "workspace_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              }
+            }
+          },
+          "run": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "compilation",
+              "created_at_ms",
+              "execution",
+              "idempotency_key",
+              "play",
+              "play_id",
+              "play_revision",
+              "revision",
+              "run_id",
+              "state",
+              "updated_at_ms",
+              "workspace_id"
+            ],
+            "properties": {
+              "compilation": {
+                "$ref": "#/$defs/compilation"
+              },
+              "created_at_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "execution": {
+                "$ref": "#/$defs/run_execution"
+              },
+              "idempotency_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "play": {
+                "$ref": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0#/$defs/play"
+              },
+              "play_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "play_revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              },
+              "run_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "queued",
+                  "running",
+                  "paused",
+                  "completed",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "updated_at_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "workspace_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              }
+            }
+          },
+          "run_cost": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "reserved",
+              "spent",
+              "unit"
+            ],
+            "properties": {
+              "reserved": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000000
+              },
+              "spent": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000000
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64,
+                "pattern": "^[a-z][a-z0-9._-]*$"
+              }
+            }
+          },
+          "run_execution": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "cost",
+              "provider_calls",
+              "provenance",
+              "selected_record_ids",
+              "selection_reasons",
+              "stages"
+            ],
+            "properties": {
+              "cost": {
+                "$ref": "#/$defs/run_cost"
+              },
+              "current_stage_ordinal": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 128
+              },
+              "error": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "code",
+                  "message",
+                  "retryable"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^[a-z][a-z0-9-]*$"
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048,
+                    "pattern": "\\S"
+                  },
+                  "retryable": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "provider_calls": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "provenance": {
+                "type": "array",
+                "maxItems": 256,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "\\S"
+                }
+              },
+              "result": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "dataset_id",
+                  "export_ready",
+                  "materialization_id",
+                  "record_count",
+                  "workbook_id"
+                ],
+                "properties": {
+                  "dataset_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                  },
+                  "export_ready": {
+                    "type": "boolean"
+                  },
+                  "materialization_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                  },
+                  "record_count": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "workbook_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                  }
+                }
+              },
+              "selected_record_ids": {
+                "type": "array",
+                "maxItems": 1000,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                }
+              },
+              "selection_reasons": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "reasons",
+                    "record_id"
+                  ],
+                  "properties": {
+                    "reasons": {
+                      "type": "array",
+                      "maxItems": 32,
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "pattern": "\\S"
+                      }
+                    },
+                    "record_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    }
+                  }
+                }
+              },
+              "stages": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 128,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "cost",
+                    "operation_id",
+                    "ordinal",
+                    "provider_calls",
+                    "state"
+                  ],
+                  "properties": {
+                    "cost": {
+                      "$ref": "#/$defs/run_cost"
+                    },
+                    "dataset_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    },
+                    "generation_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    },
+                    "materialization_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    },
+                    "operation_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$"
+                    },
+                    "ordinal": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 128
+                    },
+                    "provider_calls": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000
+                    },
+                    "record_count": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2147483647
+                    },
+                    "state": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "running",
+                        "completed",
+                        "failed"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "confidential",
+        "x-kurobara-redaction": "no-secrets-provider-neutral",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "problemCodes": [
+        "authentication-required",
+        "authority-permission-missing",
+        "gtm-resource-not-found",
+        "idempotency-key-reused",
+        "internal-error",
+        "invalid-credential",
+        "output-contract-violation",
+        "payload-too-large",
+        "request-invalid",
+        "revision-conflict",
+        "service-unavailable",
+        "unsupported-media-type"
+      ],
+      "problems": [
+        {
+          "code": "authentication-required",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "gtm-resource-not-found",
+          "retryable": false,
+          "status": 404,
+          "type": "https://problems.kurobara.invalid/gtm-resource-not-found"
+        },
+        {
+          "code": "idempotency-key-reused",
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/idempotency-key-reused"
+        },
+        {
+          "code": "internal-error",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "payload-too-large",
+          "retryable": false,
+          "status": 413,
+          "type": "https://problems.kurobara.invalid/payload-too-large"
+        },
+        {
+          "code": "request-invalid",
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "revision-conflict",
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/revision-conflict"
+        },
+        {
+          "code": "service-unavailable",
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        },
+        {
+          "code": "unsupported-media-type",
+          "retryable": false,
+          "status": 415,
+          "type": "https://problems.kurobara.invalid/unsupported-media-type"
+        }
+      ],
+      "required_permissions": [
+        "plays:write"
+      ],
+      "structuredContent": true
+    },
+    {
+      "idempotence": "inherent",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0",
+        "title": "PlayCommandRequest",
+        "description": "Provider-neutral Play preview or explicitly approved lifecycle command.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action",
+          "play"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "preview",
+              "approve",
+              "start",
+              "pause",
+              "retire"
+            ]
+          },
+          "approved_by_human": {
+            "type": "boolean"
+          },
+          "expected_base_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "play": {
+            "$ref": "#/$defs/play"
+          },
+          "preview_fingerprint": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        },
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "action"
+            ],
+            "properties": {
+              "action": {
+                "const": "preview"
+              },
+              "approved_by_human": false,
+              "expected_base_revision": false,
+              "idempotency_key": false,
+              "preview_fingerprint": false
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "action",
+              "approved_by_human",
+              "idempotency_key",
+              "preview_fingerprint"
+            ],
+            "properties": {
+              "action": {
+                "enum": [
+                  "approve",
+                  "start",
+                  "pause",
+                  "retire"
+                ]
+              }
+            }
+          }
+        ],
+        "$defs": {
+          "context_ref": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "context_id",
+              "fingerprint",
+              "revision"
+            ],
+            "properties": {
+              "context_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              }
+            }
+          },
+          "play": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "approvals",
+              "authority_envelope_id",
+              "audience",
+              "broadening",
+              "budget",
+              "capabilities",
+              "context_ref",
+              "deadline_ms",
+              "delivery",
+              "exclusions",
+              "objective",
+              "play_id",
+              "preview",
+              "selection",
+              "source",
+              "stop_conditions"
+            ],
+            "properties": {
+              "approvals": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "export",
+                  "provider_spend",
+                  "reveal"
+                ],
+                "properties": {
+                  "export": {
+                    "type": "boolean"
+                  },
+                  "provider_spend": {
+                    "type": "boolean"
+                  },
+                  "reveal": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "authority_envelope_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "audience": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "company_countries",
+                  "departments",
+                  "person_countries",
+                  "seniorities",
+                  "titles"
+                ],
+                "properties": {
+                  "company_countries": {
+                    "$ref": "#/$defs/country_list"
+                  },
+                  "departments": {
+                    "$ref": "#/$defs/text_list"
+                  },
+                  "person_countries": {
+                    "$ref": "#/$defs/country_list"
+                  },
+                  "seniorities": {
+                    "$ref": "#/$defs/text_list"
+                  },
+                  "titles": {
+                    "$ref": "#/$defs/text_list"
+                  }
+                }
+              },
+              "broadening": {
+                "type": "string",
+                "enum": [
+                  "forbidden",
+                  "human_approval"
+                ]
+              },
+              "budget": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "limit",
+                  "unit"
+                ],
+                "properties": {
+                  "limit": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 1000000000000000
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64,
+                    "pattern": "^[a-z][a-z0-9._-]*$"
+                  }
+                }
+              },
+              "capabilities": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 64,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "^[a-z][a-z0-9.-]*$"
+                }
+              },
+              "context_ref": {
+                "$ref": "#/$defs/context_ref"
+              },
+              "deadline_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "delivery": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "mode",
+                  "private_export"
+                ],
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "const": "no_send"
+                  },
+                  "private_export": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "exclusions": {
+                "$ref": "#/$defs/text_list"
+              },
+              "objective": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "metric",
+                  "target",
+                  "text"
+                ],
+                "properties": {
+                  "metric": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "\\S"
+                  },
+                  "target": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 1000000000000000
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048,
+                    "pattern": "\\S"
+                  }
+                }
+              },
+              "play_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "preview": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "max_companies",
+                  "max_contacts_per_company",
+                  "max_contacts_total",
+                  "max_provider_calls",
+                  "sample_size"
+                ],
+                "properties": {
+                  "max_companies": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100
+                  },
+                  "max_contacts_per_company": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10
+                  },
+                  "max_contacts_total": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  "max_provider_calls": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000
+                  },
+                  "sample_size": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100
+                  }
+                }
+              },
+              "selection": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "minimum_score",
+                  "required_signals"
+                ],
+                "properties": {
+                  "minimum_score": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "required_signals": {
+                    "$ref": "#/$defs/text_list"
+                  }
+                }
+              },
+              "source": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/organization_search_source"
+                  },
+                  {
+                    "$ref": "#/$defs/imported_dataset_source"
+                  }
+                ]
+              },
+              "stop_conditions": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 128,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048,
+                  "pattern": "\\S"
+                }
+              }
+            }
+          },
+          "organization_search_source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "countries",
+              "industries",
+              "keywords",
+              "kind"
+            ],
+            "properties": {
+              "countries": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 64,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{2}$"
+                }
+              },
+              "industries": {
+                "$ref": "#/$defs/text_list"
+              },
+              "keywords": {
+                "$ref": "#/$defs/text_list"
+              },
+              "kind": {
+                "type": "string",
+                "const": "organization_search"
+              }
+            }
+          },
+          "imported_dataset_source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "dataset_id",
+              "field_mapping",
+              "kind",
+              "materialization_id"
+            ],
+            "properties": {
+              "dataset_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "default_country_code": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$"
+              },
+              "field_mapping": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "domain"
+                ],
+                "properties": {
+                  "country_code": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{0,127}$"
+                  },
+                  "domain": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{0,127}$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{0,127}$"
+                  }
+                }
+              },
+              "kind": {
+                "type": "string",
+                "const": "imported_dataset"
+              },
+              "materialization_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              }
+            }
+          },
+          "country_list": {
+            "type": "array",
+            "maxItems": 64,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z]{2}$"
+            }
+          },
+          "text_list": {
+            "type": "array",
+            "maxItems": 256,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "pattern": "\\S"
+            }
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "confidential",
+        "x-kurobara-redaction": "no-secrets-provider-neutral",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "name": "kurobara_play_preview",
+      "operation_id": "plays.preview",
+      "operation_version": "1.0.0",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/plays/command-response/1.0.0",
+        "title": "PlayCommandResponse",
+        "description": "Compiled Play preview or immutable Play revision and durable run receipt.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "preview",
+              "approve",
+              "start",
+              "pause",
+              "retire"
+            ]
+          },
+          "compilation": {
+            "$ref": "#/$defs/compilation"
+          },
+          "fingerprint": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "issues": {
+            "type": "array",
+            "maxItems": 256,
+            "items": {
+              "$ref": "https://schemas.kurobara.invalid/schemas/gtm/context-command-response/1.0.0#/$defs/issue"
+            }
+          },
+          "lifecycle": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "validated",
+              "previewed",
+              "awaiting_approval",
+              "approved",
+              "active",
+              "paused",
+              "retired"
+            ]
+          },
+          "play": {
+            "$ref": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0#/$defs/play"
+          },
+          "requires_human_approval": {
+            "type": "boolean"
+          },
+          "revision": {
+            "$ref": "#/$defs/revision"
+          },
+          "run": {
+            "$ref": "#/$defs/run"
+          }
+        },
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "action",
+              "compilation",
+              "fingerprint",
+              "issues",
+              "lifecycle",
+              "play",
+              "requires_human_approval"
+            ],
+            "properties": {
+              "action": {
+                "const": "preview"
+              },
+              "revision": false,
+              "run": false
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "action",
+              "revision"
+            ],
+            "properties": {
+              "action": {
+                "enum": [
+                  "approve",
+                  "pause",
+                  "retire"
+                ]
+              },
+              "compilation": false,
+              "fingerprint": false,
+              "issues": false,
+              "lifecycle": false,
+              "play": false,
+              "requires_human_approval": false,
+              "run": false
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "action",
+              "revision",
+              "run"
+            ],
+            "properties": {
+              "action": {
+                "const": "start"
+              },
+              "compilation": false,
+              "fingerprint": false,
+              "issues": false,
+              "lifecycle": false,
+              "play": false,
+              "requires_human_approval": false
+            }
+          }
+        ],
+        "$defs": {
+          "compilation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "assumptions",
+              "authority",
+              "budget",
+              "deadline_ms",
+              "export_mode",
+              "intention_hash",
+              "stages"
+            ],
+            "properties": {
+              "assumptions": {
+                "type": "array",
+                "maxItems": 64,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048,
+                  "pattern": "\\S"
+                }
+              },
+              "authority": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "human_gates",
+                  "permissions"
+                ],
+                "properties": {
+                  "human_gates": {
+                    "type": "array",
+                    "maxItems": 32,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[a-z][a-z0-9_:-]*$"
+                    }
+                  },
+                  "permissions": {
+                    "type": "array",
+                    "maxItems": 64,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[a-z][a-z0-9-]*:[a-z][a-z0-9-]*$"
+                    }
+                  }
+                }
+              },
+              "budget": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "limit",
+                  "quoted_upper_bound",
+                  "unit"
+                ],
+                "properties": {
+                  "limit": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 1000000000000000
+                  },
+                  "quoted_upper_bound": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1000000000000000
+                  },
+                  "unit": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64,
+                    "pattern": "^[a-z][a-z0-9._-]*$"
+                  }
+                }
+              },
+              "deadline_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "export_mode": {
+                "type": "string",
+                "const": "no_send"
+              },
+              "intention_hash": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "stages": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 128,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "input_fingerprint",
+                    "operation_id",
+                    "ordinal"
+                  ],
+                  "properties": {
+                    "capability": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[a-z][a-z0-9.-]*$"
+                    },
+                    "input_fingerprint": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    },
+                    "operation_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$"
+                    },
+                    "ordinal": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 128
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "revision": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "compilation",
+              "created_at_ms",
+              "created_by_actor_id",
+              "fingerprint",
+              "lifecycle",
+              "play",
+              "play_id",
+              "revision",
+              "workspace_id"
+            ],
+            "properties": {
+              "compilation": {
+                "$ref": "#/$defs/compilation"
+              },
+              "created_at_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "created_by_actor_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "fingerprint": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "lifecycle": {
+                "type": "string",
+                "enum": [
+                  "draft",
+                  "validated",
+                  "previewed",
+                  "awaiting_approval",
+                  "approved",
+                  "active",
+                  "paused",
+                  "retired"
+                ]
+              },
+              "play": {
+                "$ref": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0#/$defs/play"
+              },
+              "play_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              },
+              "workspace_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              }
+            }
+          },
+          "run": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "compilation",
+              "created_at_ms",
+              "execution",
+              "idempotency_key",
+              "play",
+              "play_id",
+              "play_revision",
+              "revision",
+              "run_id",
+              "state",
+              "updated_at_ms",
+              "workspace_id"
+            ],
+            "properties": {
+              "compilation": {
+                "$ref": "#/$defs/compilation"
+              },
+              "created_at_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "execution": {
+                "$ref": "#/$defs/run_execution"
+              },
+              "idempotency_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "play": {
+                "$ref": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0#/$defs/play"
+              },
+              "play_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "play_revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              },
+              "run_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "queued",
+                  "running",
+                  "paused",
+                  "completed",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "updated_at_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "workspace_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              }
+            }
+          },
+          "run_cost": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "reserved",
+              "spent",
+              "unit"
+            ],
+            "properties": {
+              "reserved": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000000
+              },
+              "spent": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000000000
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64,
+                "pattern": "^[a-z][a-z0-9._-]*$"
+              }
+            }
+          },
+          "run_execution": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "cost",
+              "provider_calls",
+              "provenance",
+              "selected_record_ids",
+              "selection_reasons",
+              "stages"
+            ],
+            "properties": {
+              "cost": {
+                "$ref": "#/$defs/run_cost"
+              },
+              "current_stage_ordinal": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 128
+              },
+              "error": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "code",
+                  "message",
+                  "retryable"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^[a-z][a-z0-9-]*$"
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048,
+                    "pattern": "\\S"
+                  },
+                  "retryable": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "provider_calls": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "provenance": {
+                "type": "array",
+                "maxItems": 256,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "\\S"
+                }
+              },
+              "result": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "dataset_id",
+                  "export_ready",
+                  "materialization_id",
+                  "record_count",
+                  "workbook_id"
+                ],
+                "properties": {
+                  "dataset_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                  },
+                  "export_ready": {
+                    "type": "boolean"
+                  },
+                  "materialization_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                  },
+                  "record_count": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "workbook_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                  }
+                }
+              },
+              "selected_record_ids": {
+                "type": "array",
+                "maxItems": 1000,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                }
+              },
+              "selection_reasons": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "reasons",
+                    "record_id"
+                  ],
+                  "properties": {
+                    "reasons": {
+                      "type": "array",
+                      "maxItems": 32,
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 255,
+                        "pattern": "\\S"
+                      }
+                    },
+                    "record_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    }
+                  }
+                }
+              },
+              "stages": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 128,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "cost",
+                    "operation_id",
+                    "ordinal",
+                    "provider_calls",
+                    "state"
+                  ],
+                  "properties": {
+                    "cost": {
+                      "$ref": "#/$defs/run_cost"
+                    },
+                    "dataset_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    },
+                    "generation_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    },
+                    "materialization_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                    },
+                    "operation_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 255,
+                      "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$"
+                    },
+                    "ordinal": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 128
+                    },
+                    "provider_calls": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000
+                    },
+                    "record_count": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2147483647
+                    },
+                    "state": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "running",
+                        "completed",
+                        "failed"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "confidential",
+        "x-kurobara-redaction": "no-secrets-provider-neutral",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "problemCodes": [
+        "authentication-required",
+        "authority-permission-missing",
+        "gtm-resource-not-found",
+        "internal-error",
+        "invalid-credential",
+        "output-contract-violation",
+        "payload-too-large",
+        "request-invalid",
+        "service-unavailable",
+        "unsupported-media-type"
+      ],
+      "problems": [
+        {
+          "code": "authentication-required",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "gtm-resource-not-found",
+          "retryable": false,
+          "status": 404,
+          "type": "https://problems.kurobara.invalid/gtm-resource-not-found"
+        },
+        {
+          "code": "internal-error",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "payload-too-large",
+          "retryable": false,
+          "status": 413,
+          "type": "https://problems.kurobara.invalid/payload-too-large"
+        },
+        {
+          "code": "request-invalid",
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "service-unavailable",
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        },
+        {
+          "code": "unsupported-media-type",
+          "retryable": false,
+          "status": 415,
+          "type": "https://problems.kurobara.invalid/unsupported-media-type"
+        }
+      ],
+      "required_permissions": [
+        "plays:read"
       ],
       "structuredContent": true
     },
@@ -1104,6 +5181,928 @@
       ],
       "required_permissions": [
         "runs:read"
+      ],
+      "structuredContent": true
+    },
+    {
+      "idempotence": "inherent",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/workbooks/get-request/1.0.0",
+        "title": "WorkbookGetRequest",
+        "description": "Bounded keyset request for a Workbook projection over one immutable dataset materialization.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "after_ordinal",
+          "dataset_id",
+          "limit",
+          "materialization_id",
+          "workbook_id"
+        ],
+        "properties": {
+          "after_ordinal": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "dataset_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "materialization_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          },
+          "workbook_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "confidential",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "name": "kurobara_workbook_get",
+      "operation_id": "workbooks.get",
+      "operation_version": "1.0.0",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/workbooks/get-response/1.0.0",
+        "title": "WorkbookGetResponse",
+        "description": "Human and agent-readable Workbook page with cell state, provenance, freshness, confidence, cost, errors, and redaction.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fields",
+          "has_more",
+          "next_after_ordinal",
+          "records",
+          "view"
+        ],
+        "properties": {
+          "fields": {
+            "type": "array",
+            "maxItems": 256,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "field_id",
+                "key",
+                "label",
+                "value_type"
+              ],
+              "properties": {
+                "field_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "\\S"
+                },
+                "key": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,127}$"
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "\\S"
+                },
+                "value_type": {
+                  "type": "string",
+                  "enum": [
+                    "boolean",
+                    "number",
+                    "string"
+                  ]
+                }
+              }
+            }
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_after_ordinal": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "records": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "cells",
+                "ordinal",
+                "record_id",
+                "selection_reasons"
+              ],
+              "properties": {
+                "cells": {
+                  "type": "array",
+                  "maxItems": 256,
+                  "items": {
+                    "$ref": "#/$defs/cell"
+                  }
+                },
+                "ordinal": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "record_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "\\S"
+                },
+                "selection_reasons": {
+                  "type": "array",
+                  "maxItems": 32,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048,
+                    "pattern": "\\S"
+                  }
+                }
+              }
+            }
+          },
+          "view": {
+            "$ref": "#/$defs/view"
+          }
+        },
+        "$defs": {
+          "cell": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "confidence",
+              "cost",
+              "error",
+              "field_id",
+              "freshness",
+              "provenance",
+              "redacted",
+              "status",
+              "value"
+            ],
+            "properties": {
+              "confidence": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 1
+              },
+              "cost": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "amount",
+                      "basis",
+                      "unit"
+                    ],
+                    "properties": {
+                      "amount": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000000000000000
+                      },
+                      "basis": {
+                        "type": "string",
+                        "enum": [
+                          "estimated",
+                          "exact"
+                        ]
+                      },
+                      "unit": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64,
+                        "pattern": "^[a-z][a-z0-9._-]*$"
+                      }
+                    }
+                  }
+                ]
+              },
+              "error": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "code",
+                      "message",
+                      "retryable"
+                    ],
+                    "properties": {
+                      "code": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "pattern": "^[a-z][a-z0-9-]*$"
+                      },
+                      "message": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "pattern": "\\S"
+                      },
+                      "retryable": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                ]
+              },
+              "field_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "freshness": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "expires_at_ms",
+                      "observed_at_ms"
+                    ],
+                    "properties": {
+                      "expires_at_ms": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "observed_at_ms": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    }
+                  }
+                ]
+              },
+              "provenance": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048,
+                  "pattern": "\\S"
+                }
+              },
+              "redacted": {
+                "type": "boolean"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "running",
+                  "succeeded",
+                  "failed",
+                  "skipped"
+                ]
+              },
+              "value": {
+                "oneOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "number",
+                    "minimum": -1000000000000000,
+                    "maximum": 1000000000000000
+                  },
+                  {
+                    "type": "string",
+                    "maxLength": 16384
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "view": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "annotations",
+              "approvals",
+              "column_order",
+              "dataset_id",
+              "filters",
+              "materialization_id",
+              "name",
+              "revision",
+              "selection_reasons",
+              "selected_record_ids",
+              "workbook_id",
+              "workspace_id"
+            ],
+            "properties": {
+              "annotations": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "$ref": "#/$defs/annotation"
+                }
+              },
+              "approvals": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "$ref": "#/$defs/approval"
+                }
+              },
+              "column_order": {
+                "type": "array",
+                "maxItems": 256,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,127}$"
+                }
+              },
+              "context_ref": {
+                "$ref": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0#/$defs/context_ref"
+              },
+              "dataset_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "filters": {
+                "type": "array",
+                "maxItems": 128,
+                "items": {
+                  "$ref": "#/$defs/filter"
+                }
+              },
+              "materialization_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "play_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "play_revision": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2147483647
+              },
+              "play_run_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "recipe_application_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2147483647
+              },
+              "selection_reasons": {
+                "type": "array",
+                "maxItems": 1000,
+                "items": {
+                  "$ref": "#/$defs/selection_reason"
+                }
+              },
+              "selected_record_ids": {
+                "type": "array",
+                "maxItems": 1000,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "pattern": "\\S"
+                }
+              },
+              "workbook_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+              },
+              "workspace_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              }
+            }
+          },
+          "annotation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "created_at_ms",
+              "created_by_actor_id",
+              "note",
+              "record_id"
+            ],
+            "properties": {
+              "created_at_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "created_by_actor_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "note": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048,
+                "pattern": "\\S"
+              },
+              "record_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              }
+            }
+          },
+          "approval": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "created_at_ms",
+              "created_by_actor_id",
+              "decision",
+              "record_id"
+            ],
+            "properties": {
+              "created_at_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "created_by_actor_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              },
+              "decision": {
+                "type": "string",
+                "enum": [
+                  "approved",
+                  "rejected"
+                ]
+              },
+              "record_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              }
+            }
+          },
+          "selection_reason": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "reasons",
+              "record_id"
+            ],
+            "properties": {
+              "reasons": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 32,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048,
+                  "pattern": "\\S"
+                }
+              },
+              "record_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 255,
+                "pattern": "\\S"
+              }
+            }
+          },
+          "filter": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "field_key",
+              "operator"
+            ],
+            "properties": {
+              "field_key": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,127}$"
+              },
+              "operator": {
+                "type": "string",
+                "enum": [
+                  "equals",
+                  "is_not_null"
+                ]
+              },
+              "value": {
+                "oneOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "number",
+                    "minimum": -1000000000000000,
+                    "maximum": 1000000000000000
+                  },
+                  {
+                    "type": "string",
+                    "maxLength": 16384
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "confidential",
+        "x-kurobara-redaction": "sensitive-cell-values-require-contact-permission",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "problemCodes": [
+        "authentication-required",
+        "authority-permission-missing",
+        "gtm-resource-not-found",
+        "internal-error",
+        "invalid-credential",
+        "output-contract-violation",
+        "request-invalid",
+        "service-unavailable"
+      ],
+      "problems": [
+        {
+          "code": "authentication-required",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "gtm-resource-not-found",
+          "retryable": false,
+          "status": 404,
+          "type": "https://problems.kurobara.invalid/gtm-resource-not-found"
+        },
+        {
+          "code": "internal-error",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "request-invalid",
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "service-unavailable",
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        }
+      ],
+      "required_permissions": [
+        "workbooks:read"
+      ],
+      "structuredContent": true
+    },
+    {
+      "idempotence": "required",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/workbooks/update-request/1.0.0",
+        "title": "WorkbookUpdateRequest",
+        "description": "Versioned view-state update without copied dataset payloads.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "annotations",
+          "approvals",
+          "column_order",
+          "dataset_id",
+          "expected_revision",
+          "filters",
+          "materialization_id",
+          "name",
+          "selection_reasons",
+          "selected_record_ids",
+          "workbook_id"
+        ],
+        "properties": {
+          "annotations": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "$ref": "https://schemas.kurobara.invalid/schemas/workbooks/get-response/1.0.0#/$defs/annotation"
+            }
+          },
+          "approvals": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "$ref": "https://schemas.kurobara.invalid/schemas/workbooks/get-response/1.0.0#/$defs/approval"
+            }
+          },
+          "column_order": {
+            "type": "array",
+            "maxItems": 256,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,127}$"
+            }
+          },
+          "context_ref": {
+            "$ref": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0#/$defs/context_ref"
+          },
+          "dataset_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "filters": {
+            "type": "array",
+            "maxItems": 128,
+            "items": {
+              "$ref": "https://schemas.kurobara.invalid/schemas/workbooks/get-response/1.0.0#/$defs/filter"
+            }
+          },
+          "materialization_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          },
+          "play_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "play_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "play_run_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "recipe_application_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          },
+          "selection_reasons": {
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "$ref": "https://schemas.kurobara.invalid/schemas/workbooks/get-response/1.0.0#/$defs/selection_reason"
+            }
+          },
+          "selected_record_ids": {
+            "type": "array",
+            "maxItems": 1000,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "pattern": "\\S"
+            }
+          },
+          "workbook_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+          }
+        },
+        "dependentRequired": {
+          "play_revision": [
+            "play_id"
+          ],
+          "play_run_id": [
+            "play_id",
+            "play_revision"
+          ]
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "confidential",
+        "x-kurobara-redaction": "view-state-only-no-dataset-copy",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "name": "kurobara_workbook_update",
+      "operation_id": "workbooks.update",
+      "operation_version": "1.0.0",
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://schemas.kurobara.invalid/schemas/workbooks/update-response/1.0.0",
+        "title": "WorkbookUpdateResponse",
+        "description": "Durable Workbook view revision readback.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "view"
+        ],
+        "properties": {
+          "view": {
+            "$ref": "https://schemas.kurobara.invalid/schemas/workbooks/get-response/1.0.0#/$defs/view"
+          }
+        },
+        "x-kurobara-schema-version": "1.0.0",
+        "x-kurobara-owner": "application.gtm",
+        "x-kurobara-data-classification": "confidential",
+        "x-kurobara-redaction": "view-state-only-no-dataset-copy",
+        "x-kurobara-publication-status": "local-development-only"
+      },
+      "problemCodes": [
+        "authentication-required",
+        "authority-permission-missing",
+        "internal-error",
+        "invalid-credential",
+        "output-contract-violation",
+        "payload-too-large",
+        "request-invalid",
+        "revision-conflict",
+        "service-unavailable",
+        "unsupported-media-type"
+      ],
+      "problems": [
+        {
+          "code": "authentication-required",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/authentication-required"
+        },
+        {
+          "code": "authority-permission-missing",
+          "retryable": false,
+          "status": 403,
+          "type": "https://problems.kurobara.invalid/authority-permission-missing"
+        },
+        {
+          "code": "internal-error",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/internal-error"
+        },
+        {
+          "code": "invalid-credential",
+          "retryable": false,
+          "status": 401,
+          "type": "https://problems.kurobara.invalid/invalid-credential"
+        },
+        {
+          "code": "output-contract-violation",
+          "retryable": false,
+          "status": 500,
+          "type": "https://problems.kurobara.invalid/output-contract-violation"
+        },
+        {
+          "code": "payload-too-large",
+          "retryable": false,
+          "status": 413,
+          "type": "https://problems.kurobara.invalid/payload-too-large"
+        },
+        {
+          "code": "request-invalid",
+          "retryable": false,
+          "status": 400,
+          "type": "https://problems.kurobara.invalid/request-invalid"
+        },
+        {
+          "code": "revision-conflict",
+          "retryable": false,
+          "status": 409,
+          "type": "https://problems.kurobara.invalid/revision-conflict"
+        },
+        {
+          "code": "service-unavailable",
+          "retryable": true,
+          "status": 503,
+          "type": "https://problems.kurobara.invalid/service-unavailable"
+        },
+        {
+          "code": "unsupported-media-type",
+          "retryable": false,
+          "status": 415,
+          "type": "https://problems.kurobara.invalid/unsupported-media-type"
+        }
+      ],
+      "required_permissions": [
+        "workbooks:write"
       ],
       "structuredContent": true
     }

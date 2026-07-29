@@ -96,6 +96,96 @@ test("parses only an explicit bounded live run", () => {
   );
 });
 
+test("answers the canonical GTM questionnaire with schema-correct values", () => {
+  const options = { country: "ES" };
+  assert.deepEqual(
+    dogfoodTestHelpers.answerGtmQuestion(
+      {
+        answer_schema: { type: "string_array" },
+        question_id: "audience.segments",
+      },
+      options
+    ),
+    ["synthetic-audience.segments"]
+  );
+  assert.equal(
+    dogfoodTestHelpers.answerGtmQuestion(
+      {
+        answer_schema: { type: "number" },
+        question_id: "qualification.minimum_score",
+      },
+      options
+    ),
+    1
+  );
+  assert.deepEqual(
+    dogfoodTestHelpers.answerGtmQuestion(
+      {
+        answer_schema: { type: "string_array" },
+        question_id: "audience.company_countries",
+      },
+      options
+    ),
+    ["ES"]
+  );
+});
+
+test("binds Context plan and apply to the same initial revision", () => {
+  const context = {
+    assertions: [],
+    context_id: "context-synthetic",
+    name: "Synthetic",
+    questionnaire_version: "1.0.0",
+  };
+  assert.deepEqual(dogfoodTestHelpers.buildGtmContextPlanRequest(context), {
+    context,
+    expected_base_revision: 0,
+    mode: "plan",
+  });
+});
+
+test("reports provider-neutral Play terminal diagnostics", () => {
+  assert.throws(
+    () =>
+      dogfoodTestHelpers.readCompletedPlayResult(
+        {
+          run: {
+            execution: {
+              error: {
+                code: "play-stage-unavailable",
+                message: "sensitive-provider-payload",
+              },
+              provider_calls: 2,
+              stages: [
+                {
+                  operation_id: "organizations.discover",
+                  ordinal: 1,
+                  state: "completed",
+                },
+                {
+                  operation_id: "contacts.discover",
+                  ordinal: 2,
+                  state: "running",
+                },
+              ],
+            },
+            state: "paused",
+          },
+        },
+        true
+      ),
+    (error) =>
+      error?.code === "play-completion-invalid" &&
+      error.providerCallsMayHaveOccurred === true &&
+      error.message.includes('"error_code":"play-stage-unavailable"') &&
+      error.message.includes('"provider_calls":2') &&
+      error.message.includes(
+        "1:organizations.discover:completed,2:contacts.discover:running"
+      ) &&
+      !error.message.includes("sensitive-provider-payload")
+  );
+});
+
 test("escalates an interrupted ready stubborn child and settles within a hard bound", async () => {
   const parent = await mkdtemp(path.join(tmpdir(), "kurobara-dogfood-test."));
   temporaryDirectories.push(parent);

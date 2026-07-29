@@ -1,0 +1,21 @@
+{
+  "fields": [],
+  "has_more": false,
+  "next_after_ordinal": null,
+  "records": [],
+  "secret_provider_payload": {},
+  "view": {
+    "annotations": [],
+    "approvals": [],
+    "column_order": [],
+    "dataset_id": "synthetic-dataset",
+    "filters": [],
+    "materialization_id": "synthetic-materialization",
+    "name": "Synthetic Workbook",
+    "revision": 0,
+    "selection_reasons": [],
+    "selected_record_ids": [],
+    "workbook_id": "synthetic-workbook",
+    "workspace_id": "synthetic-workspace"
+  }
+}

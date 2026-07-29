@@ -1,0 +1,40 @@
+{
+  "operation_id": "gtm-contexts.apply",
+  "operation_version": "1.0.0",
+  "action_ref": "ApplyGtmContext",
+  "kind": "mutation",
+  "auth_profile": "http-bearer",
+  "idempotence": "required",
+  "input_schema_id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-request/1.0.0",
+  "output_schema_id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-response/1.0.0",
+  "problem_codes": [
+    "authentication-required",
+    "authority-permission-missing",
+    "internal-error",
+    "invalid-credential",
+    "output-contract-violation",
+    "payload-too-large",
+    "request-invalid",
+    "revision-conflict",
+    "service-unavailable",
+    "unsupported-media-type"
+  ],
+  "required_capabilities": [],
+  "required_permissions": ["contexts:write"],
+  "human_gates": [
+    "context-apply-confirmation",
+    "active-context-change-confirmation"
+  ],
+  "accepted_data_classes": ["confidential"],
+  "produced_data_classes": ["confidential"],
+  "status": "experimental",
+  "projections": {
+    "rest": { "method": "POST", "path": "/v1/gtm-context-revisions" },
+    "sdk_ts": { "method": "contexts.apply" },
+    "cli": { "command": "context apply", "output_mode": "json" },
+    "mcp": {
+      "availability": "available",
+      "tool": "kurobara_context_apply"
+    }
+  }
+}

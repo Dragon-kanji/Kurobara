@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/gtm/context-command-response/1.0.0",
+  "title": "GtmContextCommandResponse",
+  "description": "Fingerprintable GTM Context plan or durable immutable revision readback.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["mode"],
+  "properties": {
+    "active": { "type": "boolean" },
+    "blocking_question_ids": {
+      "type": "array",
+      "maxItems": 128,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "pattern": "^[a-z][a-z0-9_.-]*$"
+      }
+    },
+    "context": {
+      "$ref": "https://schemas.kurobara.invalid/schemas/gtm/context-command-request/1.0.0#/$defs/context"
+    },
+    "expected_base_revision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647
+    },
+    "fingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "issues": {
+      "type": "array",
+      "maxItems": 256,
+      "items": { "$ref": "#/$defs/issue" }
+    },
+    "mode": { "type": "string", "enum": ["apply", "plan"] },
+    "ready_for": { "$ref": "#/$defs/ready_for" },
+    "revision": { "$ref": "#/$defs/revision" },
+    "status": { "type": "string", "enum": ["created", "existing"] }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "blocking_question_ids",
+        "context",
+        "fingerprint",
+        "issues",
+        "mode",
+        "ready_for"
+      ],
+      "properties": {
+        "mode": { "const": "plan" },
+        "active": false,
+        "revision": false,
+        "status": false
+      }
+    },
+    {
+      "type": "object",
+      "required": ["active", "mode", "revision", "status"],
+      "properties": {
+        "mode": { "const": "apply" },
+        "blocking_question_ids": false,
+        "context": false,
+        "expected_base_revision": false,
+        "fingerprint": false,
+        "issues": false,
+        "ready_for": false
+      }
+    }
+  ],
+  "$defs": {
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "answer-invalid",
+            "confirmation-required",
+            "context-incompatible",
+            "context-not-found",
+            "duplicate-answer",
+            "permission-missing",
+            "play-invalid",
+            "revision-conflict",
+            "workbook-not-found"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "\\S"
+        },
+        "question_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[a-z][a-z0-9_.-]*$"
+        }
+      }
+    },
+    "ready_for": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agentic_outbound_play",
+        "dataset_import",
+        "imported_dataset_enrichment",
+        "offline_fixture"
+      ],
+      "properties": {
+        "agentic_outbound_play": { "type": "boolean" },
+        "dataset_import": { "type": "boolean" },
+        "imported_dataset_enrichment": { "type": "boolean" },
+        "offline_fixture": { "type": "boolean" }
+      }
+    },
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context",
+        "context_id",
+        "created_at_ms",
+        "created_by_actor_id",
+        "fingerprint",
+        "revision",
+        "workspace_id"
+      ],
+      "properties": {
+        "context": {
+          "$ref": "https://schemas.kurobara.invalid/schemas/gtm/context-command-request/1.0.0#/$defs/context"
+        },
+        "context_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "created_at_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "created_by_actor_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "fingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "workspace_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        }
+      }
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.gtm",
+  "x-kurobara-data-classification": "confidential",
+  "x-kurobara-redaction": "no-secrets-policy-answers-only",
+  "x-kurobara-publication-status": "local-development-only"
+}

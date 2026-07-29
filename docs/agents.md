@@ -6,10 +6,8 @@ tool-using agents without embedding an LLM in the runtime.
 ## Best interface today
 
 Use the CLI when the agent can execute local commands. Use REST when Kurobara
-runs as a separate loopback or private service. The TypeScript SDK projects the
-same operations.
-
-There is no MCP server in the current preview.
+runs as a separate loopback or private service. The TypeScript SDK and optional
+stdio MCP server project the same generated operations.
 
 The repository includes a concise
 [`kurobara-cli` companion skill](../.codex/skills/kurobara-cli/SKILL.md) for
@@ -27,7 +25,10 @@ kurobara setup apply \
   --file ./kurobara-setup-plan.json \
   --non-interactive \
   --json
-kurobara doctor --json
+kurobara doctor --profile agentic_outbound_play --json
+kurobara context questions \
+  --profile agentic_outbound_play \
+  --json
 kurobara first-run --offline --json
 ```
 
@@ -37,7 +38,8 @@ command from prose.
 
 ## Machine contract
 
-- Successful CLI output is JSON on stdout.
+- Agents must pass `--json`. Successful machine output is then deterministic
+  JSON on stdout; interactive TTY receipts are for human review only.
 - Errors use a bounded Problem Details JSON shape on stderr and a non-zero exit
   code; stdout stays empty.
 - The default API endpoint is `http://127.0.0.1:3000`.
@@ -53,6 +55,89 @@ For setup credentials, prefer `secret set --from-env <NAME>` or `--stdin`.
 Values are forbidden in argv. A remote profile can store only the client
 Kurobara key, never a server-side provider key.
 
+## GTM Context interview
+
+`doctor` separates `technical_ready`, `profile_ready`, and
+`operational_ready`. A missing Context does not turn a healthy runtime into a
+system outage. It returns the selected business profile, business-context
+state, blocking question IDs, remediation, the canonical questionnaire, and
+argv-safe next actions. It stays non-interactive, read-only, and makes no
+provider call.
+
+An external agent owns the conversation:
+
+1. call `context questions --profile ... --json`;
+2. ask only questions required for the selected profile and whose `ask_if`
+   condition is satisfied;
+3. preserve unknowns and record provenance for every assertion;
+4. call `context plan` with the bounded JSON document;
+5. show issues, readiness, and the exact fingerprint to the human;
+6. call `context apply` only with the unchanged Context and approved
+   fingerprint.
+
+An agent may infer ordinary offer, audience, and qualification answers. Only a
+human can confirm prohibited or sensitive data, provider rights, budget,
+retention, export intent or destination, and activation mode. Changing the
+active Context requires a second confirmation.
+
+Human operators can use:
+
+```sh
+kurobara context setup --profile agentic_outbound_play
+```
+
+That wizard calls the same REST operations. It does not embed a model or write
+an unreviewed draft.
+
+## Play and Workbook loop
+
+A Play pins one exact Context revision. It declares a measurable objective,
+one `organization_search` or `imported_dataset` source, the audience,
+exclusions, selection rules, preview caps, capabilities, budget, deadline,
+stop conditions, one exact authority envelope, approval state, and `no_send`
+delivery.
+
+```sh
+kurobara play preview --request ./play-preview.json --json
+kurobara play start --request ./play-start.json --json
+kurobara play run --run-id "<play-run-id>" --timeout-ms 60000 \
+  --poll-interval-ms 1000 --json
+kurobara workbook inspect --request ./workbook-get.json --json
+kurobara workbook select --request ./workbook-select.json --json
+kurobara workbook approve --request ./workbook-approve.json --json
+```
+
+Preview is the review boundary: inspect its quote, assumptions, permission
+envelope, exact stages, and human gates. Do not modify the Play between preview
+and start. A `requests` quote is the exact cardinality-derived provider-call
+ceiling. Other units remain the approved budget cap until a provider-free
+conversion is available. Reuse the same idempotency key when resuming the same
+intent.
+Without `--timeout-ms`, `play run` performs exactly one durable status read.
+With a bounded timeout, it polls until the run is paused or terminal.
+
+The worker claims one Play checkpoint at a time with a fenced PostgreSQL
+lease. Each provider-backed stage creates or resumes a deterministic child
+dataset generation, so stopping the CLI does not stop the Play. A later
+`play run` continues from the durable receipt. The first executable preview
+supports at most three selected contacts. It requires `minimum_score: 0` and
+an empty `required_signals` list because general scoring is not yet an
+executable Play primitive.
+
+A completed run includes aggregate settled cost, provider-call count,
+provider-neutral provenance, every stage receipt, and the exact result
+`dataset_id`, `materialization_id`, `workbook_id`, and `export_ready` state.
+Private export still requires an explicit client-side `dataset export`
+command; the background worker does not invent a filesystem destination.
+
+A Workbook is a bounded server projection, not a copy of business rows. Read
+cell status, provenance, freshness, confidence, cost, errors, redaction, and
+selection reasons before approving records. `workbook select`, `workbook
+approve`, and `workbook reject` are focused aliases of the same versioned
+`workbook update` contract: each request carries the complete prior view plus
+the appended decision. The server preserves annotation and approval history
+and stamps new entries with the authenticated actor and server time.
+
 ## Canonical references
 
 - [OpenAPI 3.1](../packages/contracts/catalog/generated/openapi-3.1.1.json) -
@@ -63,7 +148,7 @@ Kurobara key, never a server-side provider key.
   request, response, permission and problem contracts.
 - [TypeScript client](../packages/sdk-ts/src/index.ts) - source-preview SDK.
 - [MCP tool catalog](../packages/contracts/catalog/generated/mcp-tools.json) -
-  generated projection metadata only; no MCP server ships in this preview.
+  generated tool metadata served by the optional local stdio MCP process.
 
 These are source-preview artifacts, not published npm packages. Contract
 changes start in the canonical catalog and use `npm run generate:contracts`;
@@ -90,6 +175,10 @@ reconcile it first.
 
 | Intent | CLI |
 | --- | --- |
+| Read or configure GTM readiness | `context questions`, `context setup`, `context plan`, `context apply`, `context status` |
+| Preview, approve, start, pause, or retire a Play | `play preview`, `play apply`, `play start`, `play pause`, `play retire` |
+| Inspect one durable Play run | `play run` |
+| Inspect, select, approve, or reject rows in a bounded Workbook | `workbook inspect`, `workbook select`, `workbook approve`, `workbook reject`, `workbook update` |
 | Import CSV or JSONL | `dataset import` |
 | Apply a recipe | `recipe apply` |
 | Watch or export a recipe application | `recipe watch`, `recipe export` |

@@ -33,6 +33,7 @@
     "release:candidate": "node scripts/release-candidate.mjs",
     "self-host:smoke": "bash deploy/self-host/harness.sh",
     "start:api": "npm run start -w @kurobara/api",
+    "start:mcp": "npm run start -w @kurobara/mcp",
     "start:worker": "npm run start -w @kurobara/worker",
     "fix": "ultracite fix",
     "generate:contracts": "npm run generate -w @kurobara/contracts",

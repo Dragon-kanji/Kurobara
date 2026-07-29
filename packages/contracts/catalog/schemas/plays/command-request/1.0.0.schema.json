@@ -1,0 +1,375 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/plays/command-request/1.0.0",
+  "title": "PlayCommandRequest",
+  "description": "Provider-neutral Play preview or explicitly approved lifecycle command.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["action", "play"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": ["preview", "approve", "start", "pause", "retire"]
+    },
+    "approved_by_human": { "type": "boolean" },
+    "expected_base_revision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "play": { "$ref": "#/$defs/play" },
+    "preview_fingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["action"],
+      "properties": {
+        "action": { "const": "preview" },
+        "approved_by_human": false,
+        "expected_base_revision": false,
+        "idempotency_key": false,
+        "preview_fingerprint": false
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "action",
+        "approved_by_human",
+        "idempotency_key",
+        "preview_fingerprint"
+      ],
+      "properties": {
+        "action": {
+          "enum": ["approve", "start", "pause", "retire"]
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "context_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context_id", "fingerprint", "revision"],
+      "properties": {
+        "context_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "fingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        }
+      }
+    },
+    "play": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "approvals",
+        "authority_envelope_id",
+        "audience",
+        "broadening",
+        "budget",
+        "capabilities",
+        "context_ref",
+        "deadline_ms",
+        "delivery",
+        "exclusions",
+        "objective",
+        "play_id",
+        "preview",
+        "selection",
+        "source",
+        "stop_conditions"
+      ],
+      "properties": {
+        "approvals": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["export", "provider_spend", "reveal"],
+          "properties": {
+            "export": { "type": "boolean" },
+            "provider_spend": { "type": "boolean" },
+            "reveal": { "type": "boolean" }
+          }
+        },
+        "authority_envelope_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "audience": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "company_countries",
+            "departments",
+            "person_countries",
+            "seniorities",
+            "titles"
+          ],
+          "properties": {
+            "company_countries": { "$ref": "#/$defs/country_list" },
+            "departments": { "$ref": "#/$defs/text_list" },
+            "person_countries": { "$ref": "#/$defs/country_list" },
+            "seniorities": { "$ref": "#/$defs/text_list" },
+            "titles": { "$ref": "#/$defs/text_list" }
+          }
+        },
+        "broadening": {
+          "type": "string",
+          "enum": ["forbidden", "human_approval"]
+        },
+        "budget": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["limit", "unit"],
+          "properties": {
+            "limit": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 1000000000000000
+            },
+            "unit": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z][a-z0-9._-]*$"
+            }
+          }
+        },
+        "capabilities": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "^[a-z][a-z0-9.-]*$"
+          }
+        },
+        "context_ref": { "$ref": "#/$defs/context_ref" },
+        "deadline_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "delivery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "private_export"],
+          "properties": {
+            "mode": { "type": "string", "const": "no_send" },
+            "private_export": { "type": "boolean" }
+          }
+        },
+        "exclusions": { "$ref": "#/$defs/text_list" },
+        "objective": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["metric", "target", "text"],
+          "properties": {
+            "metric": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255,
+              "pattern": "\\S"
+            },
+            "target": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 1000000000000000
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "pattern": "\\S"
+            }
+          }
+        },
+        "play_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "preview": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "max_companies",
+            "max_contacts_per_company",
+            "max_contacts_total",
+            "max_provider_calls",
+            "sample_size"
+          ],
+          "properties": {
+            "max_companies": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "max_contacts_per_company": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10
+            },
+            "max_contacts_total": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000
+            },
+            "max_provider_calls": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "sample_size": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "selection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["minimum_score", "required_signals"],
+          "properties": {
+            "minimum_score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "required_signals": { "$ref": "#/$defs/text_list" }
+          }
+        },
+        "source": {
+          "oneOf": [
+            { "$ref": "#/$defs/organization_search_source" },
+            { "$ref": "#/$defs/imported_dataset_source" }
+          ]
+        },
+        "stop_conditions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048,
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
+    "organization_search_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["countries", "industries", "keywords", "kind"],
+      "properties": {
+        "countries": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$"
+          }
+        },
+        "industries": { "$ref": "#/$defs/text_list" },
+        "keywords": { "$ref": "#/$defs/text_list" },
+        "kind": { "type": "string", "const": "organization_search" }
+      }
+    },
+    "imported_dataset_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dataset_id", "field_mapping", "kind", "materialization_id"],
+      "properties": {
+        "dataset_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        },
+        "default_country_code": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$"
+        },
+        "field_mapping": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["domain"],
+          "properties": {
+            "country_code": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,127}$"
+            },
+            "domain": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,127}$"
+            },
+            "name": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,127}$"
+            }
+          }
+        },
+        "kind": { "type": "string", "const": "imported_dataset" },
+        "materialization_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "country_list": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[A-Z]{2}$" }
+    },
+    "text_list": {
+      "type": "array",
+      "maxItems": 256,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2048,
+        "pattern": "\\S"
+      }
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.gtm",
+  "x-kurobara-data-classification": "confidential",
+  "x-kurobara-redaction": "no-secrets-provider-neutral",
+  "x-kurobara-publication-status": "local-development-only"
+}

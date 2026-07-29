@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.kurobara.invalid/schemas/gtm/context-status-request/1.0.0",
+  "title": "GtmContextStatusRequest",
+  "description": "Read-only business readiness request for one canonical usage profile.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profile"],
+  "properties": {
+    "profile": {
+      "type": "string",
+      "enum": [
+        "offline_fixture",
+        "dataset_import",
+        "imported_dataset_enrichment",
+        "agentic_outbound_play"
+      ]
+    }
+  },
+  "x-kurobara-schema-version": "1.0.0",
+  "x-kurobara-owner": "application.gtm",
+  "x-kurobara-data-classification": "internal",
+  "x-kurobara-publication-status": "local-development-only"
+}
