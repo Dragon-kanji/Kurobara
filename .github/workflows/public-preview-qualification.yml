@@ -1,0 +1,94 @@
+name: Public preview qualification
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_tag:
+        description: Immutable release tag to qualify
+        required: true
+        type: string
+      expected_commit:
+        description: Full commit SHA expected behind the tag
+        required: true
+        type: string
+      artifacts_manifest_url:
+        description: Public HTTPS URL of artifacts-manifest.json
+        required: true
+        type: string
+      expected_artifacts_manifest_sha256:
+        description: Expected sha256 digest with the sha256 prefix
+        required: true
+        type: string
+
+concurrency:
+  group: public-preview-qualification-${{ inputs.expected_tag }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    name: Qualify immutable public preview
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out qualification target
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.expected_commit }}
+          persist-credentials: false
+
+      - name: Run two anonymous qualification passes
+        id: qualify
+        shell: bash
+        env:
+          ARTIFACTS_MANIFEST_URL: ${{ inputs.artifacts_manifest_url }}
+          EXPECTED_ARTIFACTS_MANIFEST_SHA256: ${{ inputs.expected_artifacts_manifest_sha256 }}
+          EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+          EXPECTED_TAG: ${{ inputs.expected_tag }}
+          REPOSITORY_URL: https://github.com/${{ github.repository }}.git
+        run: |
+          set -euo pipefail
+          report_directory="${RUNNER_TEMP}/kurobara-public-preview-proof"
+          bash scripts/public-preview-gate.sh \
+            --repository-url "${REPOSITORY_URL}" \
+            --expected-commit "${EXPECTED_COMMIT}" \
+            --expected-tag "${EXPECTED_TAG}" \
+            --artifacts-manifest-url "${ARTIFACTS_MANIFEST_URL}" \
+            --expected-artifacts-manifest-sha256 "${EXPECTED_ARTIFACTS_MANIFEST_SHA256}" \
+            --passes 2 \
+            --report-dir "${report_directory}"
+          {
+            printf 'report_directory=%s\n' "${report_directory}"
+            printf 'summary_sha256=%s\n' "$(sha256sum "${report_directory}/summary.json" | cut -d ' ' -f 1)"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Publish qualification summary
+        if: ${{ success() }}
+        shell: bash
+        env:
+          EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+          EXPECTED_TAG: ${{ inputs.expected_tag }}
+          REPORT_DIRECTORY: ${{ steps.qualify.outputs.report_directory }}
+          SUMMARY_SHA256: ${{ steps.qualify.outputs.summary_sha256 }}
+        run: |
+          {
+            printf '# Public preview qualification\n\n'
+            printf -- '- Tag: `%s`\n' "${EXPECTED_TAG}"
+            printf -- '- Commit: `%s`\n' "${EXPECTED_COMMIT}"
+            printf -- '- Summary SHA-256: `sha256:%s`\n\n' "${SUMMARY_SHA256}"
+            printf '```json\n'
+            jq . "${REPORT_DIRECTORY}/summary.json"
+            printf '```\n'
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload qualification reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kurobara-public-preview-proof-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/kurobara-public-preview-proof
+          if-no-files-found: error
+          retention-days: 90
