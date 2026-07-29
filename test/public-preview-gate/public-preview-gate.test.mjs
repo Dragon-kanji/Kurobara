@@ -25,7 +25,7 @@ import {
   validateDownloadUrl,
 } from "../../scripts/public-preview-gate.mjs";
 
-const TAG = "v0.1.0-rc.7";
+const TAG = "v0.1.0-rc.8";
 const REPOSITORY_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../.."

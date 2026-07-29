@@ -6,8 +6,25 @@ from its first stable release.
 
 ## [Unreleased]
 
+## [0.1.0-rc.8] - 2026-07-29
+
 ### Added
 
+- Added resumable human and agent onboarding with a source-bound CLI installer,
+  explicit update checks, and read-only doctor readiness.
+- Added universal organization imports from CSV and JSONL with canonical domain
+  handling, immutable lineage, deterministic rejection diagnostics, and
+  provider-neutral contact discovery.
+- Added immutable GTM Context revisions, versioned provider-neutral Plays,
+  bounded previews, explicit budgets, authority gates, and `no_send` delivery.
+- Added durable Play execution with PostgreSQL-owned fenced claims, restart-safe
+  stage receipts, settled costs, provider-call counts, and exact result
+  materialization.
+- Added bounded Workbooks for provenance, confidence, freshness, cost,
+  selection, and append-only human approval decisions.
+- Added a CLI-only human cockpit and deterministic JSON commands for external
+  coding agents, plus matching REST, TypeScript SDK, and local stdio MCP
+  projections.
 - Published the static [`kurobara.systems`](https://kurobara.systems) project
   website with responsive, agent-focused product framing and a hardened
   unprivileged container image.
@@ -21,6 +38,23 @@ from its first stable release.
   [`Dragon-kanji/kurobara.systems`](https://github.com/Dragon-kanji/kurobara.systems)
   repository so the core runtime and marketing site can evolve independently.
 - Updated `@biomejs/biome` from `2.4.5` to `2.4.16`.
+- Strengthened the terminal identity with structured Context, Play, run, and
+  Workbook receipts while keeping JSON output canonical for agents.
+
+### Security
+
+- Bound every provider-backed Play by explicit confirmation, deadline,
+  cardinality, budget, idempotency, reconciliation, and stop rules.
+- Kept provider credentials out of GTM objects, CLI receipts, MCP, delivery
+  proofs, and private exports, with sensitive reveal and export gated
+  separately.
+
+### Fixed
+
+- Preserved exact imported materializations and refused silent query broadening
+  or deterministic empty-keyword requests.
+- Projected the canonical Play contract consistently through REST, SDK, CLI,
+  MCP, worker execution, and bounded live qualification.
 
 ## [0.1.0-rc.7] - 2026-07-26
 
