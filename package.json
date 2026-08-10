@@ -64,7 +64,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.16",
     "@cyclonedx/cyclonedx-npm": "6.0.0",
-    "dependency-cruiser": "18.1.0",
+    "dependency-cruiser": "18.1.1",
     "esbuild": "0.28.1",
     "typescript": "^5.9.3",
     "ultracite": "^7.2.5"
